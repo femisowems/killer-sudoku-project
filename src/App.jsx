@@ -47,7 +47,7 @@ function App() {
   }, [isWon]);
 
   return (
-    <div id="app-root" className="bg-background min-h-screen flex flex-col items-center py-10 px-4 font-sans text-slate-800">
+    <div id="app-root" className="bg-background min-h-screen flex flex-col items-center py-6 px-2 md:py-10 md:px-4 font-sans text-slate-800">
       {/* Header & Status */}
       <header id="game-header" className="flex flex-col items-center space-y-4 w-full max-w-[800px]">
         <Header />

@@ -60,7 +60,7 @@ const Cell = ({
     };
 
     // Standardized Font Size
-    let baseClasses = "relative flex justify-center items-center text-2xl md:text-3xl cursor-pointer select-none transition-all duration-200 focus:outline-none";
+    let baseClasses = "relative flex justify-center items-center text-lg sm:text-2xl md:text-3xl cursor-pointer select-none transition-all duration-200 focus:outline-none";
 
     // Background Color Logic
     let bgColorClass = 'bg-white'; // Default hover state
@@ -69,7 +69,7 @@ const Cell = ({
 
     if (isConflict) {
         bgColorClass = 'bg-rose-400 text-white';
-        textClass = 'text-white';
+        textClass = 'text-white font-bold';
         zIndexClass = 'z-10';
     }
     else if (isCageConflict) {
@@ -77,7 +77,7 @@ const Cell = ({
     }
     else if (isSelected) {
         bgColorClass = 'bg-primary text-white';
-        textClass = 'text-white font-semibold';
+        textClass = 'text-white font-bold';
         zIndexClass = 'z-30';
     }
     else if (isCageHighlighted) {
@@ -89,15 +89,15 @@ const Cell = ({
     }
     else if (fixedState === 'prefilled') {
         bgColorClass = 'bg-slate-100';
-        textClass = 'text-slate-900';
+        textClass = 'text-slate-900 font-bold';
     }
     else if (isHighlighted) {
         bgColorClass = 'bg-indigo-50';
-        textClass = 'text-primary';
+        textClass = 'text-primary font-bold';
     }
     else if (value !== 0) {
         // User entered value
-        textClass = 'text-primary font-medium';
+        textClass = 'text-primary font-bold';
     }
 
     // Fix hover blocking selection
@@ -121,7 +121,7 @@ const Cell = ({
             />
 
             {cageSum && (
-                <span className={`absolute top-[4px] left-[4px] text-xs font-bold leading-none pointer-events-none z-30 px-1 py-0.5 rounded-sm ${isSelected || isConflict ? 'text-white bg-slate-800/40' : 'text-slate-800 bg-white/60'}`}>
+                <span className={`absolute top-[6px] left-[5px] md:top-[6px] md:left-[6px] text-[8px] md:text-xs font-bold leading-none pointer-events-none z-30 px-[2px] py-0 md:px-1 md:py-0.5 rounded-sm ${isSelected || isConflict ? 'text-white' : 'text-slate-800'}`}>
                     {cageSum}
                 </span>
             )}
