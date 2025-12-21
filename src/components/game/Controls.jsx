@@ -22,7 +22,7 @@ const Controls = ({
     }, [onNumberInput, onClear, numberCounts]);
 
     return (
-        <div id="controls-container" data-component="Controls" className="w-full flex flex-col gap-6 animate-fade-in delay-100">
+        <div id="controls-container" className="w-full flex flex-col gap-6 animate-fade-in delay-100">
 
 
 

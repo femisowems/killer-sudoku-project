@@ -20,7 +20,7 @@ const Board = ({
     }, [board, cages]);
 
     return (
-        <div id="sudoku-board-container" data-component="Board" className="relative bg-white w-full rounded-xl shadow-2xl overflow-hidden animate-pop-in border-4 border-slate-700">
+        <div id="sudoku-board-container" className="relative bg-white w-full rounded-xl shadow-2xl overflow-hidden animate-pop-in border-4 border-slate-700">
             {isPaused && (
                 <div className="absolute inset-0 z-50 bg-slate-900/20 backdrop-blur-md flex flex-col items-center justify-center animate-fade-in">
                     <button

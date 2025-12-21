@@ -16,7 +16,7 @@ const GameInfo = ({ timeSeconds, mistakes, difficulty }) => {
                 {/* Time */}
                 <div className="p-4 flex flex-col items-center justify-center bg-slate-50/50 relative group">
                     <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Time</span>
-                    <div className="text-xl font-mono font-bold text-slate-700 flex items-center gap-2">
+                    <div id="timer-display" className="text-xl font-mono font-bold text-slate-700 flex items-center gap-2">
                         {formatTime(timeSeconds)}
                     </div>
                 </div>
@@ -24,7 +24,7 @@ const GameInfo = ({ timeSeconds, mistakes, difficulty }) => {
                 {/* Mistakes */}
                 <div className="p-4 flex flex-col items-center justify-center bg-slate-50/50">
                     <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Mistakes</span>
-                    <div className={`text-xl font-mono font-bold ${mistakes > 0 ? 'text-rose-500' : 'text-emerald-500'}`}>
+                    <div id="mistakes-display" className={`text-xl font-mono font-bold ${mistakes > 0 ? 'text-rose-500' : 'text-emerald-500'}`}>
                         {mistakes}
                     </div>
                 </div>
@@ -32,7 +32,7 @@ const GameInfo = ({ timeSeconds, mistakes, difficulty }) => {
                 {/* Difficulty */}
                 <div className="p-4 flex flex-col items-center justify-center bg-slate-50/50">
                     <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Difficulty</span>
-                    <div className="text-sm font-bold text-slate-700 capitalize">
+                    <div id="difficulty-display" className="text-sm font-bold text-slate-700 capitalize">
                         {difficulty}
                     </div>
                 </div>

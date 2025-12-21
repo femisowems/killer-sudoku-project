@@ -1,4 +1,4 @@
-import { SEED_BOARD, DIFFICULTY_COUNTS } from '../constants/sudoku-constants';
+import { SEED_BOARD, DIFFICULTY_COUNTS, CAGE_SHAPES } from '../constants/sudoku-constants';
 
 export function generatePuzzle(difficulty) {
     const count = DIFFICULTY_COUNTS[difficulty] || 30;
@@ -45,37 +45,63 @@ function transpose(board) {
     return newBoard;
 }
 
+// Check if the board satisfies Killer Sudoku cage uniqueness rules
+function isKillerValid(board) {
+    for (const cage of CAGE_SHAPES) {
+        const values = new Set();
+        for (const [r, c] of cage.cells) {
+            const val = board[r][c];
+            if (values.has(val)) return false;
+            values.add(val);
+        }
+    }
+    return true;
+}
+
 // Generate a randomised valid board from the seed
 export function generateValidBoard() {
-    // Deep copy seed
-    let board = JSON.parse(JSON.stringify(SEED_BOARD));
+    let attempts = 0;
+    const MAX_ATTEMPTS = 500;
 
-    // 1. Shuffle Row Groups
-    if (Math.random() > 0.5) { // Swap band 0 and 1
-        for (let i = 0; i < 3; i++) swapRows(board, i, i + 3);
-    }
-    if (Math.random() > 0.5) { // Swap band 1 and 2
-        for (let i = 0; i < 3; i++) swapRows(board, i + 3, i + 6);
+    while (attempts < MAX_ATTEMPTS) {
+        // Deep copy seed
+        let board = JSON.parse(JSON.stringify(SEED_BOARD));
+
+        // 1. Shuffle Row Groups
+        if (Math.random() > 0.5) { // Swap band 0 and 1
+            for (let i = 0; i < 3; i++) swapRows(board, i, i + 3);
+        }
+        if (Math.random() > 0.5) { // Swap band 1 and 2
+            for (let i = 0; i < 3; i++) swapRows(board, i + 3, i + 6);
+        }
+
+        // 2. Shuffle Rows within bands
+        for (let b = 0; b < 3; b++) {
+            if (Math.random() > 0.5) swapRows(board, b * 3, b * 3 + 1);
+            if (Math.random() > 0.5) swapRows(board, b * 3 + 1, b * 3 + 2);
+            if (Math.random() > 0.5) swapRows(board, b * 3, b * 3 + 2);
+        }
+
+        // 3. Shuffle Columns within bands
+        for (let b = 0; b < 3; b++) {
+            if (Math.random() > 0.5) swapCols(board, b * 3, b * 3 + 1);
+            if (Math.random() > 0.5) swapCols(board, b * 3 + 1, b * 3 + 2);
+            if (Math.random() > 0.5) swapCols(board, b * 3, b * 3 + 2);
+        }
+
+        // 4. Randomly Transpose
+        if (Math.random() > 0.5) {
+            board = transpose(board);
+        }
+
+        // 5. Verify Killer Constraints (Cage Uniqueness)
+        if (isKillerValid(board)) {
+            return board;
+        }
+
+        attempts++;
     }
 
-    // 2. Shuffle Rows within bands
-    for (let b = 0; b < 3; b++) {
-        if (Math.random() > 0.5) swapRows(board, b * 3, b * 3 + 1);
-        if (Math.random() > 0.5) swapRows(board, b * 3 + 1, b * 3 + 2);
-        if (Math.random() > 0.5) swapRows(board, b * 3, b * 3 + 2);
-    }
-
-    // 3. Shuffle Columns within bands
-    for (let b = 0; b < 3; b++) {
-        if (Math.random() > 0.5) swapCols(board, b * 3, b * 3 + 1);
-        if (Math.random() > 0.5) swapCols(board, b * 3 + 1, b * 3 + 2);
-        if (Math.random() > 0.5) swapCols(board, b * 3, b * 3 + 2);
-    }
-
-    // 4. Randomly Transpose
-    if (Math.random() > 0.5) {
-        board = transpose(board);
-    }
-
-    return board;
+    console.warn(`Failed to generate a valid Killer Sudoku board in ${MAX_ATTEMPTS} attempts. Returning a potentially invalid board.`);
+    return JSON.parse(JSON.stringify(SEED_BOARD)); // Fallback to seed if all else fails (should be rare/impossible if seed is valid)
 }
