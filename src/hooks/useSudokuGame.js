@@ -1,5 +1,5 @@
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import {
     generateValidBoard,
     CAGE_SHAPES,
@@ -19,6 +19,8 @@ export function useSudokuGame(initialDifficulty = 'medium') {
     const [status, setStatus] = useState({ message: '', type: 'info' });
     const [isWon, setIsWon] = useState(false);
     const [cellToCageIndex, setCellToCageIndex] = useState(Array(9).fill(0).map(() => Array(9).fill(-1)));
+    const [timerSeconds, setTimerSeconds] = useState(0);
+    const [isTimerRunning, setIsTimerRunning] = useState(false);
 
     // Initialize game
     const startNewGame = useCallback((diff = difficulty) => {
@@ -26,6 +28,8 @@ export function useSudokuGame(initialDifficulty = 'medium') {
         setIsWon(false);
         setHintedCells([]);
         setSelectedCell(null);
+        setTimerSeconds(0);
+        setIsTimerRunning(true);
 
         // 1. Generate solution
         const newSolution = generateValidBoard();
@@ -65,6 +69,19 @@ export function useSudokuGame(initialDifficulty = 'medium') {
         startNewGame(initialDifficulty);
     }, []);
 
+    // Timer Interval
+    useEffect(() => {
+        let interval = null;
+        if (isTimerRunning && !isWon) {
+            interval = setInterval(() => {
+                setTimerSeconds(s => s + 1);
+            }, 1000);
+        } else if (!isTimerRunning && interval) {
+            clearInterval(interval);
+        }
+        return () => clearInterval(interval);
+    }, [isTimerRunning, isWon]);
+
     // Keyboard Navigation
     useEffect(() => {
         const handleKeyDown = (e) => {
@@ -94,21 +111,21 @@ export function useSudokuGame(initialDifficulty = 'medium') {
         return () => window.removeEventListener('keydown', handleKeyDown);
     }, [selectedCell]);
 
-    const handleCellSelect = (r, c) => {
+    const handleCellSelect = useCallback((r, c) => {
         if (selectedCell && selectedCell.r === r && selectedCell.c === c) {
             setSelectedCell(null); // Deselect if clicking same cell
         } else {
             setSelectedCell({ r, c });
         }
-    };
+    }, [selectedCell]);
 
-    const isFixed = (r, c) => {
+    const isFixed = useCallback((r, c) => {
         if (startingCells.some(([sr, sc]) => sr === r && sc === c)) return 'prefilled';
         if (hintedCells.some(([hr, hc]) => hr === r && hc === c)) return 'hinted';
         return false;
-    };
+    }, [startingCells, hintedCells]);
 
-    const handleNumberInput = (number) => {
+    const handleNumberInput = useCallback((number) => {
         if (!selectedCell) {
             setStatus({ message: 'Please select a cell first.', type: 'info' });
             return;
@@ -127,9 +144,9 @@ export function useSudokuGame(initialDifficulty = 'medium') {
 
         // Check for immediate win (optional here, but good for feedback)
         // We'll leave win check to a separate effect or function call
-    };
+    }, [selectedCell, isFixed, board]);
 
-    const handleHint = () => {
+    const handleHint = useCallback(() => {
         if (!selectedCell) {
             setStatus({ message: 'Please select an empty cell to get a hint.', type: 'info' });
             return;
@@ -147,9 +164,9 @@ export function useSudokuGame(initialDifficulty = 'medium') {
         setBoard(newBoard);
         setHintedCells([...hintedCells, [r, c]]);
         setStatus({ message: `Hint applied: The correct number is ${correctValue}.`, type: 'success' });
-    };
+    }, [selectedCell, isFixed, solutionBoard, board, hintedCells]);
 
-    const checkErrors = () => {
+    const checkErrors = useCallback(() => {
         let standardErrors = 0;
         let cageErrors = 0;
         let isFull = true;
@@ -173,18 +190,34 @@ export function useSudokuGame(initialDifficulty = 'medium') {
             return false;
         } else {
             setIsWon(true);
+            setIsTimerRunning(false);
             setStatus({ message: 'The board is full and error-free! You solved it!', type: 'success' });
             return true;
         }
-    };
+    }, [board, cages]);
 
-    const solveGame = () => {
+    const solveGame = useCallback(() => {
         // Create a copy of the solution board
         const solvedBoard = solutionBoard.map(row => [...row]);
         setBoard(solvedBoard);
         setIsWon(true);
+        setIsTimerRunning(false);
         setStatus({ message: 'Solved! Use "New Game" to play again.', type: 'success' });
-    };
+    }, [solutionBoard]);
+
+    // Calculate visible mistakes (dynamic conflict count)
+    const mistakes = useMemo(() => {
+        let count = 0;
+        for (let r = 0; r < 9; r++) {
+            for (let c = 0; c < 9; c++) {
+                // A mistake is a non-empty cell that does not match the solution
+                if (board[r][c] !== 0 && board[r][c] !== solutionBoard[r][c]) {
+                    count++;
+                }
+            }
+        }
+        return count;
+    }, [board, solutionBoard]);
 
     return {
         board,
@@ -200,6 +233,8 @@ export function useSudokuGame(initialDifficulty = 'medium') {
         handleHint,
         checkErrors,
         isFixed,
-        solveGame
+        solveGame,
+        timerSeconds,
+        mistakes
     };
 }

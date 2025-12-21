@@ -11,10 +11,13 @@ const SudokuBoard = ({
     const getCage = (idx) => cages[idx];
 
     // Track conflicting cages for efficient lookup
-    const conflictingCageIndices = new Set();
-    cages.forEach((_, idx) => {
-        if (isCageConflict(cages, board, idx)) conflictingCageIndices.add(idx);
-    });
+    const conflictingCageIndices = React.useMemo(() => {
+        const indices = new Set();
+        cages.forEach((_, idx) => {
+            if (isCageConflict(cages, board, idx)) indices.add(idx);
+        });
+        return indices;
+    }, [board, cages]);
 
     return (
         <div id="sudoku-board-container" data-component="SudokuBoard" className="relative bg-white w-full rounded-xl shadow-2xl overflow-hidden animate-pop-in border-4 border-slate-700">

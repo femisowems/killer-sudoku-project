@@ -5,17 +5,20 @@ import SudokuBoard from './components/SudokuBoard';
 import Controls from './components/Controls';
 import StatusMessage from './components/StatusMessage';
 import WinModal from './components/WinModal';
+import DifficultyModal from './components/DifficultyModal';
 import CageCombinations from './components/CageCombinations';
+import GameInfo from './components/GameInfo';
 import { useSudokuGame } from './hooks/useSudokuGame';
 
 function App() {
   const {
     board, cages, cellToCageIndex, selectedCell,
-    status, isWon, difficulty,
+    status, isWon, difficulty, timerSeconds, mistakes,
     startNewGame, handleCellSelect, handleNumberInput, handleHint, checkErrors, isFixed, solveGame
   } = useSudokuGame();
 
   const [showWinModal, setShowWinModal] = React.useState(false);
+  const [showNewGameModal, setShowNewGameModal] = React.useState(false);
   const [highlightedCageIndex, setHighlightedCageIndex] = React.useState(null);
 
   // Clear highlight when selection changes or board updates
@@ -43,16 +46,16 @@ function App() {
       <div className="flex flex-col xl:flex-row items-center xl:items-start justify-center gap-6 w-full max-w-[1200px] mt-8">
 
         {/* Left Column: Controls */}
-        <section id="controls-area" className="w-full max-w-[800px] xl:w-80 flex-shrink-0">
-          <Controls
+        <section id="controls-area" className="w-full max-w-[800px] xl:w-80 flex-shrink-0 flex flex-col items-center">
+          <GameInfo
+            timeSeconds={timerSeconds}
+            mistakes={mistakes}
             difficulty={difficulty}
-            setDifficulty={(d) => startNewGame(d)}
+          />
+
+          <Controls
             onNumberInput={handleNumberInput}
-            onHint={handleHint}
-            onCheck={checkErrors}
-            onNewGame={startNewGame}
             onClear={() => handleNumberInput(0)}
-            onSolve={solveGame}
           />
         </section>
 
@@ -69,6 +72,34 @@ function App() {
           />
           <div className="mt-4 w-full flex justify-center">
             <StatusMessage message={status.message} type={status.type} />
+          </div>
+
+          {/* Action Buttons (Moved Here) */}
+          <div className="w-full max-w-lg mt-6 grid grid-cols-4 gap-4">
+            <button
+              onClick={() => setShowNewGameModal(true)}
+              className="py-3 px-2 bg-slate-800 text-white font-semibold rounded-xl shadow hover:bg-slate-900 active:scale-[0.98] transition-all text-sm sm:text-base"
+            >
+              New Game
+            </button>
+            <button
+              onClick={checkErrors}
+              className="py-3 px-2 bg-white text-slate-700 border border-slate-200 font-semibold rounded-xl shadow-sm hover:bg-slate-50 hover:border-slate-300 active:scale-[0.98] transition-all text-sm sm:text-base"
+            >
+              Check
+            </button>
+            <button
+              onClick={handleHint}
+              className="py-3 px-2 bg-amber-100 text-amber-700 font-semibold rounded-xl shadow-sm hover:bg-amber-200 active:scale-[0.98] transition-all text-sm sm:text-base"
+            >
+              Hint
+            </button>
+            <button
+              onClick={solveGame}
+              className="py-3 px-2 bg-rose-100 text-rose-700 font-semibold rounded-xl shadow-sm hover:bg-rose-200 active:scale-[0.98] transition-all text-sm sm:text-base"
+            >
+              Solve
+            </button>
           </div>
         </main>
 
@@ -95,8 +126,17 @@ function App() {
 
       <WinModal
         isOpen={showWinModal}
-        onClose={() => startNewGame(difficulty)}
+        onClose={() => setShowNewGameModal(true)}
         onViewSolved={() => setShowWinModal(false)}
+      />
+
+      <DifficultyModal
+        isOpen={showNewGameModal}
+        onClose={() => setShowNewGameModal(false)}
+        onSelectDifficulty={(diff) => {
+          startNewGame(diff);
+          setShowNewGameModal(false);
+        }}
       />
     </div >
   );

@@ -131,4 +131,4 @@ const SudokuCell = ({
     );
 };
 
-export default SudokuCell;
+export default React.memo(SudokuCell);
