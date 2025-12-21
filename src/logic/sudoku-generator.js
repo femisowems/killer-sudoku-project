@@ -2,6 +2,19 @@ import { SEED_BOARD, DIFFICULTY_COUNTS, CAGE_SHAPES } from '../constants/sudoku-
 
 export function generatePuzzle(difficulty) {
     const count = DIFFICULTY_COUNTS[difficulty] || 30;
+
+    // 1. Map cells to their cage index for quick lookup
+    const cellToCage = new Array(9).fill(0).map(() => new Array(9).fill(-1));
+    CAGE_SHAPES.forEach((cage, index) => {
+        cage.cells.forEach(([r, c]) => {
+            cellToCage[r][c] = index;
+        });
+    });
+
+    // 2. Prepare cage tracking
+    const cageTotalCells = CAGE_SHAPES.map(c => c.cells.length);
+    const cageRevealedCount = new Array(CAGE_SHAPES.length).fill(0);
+
     const allCells = [];
     for (let r = 0; r < 9; r++) {
         for (let c = 0; c < 9; c++) {
@@ -15,7 +28,33 @@ export function generatePuzzle(difficulty) {
         [allCells[i], allCells[j]] = [allCells[j], allCells[i]];
     }
 
-    return allCells.slice(0, count);
+    const selectedCells = [];
+
+    // 3. Select cells with constraint
+    for (const [r, c] of allCells) {
+        if (selectedCells.length >= count) break;
+
+        const cageIdx = cellToCage[r][c];
+
+        // Check if revealing this cell would fully reveal the cage
+        // We allow it ONLY if it's NOT the last hidden cell
+        if (cageIdx !== -1) {
+            if (cageRevealedCount[cageIdx] + 1 < cageTotalCells[cageIdx]) {
+                // Safe to reveal
+                selectedCells.push([r, c]);
+                cageRevealedCount[cageIdx]++;
+            } else {
+                // Skip this cell to keep at least one hidden in the cage
+                // Note: In very rare cases (small board/high count), we might run out of candidates.
+                // But for standard Sudoku (81 cells) and typical counts (30-40), this is fine.
+            }
+        } else {
+            // Fallback for cells not in a cage (shouldn't happen in valid Killer Sudoku)
+            selectedCells.push([r, c]);
+        }
+    }
+
+    return selectedCells;
 }
 
 // Helper to swap two rows
