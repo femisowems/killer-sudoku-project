@@ -105,7 +105,7 @@ const Cell = ({
     }
 
     // Fix hover blocking selection
-    if (!isSelected && !isConflict && !fixedState) {
+    if (!isSelected && !isConflict && !fixedState && !isSameValue) {
         bgColorClass += ' hover:bg-slate-50';
     }
 
