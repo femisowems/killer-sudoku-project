@@ -1,9 +1,9 @@
 
 import React from 'react';
-import SudokuCell from './SudokuCell';
-import { isStandardConflict, isCageConflict } from '../utils/sudokuLogic';
+import Cell from './Cell';
+import { isStandardConflict, isCageConflict } from '../../logic/sudoku-validation';
 
-const SudokuBoard = ({
+const Board = ({
     board, cages, cellToCageIndex,
     selectedCell, onSelect, isFixed, highlightedCageIndex, isPaused, onTogglePause
 }) => {
@@ -20,7 +20,7 @@ const SudokuBoard = ({
     }, [board, cages]);
 
     return (
-        <div id="sudoku-board-container" data-component="SudokuBoard" className="relative bg-white w-full rounded-xl shadow-2xl overflow-hidden animate-pop-in border-4 border-slate-700">
+        <div id="sudoku-board-container" data-component="Board" className="relative bg-white w-full rounded-xl shadow-2xl overflow-hidden animate-pop-in border-4 border-slate-700">
             {isPaused && (
                 <div className="absolute inset-0 z-50 bg-slate-900/20 backdrop-blur-md flex flex-col items-center justify-center animate-fade-in">
                     <button
@@ -68,7 +68,7 @@ const SudokuBoard = ({
                         const conflictCage = conflictingCageIndices.has(cageIndex);
 
                         return (
-                            <SudokuCell
+                            <Cell
                                 key={`${r} -${c} `}
                                 r={r} c={c}
                                 value={value}
@@ -91,4 +91,4 @@ const SudokuBoard = ({
     );
 };
 
-export default SudokuBoard;
+export default Board;

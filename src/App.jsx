@@ -1,13 +1,13 @@
 
 import React from 'react';
-import Header from './components/Header';
-import SudokuBoard from './components/SudokuBoard';
-import Controls from './components/Controls';
-import StatusMessage from './components/StatusMessage';
-import WinModal from './components/WinModal';
-import DifficultyModal from './components/DifficultyModal';
-import CageCombinations from './components/CageCombinations';
-import GameInfo from './components/GameInfo';
+import Header from './components/layout/Header';
+import Board from './components/game/Board';
+import Controls from './components/game/Controls';
+import StatusMessage from './components/ui/StatusMessage';
+import GameWonModal from './components/ui/GameWonModal';
+import DifficultySelectionModal from './components/ui/DifficultySelectionModal';
+import CageCombinations from './components/game/CageCombinations';
+import GameInfo from './components/game/GameInfo';
 import { useSudokuGame } from './hooks/useSudokuGame';
 
 function App() {
@@ -61,7 +61,7 @@ function App() {
 
         {/* Center Column: Game Board */}
         <main id="game-board-area" className="flex flex-col items-center w-full flex-grow">
-          <SudokuBoard
+          <Board
             board={board}
             cages={cages}
             cellToCageIndex={cellToCageIndex}
@@ -145,13 +145,13 @@ function App() {
 
       </div>
 
-      <WinModal
+      <GameWonModal
         isOpen={showWinModal}
         onClose={() => setShowNewGameModal(true)}
         onViewSolved={() => setShowWinModal(false)}
       />
 
-      <DifficultyModal
+      <DifficultySelectionModal
         isOpen={showNewGameModal}
         onClose={() => setShowNewGameModal(false)}
         onSelectDifficulty={(diff) => {

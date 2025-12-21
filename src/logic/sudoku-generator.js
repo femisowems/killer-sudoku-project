@@ -1,0 +1,81 @@
+import { SEED_BOARD, DIFFICULTY_COUNTS } from '../constants/sudoku-constants';
+
+export function generatePuzzle(difficulty) {
+    const count = DIFFICULTY_COUNTS[difficulty] || 30;
+    const allCells = [];
+    for (let r = 0; r < 9; r++) {
+        for (let c = 0; c < 9; c++) {
+            allCells.push([r, c]);
+        }
+    }
+
+    // Fisher-Yates shuffle
+    for (let i = allCells.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [allCells[i], allCells[j]] = [allCells[j], allCells[i]];
+    }
+
+    return allCells.slice(0, count);
+}
+
+// Helper to swap two rows
+function swapRows(board, r1, r2) {
+    const temp = board[r1];
+    board[r1] = board[r2];
+    board[r2] = temp;
+}
+
+// Helper to swap two columns
+function swapCols(board, c1, c2) {
+    for (let i = 0; i < 9; i++) {
+        const temp = board[i][c1];
+        board[i][c1] = board[i][c2];
+        board[i][c2] = temp;
+    }
+}
+
+// Helper to transpose board
+function transpose(board) {
+    const newBoard = Array(9).fill(0).map(() => Array(9).fill(0));
+    for (let r = 0; r < 9; r++) {
+        for (let c = 0; c < 9; c++) {
+            newBoard[c][r] = board[r][c];
+        }
+    }
+    return newBoard;
+}
+
+// Generate a randomised valid board from the seed
+export function generateValidBoard() {
+    // Deep copy seed
+    let board = JSON.parse(JSON.stringify(SEED_BOARD));
+
+    // 1. Shuffle Row Groups
+    if (Math.random() > 0.5) { // Swap band 0 and 1
+        for (let i = 0; i < 3; i++) swapRows(board, i, i + 3);
+    }
+    if (Math.random() > 0.5) { // Swap band 1 and 2
+        for (let i = 0; i < 3; i++) swapRows(board, i + 3, i + 6);
+    }
+
+    // 2. Shuffle Rows within bands
+    for (let b = 0; b < 3; b++) {
+        if (Math.random() > 0.5) swapRows(board, b * 3, b * 3 + 1);
+        if (Math.random() > 0.5) swapRows(board, b * 3 + 1, b * 3 + 2);
+        if (Math.random() > 0.5) swapRows(board, b * 3, b * 3 + 2);
+    }
+
+    // 3. Shuffle Columns within bands
+    for (let b = 0; b < 3; b++) {
+        if (Math.random() > 0.5) swapCols(board, b * 3, b * 3 + 1);
+        if (Math.random() > 0.5) swapCols(board, b * 3 + 1, b * 3 + 2);
+        if (Math.random() > 0.5) swapCols(board, b * 3, b * 3 + 2);
+    }
+
+    // 4. Randomly Transpose
+    if (Math.random() > 0.5) {
+        board = transpose(board);
+    }
+
+    return board;
+}

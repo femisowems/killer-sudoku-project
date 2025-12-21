@@ -1,7 +1,7 @@
 
 import React from 'react';
 
-const SudokuCell = ({
+const Cell = ({
     r, c, value, cageIndex,
     isSelected, isHighlighted, isCageHighlighted, fixedState,
     isConflict, isCageConflict, cageSum,
@@ -131,4 +131,4 @@ const SudokuCell = ({
     );
 };
 
-export default React.memo(SudokuCell);
+export default React.memo(Cell);

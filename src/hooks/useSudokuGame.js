@@ -2,11 +2,15 @@
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import {
     generateValidBoard,
-    CAGE_SHAPES,
-    generatePuzzle,
+    generatePuzzle
+} from '../logic/sudoku-generator';
+import {
     isStandardConflict,
     isCageConflict
-} from '../utils/sudokuLogic';
+} from '../logic/sudoku-validation';
+import {
+    CAGE_SHAPES
+} from '../constants/sudoku-constants';
 
 export function useSudokuGame(initialDifficulty = 'medium') {
     const [difficulty, setDifficulty] = useState(initialDifficulty);

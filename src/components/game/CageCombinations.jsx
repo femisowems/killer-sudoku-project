@@ -1,5 +1,5 @@
 import React, { useMemo } from 'react';
-import { getCageCombinations } from '../utils/sudokuLogic';
+import { getCageCombinations } from '../../logic/sudoku-validation';
 
 const CageCombinations = ({ cage, cageIndex, onHighlightCage }) => {
     if (!cage) {
