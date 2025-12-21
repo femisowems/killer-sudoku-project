@@ -13,8 +13,8 @@ import { useSudokuGame } from './hooks/useSudokuGame';
 function App() {
   const {
     board, cages, cellToCageIndex, selectedCell,
-    status, isWon, difficulty, timerSeconds, mistakes,
-    startNewGame, handleCellSelect, handleNumberInput, handleHint, checkErrors, isFixed, solveGame
+    status, isWon, difficulty, timerSeconds, mistakes, isPaused,
+    startNewGame, handleCellSelect, handleNumberInput, handleHint, checkErrors, isFixed, solveGame, togglePause
   } = useSudokuGame();
 
   const [showWinModal, setShowWinModal] = React.useState(false);
@@ -69,6 +69,8 @@ function App() {
             onSelect={handleCellSelect}
             isFixed={isFixed}
             highlightedCageIndex={highlightedCageIndex}
+            isPaused={isPaused}
+            onTogglePause={togglePause}
           />
           <div className="mt-4 w-full flex justify-center">
             <StatusMessage message={status.message} type={status.type} />
@@ -78,28 +80,47 @@ function App() {
           <div className="w-full max-w-lg mt-6 grid grid-cols-4 gap-4">
             <button
               onClick={() => setShowNewGameModal(true)}
-              className="py-3 px-2 bg-slate-800 text-white font-semibold rounded-xl shadow hover:bg-slate-900 active:scale-[0.98] transition-all text-sm sm:text-base"
+              className="py-3 px-2 bg-slate-800 text-white font-semibold rounded-xl shadow hover:bg-slate-900 active:scale-[0.98] transition-all text-sm sm:text-base flex items-center justify-center gap-2"
             >
-              New Game
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fillRule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clipRule="evenodd" /></svg>
+              New
             </button>
             <button
               onClick={checkErrors}
-              className="py-3 px-2 bg-white text-slate-700 border border-slate-200 font-semibold rounded-xl shadow-sm hover:bg-slate-50 hover:border-slate-300 active:scale-[0.98] transition-all text-sm sm:text-base"
+              className="py-3 px-2 bg-white text-slate-700 border border-slate-200 font-semibold rounded-xl shadow-sm hover:bg-slate-50 hover:border-slate-300 active:scale-[0.98] transition-all text-sm sm:text-base flex items-center justify-center gap-2"
             >
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-slate-400" viewBox="0 0 20 20" fill="currentColor"><path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" /></svg>
               Check
             </button>
             <button
               onClick={handleHint}
-              className="py-3 px-2 bg-amber-100 text-amber-700 font-semibold rounded-xl shadow-sm hover:bg-amber-200 active:scale-[0.98] transition-all text-sm sm:text-base"
+              className="py-3 px-2 bg-amber-100 text-amber-900 font-semibold rounded-xl shadow-sm hover:bg-amber-200 active:scale-[0.98] transition-all text-sm sm:text-base flex items-center justify-center gap-2"
             >
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-amber-600" viewBox="0 0 20 20" fill="currentColor"><path d="M11 3a1 1 0 10-2 0v1a1 1 0 102 0V3zM15.657 5.757a1 1 0 00-1.414-1.414l-.707.707a1 1 0 001.414 1.414l.707-.707zM18 10a1 1 0 01-1 1h-1a1 1 0 110-2h1a1 1 0 011 1zM5.05 6.464A1 1 0 106.464 5.05l-.707-.707a1 1 0 00-1.414 1.414l.707.707zM5 10a1 1 0 01-1 1H3a1 1 0 110-2h1a1 1 0 011 1zM8 16v-1h4v1a2 2 0 11-4 0zM12 14c.015-.34.208-.646.477-.859a4 4 0 10-4.954 0c.27.213.462.519.476.859h4.002z" /></svg>
               Hint
             </button>
-            <button
-              onClick={solveGame}
-              className="py-3 px-2 bg-rose-100 text-rose-700 font-semibold rounded-xl shadow-sm hover:bg-rose-200 active:scale-[0.98] transition-all text-sm sm:text-base"
-            >
-              Solve
-            </button>
+
+            {/* Pause & Solve Group */}
+            <div className="flex bg-slate-100 rounded-xl p-1 gap-1">
+              <button
+                onClick={togglePause}
+                className={`flex-1 flex items-center justify-center rounded-lg active:scale-95 transition-all shadow-sm ${isPaused ? 'bg-primary text-white' : 'bg-white text-slate-600 hover:text-primary'}`}
+                title={isPaused ? "Resume Game" : "Pause Game"}
+              >
+                {isPaused ? (
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" viewBox="0 0 20 20" fill="currentColor"><path d="M6.3 2.841A1.5 1.5 0 004 4.11V15.89a1.5 1.5 0 002.3 1.269l9.344-5.89a1.5 1.5 0 000-2.538L6.3 2.84z" /></svg>
+                ) : (
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" viewBox="0 0 20 20" fill="currentColor"><path d="M5 4h3v12H5V4zm7 0h3v12h-3V4z" /></svg>
+                )}
+              </button>
+              <button
+                onClick={solveGame}
+                className="flex-1 flex items-center justify-center bg-white text-rose-500 rounded-lg hover:bg-rose-50 hover:text-rose-600 active:scale-95 transition-all shadow-sm"
+                title="Solve Puzzle"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" viewBox="0 0 20 20" fill="currentColor"><path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z" /></svg>
+              </button>
+            </div>
           </div>
         </main>
 

@@ -2,7 +2,9 @@
 
 A modern, responsive implementation of Killer Sudoku built with React and Tailwind CSS.
 
-![Killer Sudoku Demo](public/assets/demo.webp)
+<p align="center">
+  <img src="./public/assets/demo.webp" width="80%">
+</p>
 
 ## Features
 

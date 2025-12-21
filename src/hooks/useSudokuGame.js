@@ -21,6 +21,7 @@ export function useSudokuGame(initialDifficulty = 'medium') {
     const [cellToCageIndex, setCellToCageIndex] = useState(Array(9).fill(0).map(() => Array(9).fill(-1)));
     const [timerSeconds, setTimerSeconds] = useState(0);
     const [isTimerRunning, setIsTimerRunning] = useState(false);
+    const [isPaused, setIsPaused] = useState(false);
 
     // Initialize game
     const startNewGame = useCallback((diff = difficulty) => {
@@ -30,6 +31,7 @@ export function useSudokuGame(initialDifficulty = 'medium') {
         setSelectedCell(null);
         setTimerSeconds(0);
         setIsTimerRunning(true);
+        setIsPaused(false);
 
         // 1. Generate solution
         const newSolution = generateValidBoard();
@@ -72,15 +74,15 @@ export function useSudokuGame(initialDifficulty = 'medium') {
     // Timer Interval
     useEffect(() => {
         let interval = null;
-        if (isTimerRunning && !isWon) {
+        if (isTimerRunning && !isWon && !isPaused) {
             interval = setInterval(() => {
                 setTimerSeconds(s => s + 1);
             }, 1000);
-        } else if (!isTimerRunning && interval) {
+        } else if ((!isTimerRunning || isPaused) && interval) {
             clearInterval(interval);
         }
         return () => clearInterval(interval);
-    }, [isTimerRunning, isWon]);
+    }, [isTimerRunning, isWon, isPaused]);
 
     // Keyboard Navigation
     useEffect(() => {
@@ -205,6 +207,12 @@ export function useSudokuGame(initialDifficulty = 'medium') {
         setStatus({ message: 'Solved! Use "New Game" to play again.', type: 'success' });
     }, [solutionBoard]);
 
+    const togglePause = useCallback(() => {
+        if (!isWon) {
+            setIsPaused(prev => !prev);
+        }
+    }, [isWon]);
+
     // Calculate visible mistakes (dynamic conflict count)
     const mistakes = useMemo(() => {
         let count = 0;
@@ -235,6 +243,8 @@ export function useSudokuGame(initialDifficulty = 'medium') {
         isFixed,
         solveGame,
         timerSeconds,
-        mistakes
+        mistakes,
+        isPaused,
+        togglePause
     };
 }

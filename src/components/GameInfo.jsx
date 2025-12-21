@@ -14,9 +14,9 @@ const GameInfo = ({ timeSeconds, mistakes, difficulty }) => {
             <div className="grid grid-cols-3 divide-x divide-slate-100">
 
                 {/* Time */}
-                <div className="p-4 flex flex-col items-center justify-center bg-slate-50/50">
+                <div className="p-4 flex flex-col items-center justify-center bg-slate-50/50 relative group">
                     <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Time</span>
-                    <div className="text-xl font-mono font-bold text-slate-700">
+                    <div className="text-xl font-mono font-bold text-slate-700 flex items-center gap-2">
                         {formatTime(timeSeconds)}
                     </div>
                 </div>
