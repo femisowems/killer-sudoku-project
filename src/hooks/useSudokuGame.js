@@ -28,6 +28,7 @@ export function useSudokuGame(initialDifficulty = 'medium') {
     const [isPaused, setIsPaused] = useState(false);
     const [isAutoSolved, setIsAutoSolved] = useState(false);
     const [showErrors, setShowErrors] = useState(false);
+    const [mistakes, setMistakes] = useState(0);
 
     // Worker Ref
     const workerRef = useRef(null);
@@ -67,6 +68,7 @@ export function useSudokuGame(initialDifficulty = 'medium') {
         setTimerSeconds(0);
         setIsTimerRunning(true);
         setIsPaused(false);
+        setMistakes(0);
 
         // 1. Generate solution
         const newSolution = generateValidBoard();
@@ -203,13 +205,21 @@ export function useSudokuGame(initialDifficulty = 'medium') {
             return;
         }
 
+        // Avoid unnecessary updates
+        if (board[r][c] === number) return;
+
         const newBoard = [...board.map(row => [...row])];
         newBoard[r][c] = number;
         setBoard(newBoard);
 
+        // Track mistakes
+        if (number !== 0 && number !== solutionBoard[r][c]) {
+            setMistakes(prev => prev + 1);
+        }
+
         // Check for immediate win (optional here, but good for feedback)
         // We'll leave win check to a separate effect or function call
-    }, [selectedCell, isFixed, board]);
+    }, [selectedCell, isFixed, board, solutionBoard]);
 
     const handleHint = useCallback(() => {
         if (!selectedCell) {
@@ -263,18 +273,8 @@ export function useSudokuGame(initialDifficulty = 'medium') {
     }, [isWon]);
 
     // Calculate visible mistakes (dynamic conflict count)
-    const mistakes = useMemo(() => {
-        let count = 0;
-        for (let r = 0; r < 9; r++) {
-            for (let c = 0; c < 9; c++) {
-                // A mistake is a non-empty cell that does not match the solution
-                if (board[r][c] !== 0 && board[r][c] !== solutionBoard[r][c]) {
-                    count++;
-                }
-            }
-        }
-        return count;
-    }, [board, solutionBoard]);
+    // Calculate visible mistakes (dynamic conflict count) - REMOVED in favor of persistent state
+    // const mistakes = useMemo(...)
 
     return {
         board,
