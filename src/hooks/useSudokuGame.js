@@ -19,6 +19,8 @@ export function useSudokuGame(initialDifficulty = 'medium') {
     const [cages, setCages] = useState([]);
     const [startingCells, setStartingCells] = useState([]);
     const [hintedCells, setHintedCells] = useState([]);
+    const [notes, setNotes] = useState(Array(9).fill(0).map(() => Array(9).fill(new Set())));
+    const [isNotesMode, setIsNotesMode] = useState(false);
     const [selectedCell, setSelectedCell] = useState(null);
     const [status, setStatus] = useState({ message: '', type: 'info' });
     const [isWon, setIsWon] = useState(false);
@@ -69,6 +71,8 @@ export function useSudokuGame(initialDifficulty = 'medium') {
         setIsTimerRunning(true);
         setIsPaused(false);
         setMistakes(0);
+        setNotes(Array(9).fill(0).map(() => Array(9).fill(new Set()))); // Reset notes
+        setIsNotesMode(false); // Reset notes mode
 
         // 1. Generate solution
         const newSolution = generateValidBoard();
@@ -206,11 +210,37 @@ export function useSudokuGame(initialDifficulty = 'medium') {
         }
 
         // Avoid unnecessary updates
-        if (board[r][c] === number) return;
+        if (!isNotesMode && board[r][c] === number) return;
 
+        // Notes Mode Logic
+        if (isNotesMode) {
+            // Cannot add notes to a cell with a value
+            if (board[r][c] !== 0) return;
+
+            const currentNotes = new Set(notes[r][c]);
+            if (currentNotes.has(number)) {
+                currentNotes.delete(number);
+            } else {
+                currentNotes.add(number);
+            }
+
+            const newNotes = [...notes.map(row => [...row])];
+            newNotes[r][c] = currentNotes;
+            setNotes(newNotes);
+            return;
+        }
+
+        // Standard Input Mode
         const newBoard = [...board.map(row => [...row])];
         newBoard[r][c] = number;
         setBoard(newBoard);
+
+        // Clear notes for this cell when a number is placed
+        if (number !== 0) {
+            const newNotes = [...notes.map(row => [...row])];
+            newNotes[r][c] = new Set();
+            setNotes(newNotes);
+        }
 
         // Track mistakes
         if (number !== 0 && number !== solutionBoard[r][c]) {
@@ -219,7 +249,11 @@ export function useSudokuGame(initialDifficulty = 'medium') {
 
         // Check for immediate win (optional here, but good for feedback)
         // We'll leave win check to a separate effect or function call
-    }, [selectedCell, isFixed, board, solutionBoard]);
+    }, [selectedCell, isFixed, board, solutionBoard, isNotesMode, notes]);
+
+    const toggleNotesMode = useCallback(() => {
+        setIsNotesMode(prev => !prev);
+    }, []);
 
     const handleHint = useCallback(() => {
         if (!selectedCell) {
@@ -296,7 +330,11 @@ export function useSudokuGame(initialDifficulty = 'medium') {
         solveGame,
         timerSeconds,
         mistakes,
+        mistakes,
         isPaused,
-        togglePause
+        togglePause,
+        notes,
+        isNotesMode,
+        toggleNotesMode,
     };
 }

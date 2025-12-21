@@ -5,7 +5,7 @@ const Cell = ({
     r, c, value, cageIndex,
     isSelected, isHighlighted, isSameValue, isCageHighlighted, fixedState,
     isConflict, isCageConflict, cageSum, isError,
-    onSelect, cellToCageIndex
+    onSelect, cellToCageIndex, notes
 }) => {
     // ... (rest of borders logic) ...
 
@@ -137,7 +137,17 @@ const Cell = ({
                 </span>
             )}
 
-            {value !== 0 ? value : ''}
+            {value !== 0 ? (
+                value
+            ) : (
+                <div className={`grid grid-cols-3 grid-rows-3 w-full h-full p-0.5 sm:p-1 pt-4 sm:pt-5 md:pt-6 pb-0.5`}>
+                    {[1, 2, 3, 4, 5, 6, 7, 8, 9].map(num => (
+                        <div key={num} className={`flex items-center justify-center text-[7px] sm:text-[8px] md:text-[9px] leading-none font-medium ${isSelected || isConflict ? 'text-white/90' : 'text-slate-500'}`}>
+                            {notes && notes.has(num) ? num : ''}
+                        </div>
+                    ))}
+                </div>
+            )}
         </div>
     );
 };

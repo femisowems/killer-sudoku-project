@@ -5,7 +5,7 @@ import { isStandardConflict, isCageConflict } from '../../logic/sudoku-validatio
 
 const Board = ({
     board, solutionBoard, showErrors, cages, cellToCageIndex,
-    selectedCell, onSelect, isFixed, highlightedCageIndex, isPaused, onTogglePause
+    selectedCell, onSelect, isFixed, highlightedCageIndex, isPaused, onTogglePause, notes
 }) => {
     // Helper to find cage object by index
     const getCage = (idx) => cages[idx];
@@ -97,6 +97,7 @@ const Board = ({
                                 isCageConflict={conflictCage}
                                 onSelect={onSelect}
                                 cellToCageIndex={cellToCageIndex}
+                                notes={notes[r][c]}
                             />
                         );
                     })

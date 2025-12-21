@@ -13,8 +13,8 @@ import { useSudokuGame } from './hooks/useSudokuGame';
 function App() {
   const {
     board, solutionBoard, cages, cellToCageIndex, selectedCell,
-    status, isWon, difficulty, timerSeconds, mistakes, isPaused, isAutoSolved, showErrors,
-    startNewGame, handleCellSelect, handleNumberInput, handleHint, checkErrors, isFixed, solveGame, togglePause
+    status, isWon, difficulty, timerSeconds, mistakes, isPaused, isAutoSolved, showErrors, notes, isNotesMode,
+    startNewGame, handleCellSelect, handleNumberInput, handleHint, checkErrors, isFixed, solveGame, togglePause, toggleNotesMode
   } = useSudokuGame();
 
   // Calculate counts of each number on the board
@@ -85,6 +85,7 @@ function App() {
             highlightedCageIndex={highlightedCageIndex}
             isPaused={isPaused}
             onTogglePause={togglePause}
+            notes={notes}
           />
           <div className="mt-4 w-full flex justify-center">
             <StatusMessage message={status.message} type={status.type} />
@@ -106,13 +107,31 @@ function App() {
               <svg xmlns="http://www.w3.org/2000/svg" className={`h-5 w-5 ${showErrors ? 'text-rose-500' : 'text-slate-400'}`} viewBox="0 0 20 20" fill="currentColor"><path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" /></svg>
               Check
             </button>
-            <button
-              onClick={handleHint}
-              className="py-3 px-2 bg-amber-100 text-amber-900 font-semibold rounded-xl shadow-sm hover:bg-amber-200 active:scale-[0.98] transition-all text-sm sm:text-base flex items-center justify-center gap-2"
-            >
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-amber-600" viewBox="0 0 20 20" fill="currentColor"><path d="M11 3a1 1 0 10-2 0v1a1 1 0 102 0V3zM15.657 5.757a1 1 0 00-1.414-1.414l-.707.707a1 1 0 001.414 1.414l.707-.707zM18 10a1 1 0 01-1 1h-1a1 1 0 110-2h1a1 1 0 011 1zM5.05 6.464A1 1 0 106.464 5.05l-.707-.707a1 1 0 00-1.414 1.414l.707.707zM5 10a1 1 0 01-1 1H3a1 1 0 110-2h1a1 1 0 011 1zM8 16v-1h4v1a2 2 0 11-4 0zM12 14c.015-.34.208-.646.477-.859a4 4 0 10-4.954 0c.27.213.462.519.476.859h4.002z" /></svg>
-              Hint
-            </button>
+            {/* Notes & Hint Group */}
+            <div className={`flex rounded-xl p-1 gap-1 border transition-colors ${isNotesMode ? 'bg-primary/10 border-primary/20' : 'bg-amber-50 border-amber-100'}`}>
+              <button
+                onClick={toggleNotesMode}
+                className={`relative flex-1 flex items-center justify-center rounded-lg active:scale-95 transition-all shadow-sm ${isNotesMode ? 'bg-primary text-white hover:bg-primary/90' : 'text-amber-700 hover:bg-amber-100/50'}`}
+                title="Toggle Notes Mode"
+              >
+                {/* Badge */}
+                <div className={`absolute -top-2 -right-2 px-1.5 py-0.5 text-[10px] font-bold rounded-full border shadow-sm ${isNotesMode ? 'bg-primary text-white border-white' : 'bg-slate-200 text-slate-500 border-white'}`}>
+                  {isNotesMode ? 'ON' : 'OFF'}
+                </div>
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" viewBox="0 0 20 20" fill="currentColor">
+                  <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z" />
+                </svg>
+              </button>
+              <button
+                onClick={handleHint}
+                className="flex-1 flex items-center justify-center rounded-lg hover:bg-amber-200 text-amber-600 active:scale-95 transition-all shadow-sm"
+                title="Get Hint"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" viewBox="0 0 20 20" fill="currentColor">
+                  <path d="M11 3a1 1 0 10-2 0v1a1 1 0 102 0V3zM15.657 5.757a1 1 0 00-1.414-1.414l-.707.707a1 1 0 001.414 1.414l.707-.707zM18 10a1 1 0 01-1 1h-1a1 1 0 110-2h1a1 1 0 011 1zM5.05 6.464A1 1 0 106.464 5.05l-.707-.707a1 1 0 00-1.414 1.414l.707.707zM5 10a1 1 0 01-1 1H3a1 1 0 110-2h1a1 1 0 011 1zM8 16v-1h4v1a2 2 0 11-4 0zM12 14c.015-.34.208-.646.477-.859a4 4 0 10-4.954 0c.27.213.462.519.476.859h4.002z" />
+                </svg>
+              </button>
+            </div>
 
             {/* Pause & Solve Group */}
             <div className="flex bg-slate-100 rounded-xl p-1 gap-1">
