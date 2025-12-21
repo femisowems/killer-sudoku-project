@@ -8,6 +8,7 @@ import GameWonModal from './components/ui/GameWonModal';
 import DifficultySelectionModal from './components/ui/DifficultySelectionModal';
 import CageCombinations from './components/game/CageCombinations';
 import GameInfo from './components/game/GameInfo';
+import Scoreboard from './components/game/Scoreboard';
 import { useSudokuGame } from './hooks/useSudokuGame';
 
 function App() {
@@ -16,6 +17,17 @@ function App() {
     status, isWon, difficulty, timerSeconds, mistakes, isPaused,
     startNewGame, handleCellSelect, handleNumberInput, handleHint, checkErrors, isFixed, solveGame, togglePause
   } = useSudokuGame();
+
+  // Calculate counts of each number on the board
+  const numberCounts = React.useMemo(() => {
+    const counts = Array(10).fill(0);
+    board.forEach(row => {
+      row.forEach(val => {
+        if (val >= 1 && val <= 9) counts[val]++;
+      });
+    });
+    return counts;
+  }, [board]);
 
   const [showWinModal, setShowWinModal] = React.useState(false);
   const [showNewGameModal, setShowNewGameModal] = React.useState(false);
@@ -56,6 +68,7 @@ function App() {
           <Controls
             onNumberInput={handleNumberInput}
             onClear={() => handleNumberInput(0)}
+            numberCounts={numberCounts}
           />
         </section>
 
@@ -126,6 +139,12 @@ function App() {
 
         {/* Right Column: Strategies */}
         <aside id="sidebar-strategies" className="w-full max-w-[800px] xl:w-64 flex-shrink-0 flex flex-col gap-4">
+          <Scoreboard
+            difficulty={difficulty}
+            isWon={isWon}
+            timerSeconds={timerSeconds}
+          />
+
           <CageCombinations
             cage={selectedCell ? cages[cellToCageIndex[selectedCell.r][selectedCell.c]] : null}
             cageIndex={selectedCell ? cellToCageIndex[selectedCell.r][selectedCell.c] : -1}

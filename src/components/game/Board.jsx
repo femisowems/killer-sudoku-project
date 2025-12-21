@@ -34,7 +34,7 @@ const Board = ({
                             Resume Game
                         </div>
                     </button>
-                    <div className="bg-white/90 px-6 py-2 rounded-full shadow-lg backdrop-blur text-slate-800 font-bold text-lg">
+                    <div className="bg-white/90 px-6 py-2 rounded-full shadow-lg backdrop-blur text-slate-800 font-bold text-lg mt-9">
                         Game Paused
                     </div>
                 </div>
