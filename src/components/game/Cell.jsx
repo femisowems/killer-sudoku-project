@@ -3,7 +3,7 @@ import React from 'react';
 
 const Cell = ({
     r, c, value, cageIndex,
-    isSelected, isHighlighted, isCageHighlighted, fixedState,
+    isSelected, isHighlighted, isSameValue, isCageHighlighted, fixedState,
     isConflict, isCageConflict, cageSum,
     onSelect, cellToCageIndex
 }) => {
@@ -60,7 +60,7 @@ const Cell = ({
     };
 
     // Standardized Font Size
-    let baseClasses = "relative flex justify-center items-center text-lg sm:text-2xl md:text-3xl cursor-pointer select-none transition-all duration-200 focus:outline-none";
+    const baseClasses = "relative flex justify-center items-center text-lg sm:text-2xl md:text-3xl cursor-pointer select-none transition-all duration-200 focus:outline-none";
 
     // Background Color Logic
     let bgColorClass = 'bg-white'; // Default hover state
@@ -79,6 +79,10 @@ const Cell = ({
         bgColorClass = 'bg-primary text-white';
         textClass = 'text-white font-bold';
         zIndexClass = 'z-30';
+    }
+    else if (isSameValue) {
+        bgColorClass = 'bg-indigo-200';
+        textClass = 'text-primary font-bold';
     }
     else if (isCageHighlighted) {
         bgColorClass = 'bg-yellow-100';

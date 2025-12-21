@@ -58,10 +58,20 @@ const Board = ({
 
                         // Highlight logic
                         let isHighlighted = false;
+                        let isSameValue = false;
+
                         if (selectedCell) {
                             const { r: sr, c: sc } = selectedCell;
+                            const selectedValue = board[sr][sc];
+
+                            // Highlight peers (row, col, box)
                             if (sr === r || sc === c) isHighlighted = true;
                             if (Math.floor(sr / 3) === Math.floor(r / 3) && Math.floor(sc / 3) === Math.floor(c / 3)) isHighlighted = true;
+
+                            // Highlight same numbers (if not empty)
+                            if (selectedValue !== 0 && value === selectedValue) {
+                                isSameValue = true;
+                            }
                         }
 
                         const conflictStandard = isStandardConflict(board, r, c);
@@ -76,6 +86,7 @@ const Board = ({
                                 cageSum={showSum ? cage.sum : null}
                                 isSelected={isSelected}
                                 isHighlighted={isHighlighted}
+                                isSameValue={isSameValue}
                                 isCageHighlighted={highlightedCageIndex === cageIndex}
                                 fixedState={isFixed(r, c)}
                                 isConflict={conflictStandard}
