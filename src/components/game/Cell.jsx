@@ -111,7 +111,7 @@ const Cell = ({
             className={`${baseClasses} ${bgColorClass} ${textClass} ${zIndexClass}`}
             style={{
                 ...getGridBorders(),
-                aspectRatio: '1/1'
+                aspectRatio: '0.9'
             }}
         >
             {/* Inner Cage Border Overlay */}
