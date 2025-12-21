@@ -1,5 +1,5 @@
 
-import { useState, useEffect, useCallback, useMemo } from 'react';
+import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import {
     generateValidBoard,
     generatePuzzle
@@ -26,6 +26,33 @@ export function useSudokuGame(initialDifficulty = 'medium') {
     const [timerSeconds, setTimerSeconds] = useState(0);
     const [isTimerRunning, setIsTimerRunning] = useState(false);
     const [isPaused, setIsPaused] = useState(false);
+
+    // Worker Ref
+    const workerRef = useRef(null);
+
+    // Initialize Worker
+    useEffect(() => {
+        workerRef.current = new Worker(new URL('../workers/puzzle.worker.js', import.meta.url), { type: 'module' });
+
+        workerRef.current.onmessage = (e) => {
+            const { type, payload } = e.data;
+            if (type === 'validationResult') {
+                const { unique, solutionCount } = payload;
+                if (!unique) {
+                    console.warn(`Generated puzzle has ${solutionCount} solutions. It might not be a valid Sudoku.`);
+                    // Optionally set a status message here, but careful not to spam user
+                } else {
+                    console.log('Puzzle validated: Unique solution found.');
+                }
+            }
+        };
+
+        return () => {
+            if (workerRef.current) {
+                workerRef.current.terminate();
+            }
+        };
+    }, []);
 
     // Initialize game
     const startNewGame = useCallback((diff = difficulty) => {
@@ -66,6 +93,14 @@ export function useSudokuGame(initialDifficulty = 'medium') {
             newBoard[r][c] = newSolution[r][c];
         });
         setBoard(newBoard);
+
+        // Validate Puzzle in Background
+        if (workerRef.current) {
+            workerRef.current.postMessage({
+                type: 'validate',
+                payload: { board: newBoard }
+            });
+        }
 
         setStatus({ message: `New ${diff.charAt(0).toUpperCase() + diff.slice(1)} game started. Good luck!`, type: 'info' });
     }, [difficulty]);
