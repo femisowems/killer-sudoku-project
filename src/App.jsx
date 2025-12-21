@@ -191,6 +191,9 @@ function App() {
         isOpen={showWinModal}
         onClose={() => setShowNewGameModal(true)}
         onViewSolved={() => setShowWinModal(false)}
+        timeSeconds={timerSeconds}
+        mistakes={mistakes}
+        difficulty={difficulty}
       />
 
       <DifficultySelectionModal

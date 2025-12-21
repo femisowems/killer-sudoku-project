@@ -59,5 +59,5 @@ export const CAGE_SHAPES = [
 export const DIFFICULTY_COUNTS = {
     easy: 30,
     medium: 20,
-    hard: 10
+    hard: 8
 };
