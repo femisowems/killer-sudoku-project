@@ -14,7 +14,7 @@ import { useSudokuGame } from './hooks/useSudokuGame';
 function App() {
   const {
     board, cages, cellToCageIndex, selectedCell,
-    status, isWon, difficulty, timerSeconds, mistakes, isPaused,
+    status, isWon, difficulty, timerSeconds, mistakes, isPaused, isAutoSolved,
     startNewGame, handleCellSelect, handleNumberInput, handleHint, checkErrors, isFixed, solveGame, togglePause
   } = useSudokuGame();
 
@@ -143,6 +143,7 @@ function App() {
             difficulty={difficulty}
             isWon={isWon}
             timerSeconds={timerSeconds}
+            isAutoSolved={isAutoSolved}
           />
 
           <CageCombinations

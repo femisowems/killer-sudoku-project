@@ -26,6 +26,7 @@ export function useSudokuGame(initialDifficulty = 'medium') {
     const [timerSeconds, setTimerSeconds] = useState(0);
     const [isTimerRunning, setIsTimerRunning] = useState(false);
     const [isPaused, setIsPaused] = useState(false);
+    const [isAutoSolved, setIsAutoSolved] = useState(false);
 
     // Worker Ref
     const workerRef = useRef(null);
@@ -58,6 +59,7 @@ export function useSudokuGame(initialDifficulty = 'medium') {
     const startNewGame = useCallback((diff = difficulty) => {
         setDifficulty(diff);
         setIsWon(false);
+        setIsAutoSolved(false); // Reset auto-solve flag
         setHintedCells([]);
         setSelectedCell(null);
         setTimerSeconds(0);
@@ -242,6 +244,7 @@ export function useSudokuGame(initialDifficulty = 'medium') {
         const solvedBoard = solutionBoard.map(row => [...row]);
         setBoard(solvedBoard);
         setIsWon(true);
+        setIsAutoSolved(true); // Mark as auto-solved
         setIsTimerRunning(false);
         setStatus({ message: 'Solved! Use "New Game" to play again.', type: 'success' });
     }, [solutionBoard]);
@@ -273,6 +276,7 @@ export function useSudokuGame(initialDifficulty = 'medium') {
         selectedCell,
         status,
         isWon,
+        isAutoSolved,
         difficulty,
         startNewGame,
         handleCellSelect,

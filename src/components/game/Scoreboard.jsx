@@ -1,7 +1,7 @@
 
 import React, { useState, useEffect } from 'react';
 
-const Scoreboard = ({ difficulty, isWon, timerSeconds }) => {
+const Scoreboard = ({ difficulty, isWon, timerSeconds, isAutoSolved }) => {
     const [bestTimes, setBestTimes] = useState({
         easy: null,
         medium: null,
@@ -18,7 +18,7 @@ const Scoreboard = ({ difficulty, isWon, timerSeconds }) => {
 
     // Update best time on win
     useEffect(() => {
-        if (isWon) {
+        if (isWon && !isAutoSolved) {
             setBestTimes(prev => {
                 const currentBest = prev[difficulty];
                 if (currentBest === null || timerSeconds < currentBest) {
@@ -29,7 +29,7 @@ const Scoreboard = ({ difficulty, isWon, timerSeconds }) => {
                 return prev;
             });
         }
-    }, [isWon, difficulty, timerSeconds]);
+    }, [isWon, difficulty, timerSeconds, isAutoSolved]);
 
     const formatTime = (seconds) => {
         if (seconds === null) return '--:--';
