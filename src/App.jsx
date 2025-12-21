@@ -1,4 +1,3 @@
-
 import React from 'react';
 import Header from './components/layout/Header';
 import Board from './components/game/Board';
@@ -13,8 +12,8 @@ import { useSudokuGame } from './hooks/useSudokuGame';
 
 function App() {
   const {
-    board, cages, cellToCageIndex, selectedCell,
-    status, isWon, difficulty, timerSeconds, mistakes, isPaused, isAutoSolved,
+    board, solutionBoard, cages, cellToCageIndex, selectedCell,
+    status, isWon, difficulty, timerSeconds, mistakes, isPaused, isAutoSolved, showErrors,
     startNewGame, handleCellSelect, handleNumberInput, handleHint, checkErrors, isFixed, solveGame, togglePause
   } = useSudokuGame();
 
@@ -76,6 +75,8 @@ function App() {
         <main id="game-board-area" className="flex flex-col items-center w-full flex-grow">
           <Board
             board={board}
+            solutionBoard={solutionBoard}
+            showErrors={showErrors}
             cages={cages}
             cellToCageIndex={cellToCageIndex}
             selectedCell={selectedCell}
@@ -100,9 +101,9 @@ function App() {
             </button>
             <button
               onClick={checkErrors}
-              className="py-3 px-2 bg-white text-slate-700 border border-slate-200 font-semibold rounded-xl shadow-sm hover:bg-slate-50 hover:border-slate-300 active:scale-[0.98] transition-all text-sm sm:text-base flex items-center justify-center gap-2"
+              className={`py-3 px-2 font-semibold rounded-xl shadow-sm active:scale-[0.98] transition-all text-sm sm:text-base flex items-center justify-center gap-2 border whitespace-nowrap ${showErrors ? 'bg-rose-100 text-rose-700 border-rose-200 ring-2 ring-rose-200' : 'bg-white text-slate-700 border-slate-200 hover:bg-slate-50 hover:border-slate-300'}`}
             >
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-slate-400" viewBox="0 0 20 20" fill="currentColor"><path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" /></svg>
+              <svg xmlns="http://www.w3.org/2000/svg" className={`h-5 w-5 ${showErrors ? 'text-rose-500' : 'text-slate-400'}`} viewBox="0 0 20 20" fill="currentColor"><path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" /></svg>
               Check
             </button>
             <button
@@ -179,7 +180,7 @@ function App() {
           setShowNewGameModal(false);
         }}
       />
-    </div >
+    </div>
   );
 }
 

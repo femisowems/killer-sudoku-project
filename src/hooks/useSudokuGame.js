@@ -27,6 +27,7 @@ export function useSudokuGame(initialDifficulty = 'medium') {
     const [isTimerRunning, setIsTimerRunning] = useState(false);
     const [isPaused, setIsPaused] = useState(false);
     const [isAutoSolved, setIsAutoSolved] = useState(false);
+    const [showErrors, setShowErrors] = useState(false);
 
     // Worker Ref
     const workerRef = useRef(null);
@@ -60,6 +61,7 @@ export function useSudokuGame(initialDifficulty = 'medium') {
         setDifficulty(diff);
         setIsWon(false);
         setIsAutoSolved(false); // Reset auto-solve flag
+        setShowErrors(false); // Reset error showing
         setHintedCells([]);
         setSelectedCell(null);
         setTimerSeconds(0);
@@ -124,6 +126,26 @@ export function useSudokuGame(initialDifficulty = 'medium') {
         }
         return () => clearInterval(interval);
     }, [isTimerRunning, isWon, isPaused]);
+
+    // Automatic Win Detection
+    useEffect(() => {
+        if (isWon) return;
+
+        // Check if board is full (no zeros)
+        const isFull = board.every(row => row.every(cell => cell !== 0));
+        if (!isFull) return;
+
+        // Check correctness
+        const isCorrect = board.every((row, r) =>
+            row.every((cell, c) => cell === solutionBoard[r][c])
+        );
+
+        if (isCorrect) {
+            setIsWon(true);
+            setIsTimerRunning(false);
+            setStatus({ message: 'Congratulations! You solved it!', type: 'success' });
+        }
+    }, [board, solutionBoard, isWon]);
 
     // Keyboard Navigation
     useEffect(() => {
@@ -210,34 +232,19 @@ export function useSudokuGame(initialDifficulty = 'medium') {
     }, [selectedCell, isFixed, solutionBoard, board, hintedCells]);
 
     const checkErrors = useCallback(() => {
-        let standardErrors = 0;
-        let cageErrors = 0;
-        let isFull = true;
+        // If already won, do nothing
+        if (isWon) return;
 
-        for (let r = 0; r < 9; r++) {
-            for (let c = 0; c < 9; c++) {
-                if (board[r][c] === 0) isFull = false;
-                if (isStandardConflict(board, r, c)) standardErrors++;
-            }
-        }
+        // Toggle error showing
+        const newShowErrors = !showErrors;
+        setShowErrors(newShowErrors);
 
-        cages.forEach((_, index) => {
-            if (isCageConflict(cages, board, index)) cageErrors++;
-        });
-
-        if (standardErrors + cageErrors > 0) {
-            setStatus({ message: `Found ${standardErrors} standard Sudoku violations and ${cageErrors} cage rule violations.`, type: 'error' });
-            return false;
-        } else if (!isFull) {
-            setStatus({ message: 'No errors found, but the puzzle is not complete yet.', type: 'info' });
-            return false;
+        if (newShowErrors) {
+            setStatus({ message: 'Real-time error checking ON.', type: 'info' });
         } else {
-            setIsWon(true);
-            setIsTimerRunning(false);
-            setStatus({ message: 'The board is full and error-free! You solved it!', type: 'success' });
-            return true;
+            setStatus({ message: 'Real-time error checking OFF.', type: 'info' });
         }
-    }, [board, cages]);
+    }, [showErrors, isWon]);
 
     const solveGame = useCallback(() => {
         // Create a copy of the solution board
@@ -271,12 +278,14 @@ export function useSudokuGame(initialDifficulty = 'medium') {
 
     return {
         board,
+        solutionBoard,
         cages,
         cellToCageIndex,
         selectedCell,
         status,
         isWon,
         isAutoSolved,
+        showErrors,
         difficulty,
         startNewGame,
         handleCellSelect,

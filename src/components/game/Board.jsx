@@ -4,7 +4,7 @@ import Cell from './Cell';
 import { isStandardConflict, isCageConflict } from '../../logic/sudoku-validation';
 
 const Board = ({
-    board, cages, cellToCageIndex,
+    board, solutionBoard, showErrors, cages, cellToCageIndex,
     selectedCell, onSelect, isFixed, highlightedCageIndex, isPaused, onTogglePause
 }) => {
     // Helper to find cage object by index
@@ -77,6 +77,9 @@ const Board = ({
                         const conflictStandard = isStandardConflict(board, r, c);
                         const conflictCage = conflictingCageIndices.has(cageIndex);
 
+                        // Real-time error highlight
+                        const isError = showErrors && value !== 0 && value !== solutionBoard[r][c];
+
                         return (
                             <Cell
                                 key={`${r} -${c} `}
@@ -88,6 +91,7 @@ const Board = ({
                                 isHighlighted={isHighlighted}
                                 isSameValue={isSameValue}
                                 isCageHighlighted={highlightedCageIndex === cageIndex}
+                                isError={isError}
                                 fixedState={isFixed(r, c)}
                                 isConflict={conflictStandard}
                                 isCageConflict={conflictCage}

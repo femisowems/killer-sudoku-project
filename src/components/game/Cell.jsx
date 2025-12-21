@@ -4,9 +4,11 @@ import React from 'react';
 const Cell = ({
     r, c, value, cageIndex,
     isSelected, isHighlighted, isSameValue, isCageHighlighted, fixedState,
-    isConflict, isCageConflict, cageSum,
+    isConflict, isCageConflict, cageSum, isError,
     onSelect, cellToCageIndex
 }) => {
+    // ... (rest of borders logic) ...
+
     // 1. Grid Borders (Outer Container) - Always Solid
     const getGridBorders = () => {
         const thinSolid = '1px solid #cbd5e1'; // slate-300
@@ -34,7 +36,7 @@ const Cell = ({
     // 2. Cage Borders (Inner Overlay) - Dashed & Inset
     const getCageBorders = () => {
         // Use lighter border for dark backgrounds (Selected or Conflict)
-        const isDarkBg = isSelected || isConflict;
+        const isDarkBg = isSelected || isConflict || isError;
         const dashedCage = isDarkBg
             ? '2px dashed rgba(255, 255, 255, 0.7)' // White-ish for dark bg
             : '2px dashed #64748b'; // Slate-500 for light bg
@@ -67,7 +69,12 @@ const Cell = ({
     let textClass = 'text-slate-700';
     let zIndexClass = 'z-0'; // Default stacking
 
-    if (isConflict) {
+    if (isError) {
+        bgColorClass = 'bg-rose-300';
+        textClass = 'text-rose-900 font-bold';
+        zIndexClass = 'z-20';
+    }
+    else if (isConflict) {
         bgColorClass = 'bg-rose-400 text-white';
         textClass = 'text-white font-bold';
         zIndexClass = 'z-10';
