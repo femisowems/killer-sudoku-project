@@ -1,5 +1,5 @@
 
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { AreaChart, Area, Tooltip, ResponsiveContainer } from 'recharts';
 
 import { useGame } from '../../context/GameContext';
