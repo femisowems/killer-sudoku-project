@@ -79,10 +79,28 @@ export const GameProvider = ({ children }) => {
         }
     }, [isWon, difficulty, timerSeconds, isAutoSolved]);
 
+    // Theme State
+    const [theme, setTheme] = React.useState('white');
+
+    // Load theme on mount
+    React.useEffect(() => {
+        const savedTheme = localStorage.getItem('killerSudokuTheme');
+        if (savedTheme) {
+            setTheme(savedTheme);
+        }
+    }, []);
+
+    const updatedSetTheme = (newTheme) => {
+        setTheme(newTheme);
+        localStorage.setItem('killerSudokuTheme', newTheme);
+    };
+
     const value = {
         ...gameState,
         startNewGame: startNewGameWrapper,
-        stats
+        stats,
+        theme,
+        setTheme: updatedSetTheme
     };
 
     return (

@@ -10,14 +10,21 @@ import DifficultySelectionModal from './components/ui/DifficultySelectionModal';
 import CageCombinations from './components/game/CageCombinations';
 import GameInfo from './components/game/GameInfo';
 import Scoreboard from './components/game/Scoreboard';
+import ThemePicker from './components/ui/ThemePicker';
 import { useGame } from './context/GameContext';
+
+const THEME_COLORS = {
+  platinum: '#EBEBEB',
+  seashell: '#f7efe9',
+  onyx: '#0f0f0f'
+};
 
 function App() {
   const {
     status, isWon, selectedCell, difficulty,
     checkErrors, showErrors, togglePause, isPaused, setIsPaused, toggleNotesMode, isNotesMode,
     hintsRemaining, handleHint, solveGame, timerSeconds,
-    undo, redo, canUndo, canRedo
+    undo, redo, canUndo, canRedo, theme
   } = useGame();
 
   const [showWinModal, setShowWinModal] = React.useState(false);
@@ -45,7 +52,16 @@ function App() {
   }, [isWon]);
 
   return (
-    <div id="app-root" className="bg-background min-h-screen flex flex-col items-center py-6 px-2 md:py-10 md:px-4 font-sans text-slate-800">
+    <div
+      id="app-root"
+      className={`min-h-screen flex flex-col items-center py-6 px-2 md:py-10 md:px-4 font-sans transition-colors duration-300 ${theme === 'dark' ? 'text-slate-300' : 'text-slate-800'}`}
+      style={{ backgroundColor: THEME_COLORS[theme] || THEME_COLORS.white }}
+    >
+      {/* Theme Picker (Fixed Top Right) */}
+      <div className="absolute top-4 right-4 z-50">
+        <ThemePicker />
+      </div>
+
       {/* Header & Status */}
       <header id="game-header" className="flex flex-col items-center space-y-4 w-full max-w-[800px]">
         <Header />
