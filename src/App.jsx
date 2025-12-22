@@ -127,7 +127,7 @@ function App() {
                 title="Toggle Notes Mode"
               >
                 {/* Badge */}
-                <div className={`absolute -top-2 -right-2 px-1.5 py-0.5 text-[10px] font-bold rounded-full border shadow-sm ${isNotesMode ? 'bg-primary text-white border-white' : 'bg-slate-200 text-slate-500 border-white'}`}>
+                <div className={`absolute -top-2 -left-2 px-1.5 py-0.5 text-[10px] font-bold rounded-full border shadow-sm ${isNotesMode ? 'bg-primary text-white border-white' : 'bg-slate-200 text-slate-500 border-white'}`}>
                   {isNotesMode ? 'ON' : 'OFF'}
                 </div>
                 <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" viewBox="0 0 20 20" fill="currentColor">
@@ -255,7 +255,7 @@ function App() {
                 title="Toggle Notes Mode"
               >
                 {/* Badge */}
-                <div className={`absolute -top-2 -right-2 px-1.5 py-0.5 text-[10px] font-bold rounded-full border shadow-sm ${isNotesMode ? 'bg-primary text-white border-white' : 'bg-slate-200 text-slate-500 border-white'}`}>
+                <div className={`absolute -top-2 -left-2 px-1.5 py-0.5 text-[10px] font-bold rounded-full border shadow-sm ${isNotesMode ? 'bg-primary text-white border-white' : 'bg-slate-200 text-slate-500 border-white'}`}>
                   {isNotesMode ? 'ON' : 'OFF'}
                 </div>
                 <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" viewBox="0 0 20 20" fill="currentColor">
