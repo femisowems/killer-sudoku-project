@@ -1,13 +1,15 @@
 
 import React from 'react';
 
+import { motion } from 'framer-motion';
+
 const Cell = ({
     r, c, value, cageIndex,
     isSelected, isHighlighted, isSameValue, isCageHighlighted, fixedState,
     isConflict, isCageConflict, cageSum, isError,
     onSelect, cellToCageIndex, notes
 }) => {
-    // ... (rest of borders logic) ...
+    // ... existing logic ...
 
     // 1. Grid Borders (Outer Container) - Always Solid
     const getGridBorders = () => {
@@ -138,7 +140,14 @@ const Cell = ({
             )}
 
             {value !== 0 ? (
-                value
+                <motion.span
+                    initial={{ scale: 0.5, opacity: 0 }}
+                    animate={{ scale: 1, opacity: 1 }}
+                    key={value}
+                    transition={{ type: "spring", stiffness: 300, damping: 20 }}
+                >
+                    {value}
+                </motion.span>
             ) : (
                 <div className={`grid grid-cols-3 grid-rows-3 w-full h-full p-0.5 sm:p-1 pt-4 sm:pt-5 md:pt-6 pb-0.5`}>
                     {[1, 2, 3, 4, 5, 6, 7, 8, 9].map(num => (
