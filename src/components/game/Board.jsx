@@ -8,13 +8,12 @@ import { useGame } from '../../context/GameContext';
 const Board = ({ highlightedCageIndex }) => {
     const {
         board, solutionBoard, showErrors, cages, cellToCageIndex,
-        selectedCell, handleCellSelect, isFixed, isPaused, togglePause, notes
+        selectedCell, handleCellSelect, isFixed, isPaused, notes
     } = useGame();
 
     // Map context function names to local prop names for consistency if needed, 
     // or just direct use.
     const onSelect = handleCellSelect;
-    const onTogglePause = togglePause;
     // Helper to find cage object by index
     const getCage = (idx) => cages[idx];
 

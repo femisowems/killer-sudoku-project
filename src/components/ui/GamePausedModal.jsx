@@ -13,7 +13,6 @@ const GamePausedModal = ({ isOpen, onResume }) => {
 
     // Use context values and override if needed
     const timeSeconds = timerSeconds;
-    const handleResume = togglePause;
     if (!isOpen) return null;
 
     const formatTime = (totalSeconds) => {

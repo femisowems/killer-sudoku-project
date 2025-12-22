@@ -12,6 +12,12 @@ const CageCombinations = ({ onHighlightCage }) => {
         cageIndex = cellToCageIndex[selectedCell.r][selectedCell.c];
         cage = cages[cageIndex];
     }
+
+    const combinations = useMemo(() => {
+        if (!cage) return [];
+        return getCageCombinations(cage.sum, cage.cells.length);
+    }, [cage]);
+
     if (!cage) {
         return (
             <div className="bg-white p-4 rounded-2xl shadow-sm border border-slate-100 min-h-[100px] flex items-center justify-center text-slate-400 text-sm">
@@ -19,10 +25,6 @@ const CageCombinations = ({ onHighlightCage }) => {
             </div>
         );
     }
-
-    const combinations = useMemo(() => {
-        return getCageCombinations(cage.sum, cage.cells.length);
-    }, [cage.sum, cage.cells.length]);
 
     return (
         <div

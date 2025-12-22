@@ -7,7 +7,7 @@ const Controls = () => {
     const { handleNumberInput, board } = useGame();
     // Map for consistency
     const onNumberInput = handleNumberInput;
-    const onClear = () => handleNumberInput(0);
+    const onClear = React.useCallback(() => handleNumberInput(0), [handleNumberInput]);
 
     // Calculate numberCounts locally or get it from context if we move it there.
     // Ideally this logic should be in the hook/context, but for now we can derive it here 

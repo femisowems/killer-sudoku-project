@@ -16,7 +16,7 @@ function App() {
   const {
     status, isWon, selectedCell, difficulty,
     checkErrors, showErrors, togglePause, isPaused, toggleNotesMode, isNotesMode,
-    hintsRemaining, handleHint, handleNumberInput, solveGame
+    hintsRemaining, handleHint, solveGame
   } = useGame();
 
   const [showWinModal, setShowWinModal] = React.useState(false);
@@ -250,7 +250,7 @@ function App() {
                 )}
               </button>
               <button
-                onClick={useGame().solveGame}
+                onClick={solveGame}
                 disabled={isWon}
                 className={`flex-1 flex items-center justify-center rounded-lg active:scale-95 transition-all shadow-sm ${isWon
                   ? 'bg-slate-100 text-slate-300 cursor-not-allowed'
