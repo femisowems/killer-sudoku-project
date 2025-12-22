@@ -7,7 +7,7 @@ on:
     branches: [ main, master ]
 
 jobs:
-  build-and-lint:
+  Build-and-Lint:
     runs-on: ubuntu-latest
 
     steps:
