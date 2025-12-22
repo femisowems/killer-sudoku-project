@@ -5,66 +5,8 @@ import { AreaChart, Area, Tooltip, ResponsiveContainer } from 'recharts';
 import { useGame } from '../../context/GameContext';
 
 const Scoreboard = () => {
-    const { difficulty, isWon, timerSeconds, isAutoSolved } = useGame();
-    const [stats, setStats] = useState({
-        easy: { started: 0, wins: [] },
-        medium: { started: 0, wins: [] },
-        hard: { started: 0, wins: [] }
-    });
+    const { difficulty, stats } = useGame(); // Consume stats from context
     const [viewDetail, setViewDetail] = useState(false);
-
-    // Load stats and migrate
-    useEffect(() => {
-        const savedStats = localStorage.getItem('killerSudokuStats');
-        if (savedStats) {
-            setStats(JSON.parse(savedStats));
-        } else {
-            // Attempt migration from old best times
-            const oldBest = localStorage.getItem('killerSudokuBestTimes');
-            if (oldBest) {
-                const parsedBest = JSON.parse(oldBest);
-                const newStats = {
-                    easy: { started: parsedBest.easy ? 1 : 0, wins: parsedBest.easy ? [parsedBest.easy] : [] },
-                    medium: { started: parsedBest.medium ? 1 : 0, wins: parsedBest.medium ? [parsedBest.medium] : [] },
-                    hard: { started: parsedBest.hard ? 1 : 0, wins: parsedBest.hard ? [parsedBest.hard] : [] }
-                };
-                setStats(newStats);
-                localStorage.setItem('killerSudokuStats', JSON.stringify(newStats));
-            }
-        }
-    }, []);
-
-    // Update stats on win
-    useEffect(() => {
-        if (isWon && !isAutoSolved) {
-            setStats(prev => {
-                // Check if this win is already recorded (simple debounce via timerSeconds check? or just rely on isWon only firing once per game session ideally. 
-                // Context state cleanup ensures proper isWon toggling, but react strict mode might fire twice.
-                // We'll trust the updater function runs correctly or we can check if last win time equals current.
-                // For safety, let's assume one mount per win or simple distinct addition.
-
-                const currentDiffStats = prev[difficulty] || { started: 1, wins: [] }; // fallback if started not tracked yet
-                const lastWin = currentDiffStats.wins[currentDiffStats.wins.length - 1];
-
-                // Prevent duplicate recording of same game win if re-rendering
-                // NOTE: This logic is imperfect vs reloads, but good enough for session.
-                // A better way is if GameContext provided a unique GameID.
-                // For now, we'll check if the last win matches the current time mostly.
-                if (lastWin === timerSeconds) return prev;
-
-                const newWins = [...currentDiffStats.wins, timerSeconds];
-                const newStats = {
-                    ...prev,
-                    [difficulty]: {
-                        ...currentDiffStats,
-                        wins: newWins
-                    }
-                };
-                localStorage.setItem('killerSudokuStats', JSON.stringify(newStats));
-                return newStats;
-            });
-        }
-    }, [isWon, difficulty, timerSeconds, isAutoSolved]);
 
     const getStatsForLevel = (level) => {
         const s = stats[level] || { started: 0, wins: [] };
