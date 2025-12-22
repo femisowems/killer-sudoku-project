@@ -155,6 +155,37 @@ export function useSudokuGame(initialDifficulty = 'medium') {
         }
     }, [board, solutionBoard, isWon]);
 
+    // Idle Timer (5 minutes)
+    const idleTimerRef = useRef(null);
+
+    const resetIdleTimer = useCallback(() => {
+        if (idleTimerRef.current) clearTimeout(idleTimerRef.current);
+
+        // Only set timer if not won and not already paused
+        if (!isWon && !isPaused) {
+            idleTimerRef.current = setTimeout(() => {
+                setIsPaused(true);
+                // Optional: alert or status update? Usually modal is sufficient.
+            }, 300000); // 5 minutes = 300,000 ms
+        }
+    }, [isWon, isPaused]);
+
+    useEffect(() => {
+        // Events to detect activity
+        const events = ['mousemove', 'keydown', 'mousedown', 'touchstart', 'click'];
+        const handleActivity = () => resetIdleTimer();
+
+        events.forEach(event => window.addEventListener(event, handleActivity));
+
+        // Initialize timer
+        resetIdleTimer();
+
+        return () => {
+            if (idleTimerRef.current) clearTimeout(idleTimerRef.current);
+            events.forEach(event => window.removeEventListener(event, handleActivity));
+        };
+    }, [resetIdleTimer]);
+
     // Keyboard Navigation
     useEffect(() => {
         const handleKeyDown = (e) => {
