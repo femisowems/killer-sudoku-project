@@ -125,46 +125,55 @@ const Scoreboard = () => {
                     </div>
 
                     {/* Mini History Chart - Recharts Area Chart */}
-                    <div className="col-span-2 mt-4 h-24 w-full">
-                        {stats[difficulty].wins.length > 0 ? (
-                            <ResponsiveContainer width="100%" height="100%">
-                                <AreaChart
-                                    data={stats[difficulty].wins.slice(-20).map((t, i) => ({ index: i + 1, time: t }))}
-                                >
-                                    <defs>
-                                        <linearGradient id="colorTime" x1="0" y1="0" x2="0" y2="1">
-                                            <stop offset="5%" stopColor="#4f46e5" stopOpacity={0.3} />
-                                            <stop offset="95%" stopColor="#4f46e5" stopOpacity={0} />
-                                        </linearGradient>
-                                    </defs>
-                                    <Tooltip
-                                        content={({ active, payload }) => {
-                                            if (active && payload && payload.length) {
-                                                return (
-                                                    <div className="bg-slate-800 text-white text-xs p-2 rounded shadow-lg">
-                                                        <p className="font-bold">Game {payload[0].payload.index}</p>
-                                                        <p>Time: {formatTime(payload[0].value)}</p>
-                                                    </div>
-                                                );
-                                            }
-                                            return null;
-                                        }}
-                                    />
-                                    <Area
-                                        type="monotone"
-                                        dataKey="time"
-                                        stroke="#4f46e5"
-                                        fillOpacity={1}
-                                        fill="url(#colorTime)"
-                                        strokeWidth={2}
-                                    />
-                                </AreaChart>
-                            </ResponsiveContainer>
-                        ) : (
-                            <div className="w-full h-full flex items-center justify-center text-xs text-slate-400 border border-dashed border-slate-200 rounded">
-                                Win a game to see your history!
-                            </div>
-                        )}
+                    <div className="col-span-2 mt-4 w-full">
+                        <h4 className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-2">
+                            Win History {stats[difficulty].wins.length > 20 ? '(Last 20)' : ''}
+                        </h4>
+                        <div className="h-24 w-full">
+                            {stats[difficulty].wins.length > 0 ? (
+                                <ResponsiveContainer width="100%" height="100%">
+                                    <AreaChart
+                                        data={stats[difficulty].wins.slice(-20).map((t, i) => {
+                                            const totalWins = stats[difficulty].wins.length;
+                                            const startIndex = Math.max(0, totalWins - 20);
+                                            return { index: startIndex + i + 1, time: t };
+                                        })}
+                                    >
+                                        <defs>
+                                            <linearGradient id="colorTime" x1="0" y1="0" x2="0" y2="1">
+                                                <stop offset="5%" stopColor="#4f46e5" stopOpacity={0.3} />
+                                                <stop offset="95%" stopColor="#4f46e5" stopOpacity={0} />
+                                            </linearGradient>
+                                        </defs>
+                                        <Tooltip
+                                            content={({ active, payload }) => {
+                                                if (active && payload && payload.length) {
+                                                    return (
+                                                        <div className="bg-slate-800 text-white text-xs p-2 rounded shadow-lg">
+                                                            <p className="font-bold">Win #{payload[0].payload.index}</p>
+                                                            <p>Time: {formatTime(payload[0].value)}</p>
+                                                        </div>
+                                                    );
+                                                }
+                                                return null;
+                                            }}
+                                        />
+                                        <Area
+                                            type="monotone"
+                                            dataKey="time"
+                                            stroke="#4f46e5"
+                                            fillOpacity={1}
+                                            fill="url(#colorTime)"
+                                            strokeWidth={2}
+                                        />
+                                    </AreaChart>
+                                </ResponsiveContainer>
+                            ) : (
+                                <div className="w-full h-full flex items-center justify-center text-xs text-slate-400 border border-dashed border-slate-200 rounded">
+                                    Win a game to see your history!
+                                </div>
+                            )}
+                        </div>
                     </div>
                 </div>
             )}
