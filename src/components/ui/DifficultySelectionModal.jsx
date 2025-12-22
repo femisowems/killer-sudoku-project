@@ -1,7 +1,15 @@
 
 import React from 'react';
 
-const DifficultyModal = ({ isOpen, onClose, onSelectDifficulty }) => {
+import { useGame } from '../../context/GameContext';
+
+const DifficultyModal = ({ isOpen, onClose }) => {
+    const { startNewGame } = useGame();
+    // Helper to handle selection
+    const onSelectDifficulty = (diff) => {
+        startNewGame(diff);
+        onClose();
+    };
     if (!isOpen) return null;
 
     return (

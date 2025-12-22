@@ -3,10 +3,18 @@ import React from 'react';
 import Cell from './Cell';
 import { isStandardConflict, isCageConflict } from '../../logic/sudoku-validation';
 
-const Board = ({
-    board, solutionBoard, showErrors, cages, cellToCageIndex,
-    selectedCell, onSelect, isFixed, highlightedCageIndex, isPaused, onTogglePause, notes
-}) => {
+import { useGame } from '../../context/GameContext';
+
+const Board = ({ highlightedCageIndex }) => {
+    const {
+        board, solutionBoard, showErrors, cages, cellToCageIndex,
+        selectedCell, handleCellSelect, isFixed, isPaused, togglePause, notes
+    } = useGame();
+
+    // Map context function names to local prop names for consistency if needed, 
+    // or just direct use.
+    const onSelect = handleCellSelect;
+    const onTogglePause = togglePause;
     // Helper to find cage object by index
     const getCage = (idx) => cages[idx];
 

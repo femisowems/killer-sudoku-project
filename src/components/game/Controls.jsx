@@ -1,9 +1,28 @@
 
 import React, { useEffect } from 'react';
 
-const Controls = ({
-    onNumberInput, onClear, numberCounts
-}) => {
+import { useGame } from '../../context/GameContext';
+
+const Controls = () => {
+    const { handleNumberInput, board } = useGame();
+    // Map for consistency
+    const onNumberInput = handleNumberInput;
+    const onClear = () => handleNumberInput(0);
+
+    // Calculate numberCounts locally or get it from context if we move it there.
+    // Ideally this logic should be in the hook/context, but for now we can derive it here 
+    // or keep it in App. Wait, if App calculates it, Controls needs it.
+    // Let's verify if `board` is in context. Yes.
+    // So we can memoize it here.
+    const numberCounts = React.useMemo(() => {
+        const counts = Array(10).fill(0);
+        board.forEach(row => {
+            row.forEach(val => {
+                if (val >= 1 && val <= 9) counts[val]++;
+            });
+        });
+        return counts;
+    }, [board]);
 
     useEffect(() => {
         const handleKeyDown = (e) => {

@@ -1,7 +1,10 @@
 
 import React, { useState, useEffect } from 'react';
 
-const Scoreboard = ({ difficulty, isWon, timerSeconds, isAutoSolved }) => {
+import { useGame } from '../../context/GameContext';
+
+const Scoreboard = () => {
+    const { difficulty, isWon, timerSeconds, isAutoSolved } = useGame();
     const [bestTimes, setBestTimes] = useState({
         easy: null,
         medium: null,

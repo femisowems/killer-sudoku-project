@@ -1,6 +1,11 @@
 import React from 'react';
 
-const GameInfo = ({ timeSeconds, mistakes, difficulty }) => {
+import { useGame } from '../../context/GameContext';
+
+const GameInfo = () => {
+    const { timerSeconds, mistakes, difficulty } = useGame();
+    // Map props
+    const timeSeconds = timerSeconds;
     // Format seconds into MM:SS
     const formatTime = (totalSeconds) => {
         const minutes = Math.floor(totalSeconds / 60);

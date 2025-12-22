@@ -1,6 +1,19 @@
 import React from 'react';
 
-const GamePausedModal = ({ isOpen, onResume, timeSeconds, mistakes, difficulty }) => {
+import { useGame } from '../../context/GameContext';
+
+const GamePausedModal = ({ isOpen, onResume }) => {
+    // Note: isOpen and onResume passed from App because App controls modal rendering?
+    // Actually, isPaused is in context, so we could check context.isPaused instead of props.isOpen.
+    // togglePause is also in context.
+    const { isPaused, togglePause, timerSeconds, mistakes, difficulty } = useGame();
+
+    // We can rely on context for open state and resume action
+    if (!isPaused) return null;
+
+    // Use context values and override if needed
+    const timeSeconds = timerSeconds;
+    const handleResume = togglePause;
     if (!isOpen) return null;
 
     const formatTime = (totalSeconds) => {

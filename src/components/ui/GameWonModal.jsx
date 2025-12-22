@@ -1,7 +1,12 @@
 
 import React from 'react';
 
-const WinModal = ({ isOpen, onClose, onViewSolved, timeSeconds, mistakes, difficulty }) => {
+import { useGame } from '../../context/GameContext';
+
+const WinModal = ({ isOpen, onClose, onViewSolved }) => {
+    const { timerSeconds, mistakes, difficulty } = useGame();
+    // Map props to context values
+    const timeSeconds = timerSeconds;
     if (!isOpen) return null;
 
     const formatTime = (totalSeconds) => {

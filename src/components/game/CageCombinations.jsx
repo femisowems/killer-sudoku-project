@@ -1,7 +1,17 @@
-import React, { useMemo } from 'react';
+import { useMemo } from 'react';
+import { useGame } from '../../context/GameContext';
 import { getCageCombinations } from '../../logic/sudoku-validation';
 
-const CageCombinations = ({ cage, cageIndex, onHighlightCage }) => {
+const CageCombinations = ({ onHighlightCage }) => {
+    const { cages, cellToCageIndex, selectedCell } = useGame();
+
+    // Derive active cage
+    let cage = null;
+    let cageIndex = -1;
+    if (selectedCell) {
+        cageIndex = cellToCageIndex[selectedCell.r][selectedCell.c];
+        cage = cages[cageIndex];
+    }
     if (!cage) {
         return (
             <div className="bg-white p-4 rounded-2xl shadow-sm border border-slate-100 min-h-[100px] flex items-center justify-center text-slate-400 text-sm">
