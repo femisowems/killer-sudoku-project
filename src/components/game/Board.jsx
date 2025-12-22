@@ -27,13 +27,17 @@ const Board = ({ highlightedCageIndex }) => {
     }, [board, cages]);
 
     return (
-        <div id="sudoku-board-container" className="relative bg-white w-full rounded-xl shadow-2xl overflow-hidden animate-pop-in border-4 border-slate-700">
+        <div id="sudoku-board-container"
+            className="relative w-full rounded-xl shadow-2xl overflow-hidden animate-pop-in border-4"
+            style={{ backgroundColor: 'var(--bg-panel)', borderColor: 'var(--border-thick)' }}
+        >
             {isPaused && (
                 <div className="absolute inset-0 z-50 bg-slate-900/10 backdrop-blur-md transition-all duration-300"></div>
             )}
             <div
                 id="sudoku-grid"
-                className="grid grid-cols-9 w-full bg-slate-800 gap-[1px] border-[1px] border-slate-800"
+                className="grid grid-cols-9 w-full gap-[1px] border-[1px]"
+                style={{ backgroundColor: 'var(--border-thin)', borderColor: 'var(--border-thin)' }}
             >
                 {board.map((row, r) => (
                     row.map((value, c) => {

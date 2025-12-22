@@ -51,11 +51,16 @@ function App() {
     }
   }, [isWon]);
 
+  // Apply theme to document root for global CSS variables
+  React.useEffect(() => {
+    document.documentElement.setAttribute('data-theme', theme);
+  }, [theme]);
+
   return (
     <div
       id="app-root"
-      className={`min-h-screen flex flex-col items-center py-6 px-2 md:py-10 md:px-4 font-sans transition-colors duration-300 ${theme === 'dark' ? 'text-slate-300' : 'text-slate-800'}`}
-      style={{ backgroundColor: THEME_COLORS[theme] || THEME_COLORS.white }}
+      className="min-h-screen flex flex-col items-center py-6 px-2 md:py-10 md:px-4 font-sans transition-colors duration-300"
+      style={{ backgroundColor: 'var(--bg-app)' }}
     >
       {/* Theme Picker (Fixed Top Right) */}
       <div className="absolute top-4 right-4 z-50">
@@ -90,7 +95,8 @@ function App() {
           <div id="mobile-action-buttons" className="w-full max-w-lg mt-6 grid grid-cols-4 gap-4 xl:hidden">
             <button
               onClick={() => setShowNewGameModal(true)}
-              className="py-3 px-2 bg-slate-800 text-white font-semibold rounded-xl shadow hover:bg-slate-900 active:scale-[0.98] transition-all text-sm sm:text-base flex items-center justify-center gap-2"
+              className="py-3 px-2 text-white font-semibold rounded-xl shadow hover:brightness-110 active:scale-[0.98] transition-all text-sm sm:text-base flex items-center justify-center gap-2"
+              style={{ backgroundColor: 'var(--border-thick)' }}
             >
               <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fillRule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clipRule="evenodd" /></svg>
               New
@@ -169,17 +175,17 @@ function App() {
               </button>
             </div>
 
-            {/* Pause & Solve Group - Reused from Desktop but kept in App because it mixes layout and Action */}
-            <div className="flex bg-slate-100 rounded-xl p-1 gap-1">
+            <div className="flex rounded-xl p-1 gap-1" style={{ backgroundColor: 'var(--bg-app)' }}>
               <button
                 onClick={togglePause}
                 disabled={isWon}
                 className={`flex-1 flex items-center justify-center rounded-lg active:scale-95 transition-all shadow-sm ${isWon
-                  ? 'bg-slate-100 text-slate-300 cursor-not-allowed'
+                  ? 'bg-slate-100 text-slate-300 opacity-50 cursor-not-allowed'
                   : isPaused
                     ? 'bg-primary text-white'
-                    : 'bg-white text-slate-600 hover:text-primary'
+                    : 'bg-white text-slate-600 hover:text-primary transition-colors'
                   }`}
+                style={{ backgroundColor: !isWon && !isPaused ? 'var(--bg-panel)' : undefined, color: !isWon && !isPaused ? 'var(--text-base)' : undefined }}
                 title={isPaused ? "Resume Game" : "Pause Game"}
               >
                 {isPaused ? (
@@ -192,9 +198,10 @@ function App() {
                 onClick={solveGame}
                 disabled={isWon}
                 className={`flex-1 flex items-center justify-center rounded-lg active:scale-95 transition-all shadow-sm ${isWon
-                  ? 'bg-slate-100 text-slate-300 cursor-not-allowed'
-                  : 'bg-white text-rose-500 hover:bg-rose-50 hover:text-rose-600'
+                  ? 'bg-slate-100 text-slate-300 opacity-50 cursor-not-allowed'
+                  : 'bg-white text-rose-500 hover:bg-rose-50 hover:text-rose-600 transition-colors'
                   }`}
+                style={{ backgroundColor: !isWon ? 'var(--bg-panel)' : undefined }}
                 title="Solve Puzzle"
               >
                 <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" viewBox="0 0 20 20" fill="currentColor">
@@ -218,7 +225,8 @@ function App() {
           <div id="desktop-action-buttons" className="w-full max-w-lg mt-6 hidden xl:grid grid-cols-4 gap-4">
             <button
               onClick={() => setShowNewGameModal(true)}
-              className="py-3 px-2 bg-slate-800 text-white font-semibold rounded-xl shadow hover:bg-slate-900 active:scale-[0.98] transition-all text-sm sm:text-base flex items-center justify-center gap-2"
+              className="py-3 px-2 text-white font-semibold rounded-xl shadow hover:brightness-110 active:scale-[0.98] transition-all text-sm sm:text-base flex items-center justify-center gap-2"
+              style={{ backgroundColor: 'var(--border-thick)' }}
             >
               <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fillRule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clipRule="evenodd" /></svg>
               New
@@ -258,16 +266,17 @@ function App() {
               </div>
             </div>
             {/* Notes & Hint Group */}
-            <div className={`flex rounded-xl p-1 gap-1 border transition-colors ${isNotesMode ? 'bg-primary/10 border-primary/20' : 'bg-amber-50 border-amber-100'}`}>
+            <div className="flex rounded-xl p-1 gap-1 border transition-colors" style={{ backgroundColor: 'var(--bg-app)', borderColor: 'var(--border-thin)' }}>
               <button
                 onClick={toggleNotesMode}
                 disabled={isWon}
                 className={`relative flex-1 flex items-center justify-center rounded-lg active:scale-95 transition-all shadow-sm ${isWon
-                  ? 'bg-transparent text-slate-300 cursor-not-allowed'
+                  ? 'bg-transparent opacity-50 cursor-not-allowed'
                   : isNotesMode
                     ? 'bg-primary text-white hover:bg-primary/90'
-                    : 'text-amber-700 hover:bg-amber-100/50'
+                    : 'hover:brightness-95'
                   }`}
+                style={{ color: !isWon && !isNotesMode ? 'var(--text-base)' : undefined }}
                 title="Toggle Notes Mode"
               >
                 {/* Badge */}
@@ -282,7 +291,7 @@ function App() {
                 onClick={handleHint}
                 disabled={isWon || hintsRemaining <= 0}
                 className={`relative flex-1 flex items-center justify-center rounded-lg active:scale-95 transition-all shadow-sm ${(isWon || hintsRemaining <= 0)
-                  ? 'bg-slate-50 text-slate-300 cursor-not-allowed'
+                  ? 'bg-slate-50 text-slate-300 opacity-50 cursor-not-allowed'
                   : 'hover:bg-amber-200 text-amber-600'
                   }`}
                 title={isWon ? "Game Won" : hintsRemaining > 0 ? "Get Hint" : "No Hints Remaining"}
@@ -297,16 +306,17 @@ function App() {
               </button>
             </div>
 
-            <div className="flex bg-slate-100 rounded-xl p-1 gap-1">
+            <div className="flex rounded-xl p-1 gap-1" style={{ backgroundColor: 'var(--bg-app)' }}>
               <button
                 onClick={togglePause}
                 disabled={isWon}
                 className={`flex-1 flex items-center justify-center rounded-lg active:scale-95 transition-all shadow-sm ${isWon
-                  ? 'bg-slate-100 text-slate-300 cursor-not-allowed'
+                  ? 'bg-slate-100 text-slate-300 opacity-50 cursor-not-allowed'
                   : isPaused
                     ? 'bg-primary text-white'
-                    : 'bg-white text-slate-600 hover:text-primary'
+                    : 'bg-white text-slate-600 hover:text-primary transition-colors'
                   }`}
+                style={{ backgroundColor: !isWon && !isPaused ? 'var(--bg-panel)' : undefined, color: !isWon && !isPaused ? 'var(--text-base)' : undefined }}
                 title={isPaused ? "Resume Game" : "Pause Game"}
               >
                 {isPaused ? (
@@ -319,9 +329,10 @@ function App() {
                 onClick={solveGame}
                 disabled={isWon}
                 className={`flex-1 flex items-center justify-center rounded-lg active:scale-95 transition-all shadow-sm ${isWon
-                  ? 'bg-slate-100 text-slate-300 cursor-not-allowed'
-                  : 'bg-white text-rose-500 hover:bg-rose-50 hover:text-rose-600'
+                  ? 'bg-slate-100 text-slate-300 opacity-50 cursor-not-allowed'
+                  : 'bg-white text-rose-500 hover:bg-rose-50 hover:text-rose-600 transition-colors'
                   }`}
+                style={{ backgroundColor: !isWon ? 'var(--bg-panel)' : undefined }}
                 title="Solve Puzzle"
               >
                 <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" viewBox="0 0 20 20" fill="currentColor">
@@ -340,8 +351,8 @@ function App() {
           />
 
           {/* Instructions / Tips */}
-          <div className="bg-slate-50 p-4 rounded-xl border border-slate-200 text-xs text-slate-500">
-            <p className="mb-2 font-semibold">How to play:</p>
+          <div className="p-4 rounded-xl border text-xs" style={{ backgroundColor: 'var(--bg-panel)', borderColor: 'var(--border-thin)', color: 'var(--text-muted)' }}>
+            <p className="mb-2 font-semibold" style={{ color: 'var(--text-base)' }}>How to play:</p>
             <ul className="list-disc pl-4 space-y-1">
               <li>Normal Sudoku rules apply.</li>
               <li>Numbers in cages must sum to the target.</li>
@@ -367,9 +378,9 @@ function App() {
         onClose={() => setShowNewGameModal(false)}
       />
 
-      <footer className="mt-12 text-center text-slate-400 text-sm font-medium">
+      <footer className="mt-12 text-center text-sm font-medium" style={{ color: 'var(--text-muted)' }}>
         <p>
-          Made by <a href="https://ssowemimo.com" target="_blank" rel="noopener noreferrer" className="text-slate-500 hover:text-primary transition-colors">Femi Sowems</a>
+          Made by <a href="https://ssowemimo.com" target="_blank" rel="noopener noreferrer" className="hover:text-primary transition-colors" style={{ color: 'var(--text-base)' }}>Femi Sowems</a>
         </p>
       </footer>
     </div >

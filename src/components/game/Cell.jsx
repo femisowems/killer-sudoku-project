@@ -13,8 +13,8 @@ const Cell = ({
 
     // 1. Grid Borders (Outer Container) - Always Solid
     const getGridBorders = () => {
-        const thinSolid = '1px solid #cbd5e1'; // slate-300
-        const thickSolid = '2px solid #475569'; // slate-600
+        const thinSolid = '1px solid var(--border-thin)';
+        const thickSolid = '2px solid var(--border-thick)';
 
         const style = {};
 
@@ -41,10 +41,10 @@ const Cell = ({
         const isDarkBg = isSelected || isConflict || isError;
         const dashedCage = isDarkBg
             ? '2px dashed rgba(255, 255, 255, 0.7)' // White-ish for dark bg
-            : '2px dashed #64748b'; // Slate-500 for light bg
+            : '2px dashed var(--text-muted)'; // Thematic muted color
 
         const style = {};
-
+        // ... rest of getCageBorders remains same ...
         // Helper to safely get neighbor cage index
         const getCage = (row, col) => {
             if (row < 0 || row > 8 || col < 0 || col > 8) return -1;
@@ -67,55 +67,69 @@ const Cell = ({
     const baseClasses = "relative flex justify-center items-center text-lg sm:text-2xl md:text-3xl cursor-pointer select-none transition-all duration-200 focus:outline-none";
 
     // Background Color Logic
-    let bgColorClass = 'bg-white'; // Default hover state
-    let textClass = 'text-slate-700';
+    let bgColorClass = ''; // Will use inline style for theme-aware bg
+    let textClass = '';
     let zIndexClass = 'z-0'; // Default stacking
 
+    const themeStyles = {
+        backgroundColor: 'var(--bg-panel)',
+        color: 'var(--text-base)'
+    };
+
     if (isError) {
-        bgColorClass = 'bg-rose-300';
-        textClass = 'text-rose-900 font-bold';
+        themeStyles.backgroundColor = 'var(--bg-error)';
+        themeStyles.color = 'var(--text-error)';
+        themeStyles.fontWeight = 'bold';
         zIndexClass = 'z-20';
     }
     else if (isConflict) {
-        bgColorClass = 'bg-rose-400 text-white';
-        textClass = 'text-white font-bold';
+        themeStyles.backgroundColor = 'var(--bg-error)';
+        themeStyles.color = 'var(--text-error)';
+        themeStyles.fontWeight = 'bold';
         zIndexClass = 'z-10';
     }
     else if (isCageConflict) {
-        bgColorClass = 'bg-rose-100';
+        themeStyles.backgroundColor = 'rgba(244, 63, 94, 0.1)'; // Subtle red without wiping theme
     }
     else if (isSelected) {
-        bgColorClass = 'bg-primary text-white';
-        textClass = 'text-white font-bold';
+        themeStyles.backgroundColor = 'var(--bg-selected)';
+        themeStyles.color = 'var(--text-selected)';
+        themeStyles.fontWeight = 'bold';
         zIndexClass = 'z-30';
     }
     else if (isSameValue) {
-        bgColorClass = 'bg-indigo-200';
-        textClass = 'text-primary font-bold';
+        themeStyles.backgroundColor = 'var(--bg-highlight)';
+        themeStyles.color = 'var(--primary-accent)';
+        themeStyles.fontWeight = 'bold';
     }
     else if (isCageHighlighted) {
-        bgColorClass = 'bg-yellow-100';
+        // Keep a thematic hint for cage highlighting
+        themeStyles.backgroundColor = 'var(--primary-accent-muted)';
     }
     else if (fixedState === 'hinted') {
-        bgColorClass = 'bg-amber-100';
-        textClass = 'text-amber-900 font-bold';
+        themeStyles.backgroundColor = 'var(--bg-hint)';
+        themeStyles.color = 'var(--text-hint)';
+        themeStyles.fontWeight = 'bold';
     }
     else if (fixedState === 'prefilled') {
-        bgColorClass = 'bg-slate-100';
-        textClass = 'text-slate-900 font-bold';
+        themeStyles.backgroundColor = 'var(--bg-prefilled)';
+        themeStyles.color = 'var(--text-prefilled)';
+        themeStyles.fontWeight = 'bold';
     }
     else if (isHighlighted) {
-        bgColorClass = 'bg-indigo-50';
-        textClass = 'text-primary font-bold';
+        themeStyles.backgroundColor = 'var(--bg-highlight)';
+        themeStyles.color = 'var(--primary-accent)';
+        themeStyles.fontWeight = 'bold';
     }
     else if (value !== 0) {
         // User entered value
-        textClass = 'text-primary font-bold';
+        themeStyles.color = 'var(--primary-accent)';
+        themeStyles.fontWeight = 'bold';
     }
 
     // Fix hover blocking selection
     if (!isSelected && !isConflict && !fixedState && !isSameValue) {
-        bgColorClass += ' hover:bg-slate-50';
+        bgColorClass += ' hover:brightness-95'; // Subtle hover across themes
     }
 
     return (
@@ -124,6 +138,7 @@ const Cell = ({
             className={`${baseClasses} ${bgColorClass} ${textClass} ${zIndexClass}`}
             style={{
                 ...getGridBorders(),
+                ...themeStyles,
                 aspectRatio: '0.9'
             }}
         >
@@ -134,7 +149,7 @@ const Cell = ({
             />
 
             {cageSum && (
-                <span className={`absolute top-[6px] left-[5px] md:top-[6px] md:left-[6px] text-[8px] md:text-xs font-bold leading-none pointer-events-none z-30 px-[2px] py-0 md:px-1 md:py-0.5 rounded-sm ${isSelected || isConflict ? 'text-white' : 'text-slate-800'}`}>
+                <span className={`absolute top-[6px] left-[5px] md:top-[6px] md:left-[6px] text-[8px] md:text-xs font-bold leading-none pointer-events-none z-30 px-[2px] py-0 md:px-1 md:py-0.5 rounded-sm ${isSelected || isConflict ? 'text-white' : ''}`} style={{ color: !(isSelected || isConflict) ? 'var(--text-base)' : undefined }}>
                     {cageSum}
                 </span>
             )}
@@ -151,7 +166,7 @@ const Cell = ({
             ) : (
                 <div className={`grid grid-cols-3 grid-rows-3 w-full h-full p-0.5 sm:p-1 pt-4 sm:pt-5 md:pt-6 pb-0.5`}>
                     {[1, 2, 3, 4, 5, 6, 7, 8, 9].map(num => (
-                        <div key={num} className={`flex items-center justify-center text-[7px] sm:text-[8px] md:text-[9px] leading-none font-medium ${isSelected || isConflict ? 'text-white/90' : 'text-slate-500'}`}>
+                        <div key={num} className={`flex items-center justify-center text-[7px] sm:text-[8px] md:text-[9px] leading-none font-medium ${isSelected || isConflict ? 'text-white/90' : ''}`} style={{ color: !(isSelected || isConflict) ? 'var(--text-muted)' : undefined }}>
                             {notes && notes.has(num) ? num : ''}
                         </div>
                     ))}

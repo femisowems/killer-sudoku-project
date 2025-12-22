@@ -14,30 +14,30 @@ const GameInfo = () => {
     };
 
     return (
-        <div className="bg-white rounded-2xl shadow-sm border border-slate-100 flex flex-col w-full overflow-hidden mb-6 animate-fade-in">
+        <div className="rounded-2xl shadow-sm border flex flex-col w-full overflow-hidden mb-6 animate-fade-in" style={{ backgroundColor: 'var(--bg-panel)', borderColor: 'var(--border-thin)' }}>
             {/* Grid for 3 items */}
-            <div className="grid grid-cols-3 divide-x divide-slate-100">
+            <div className="grid grid-cols-3 divide-x" style={{ borderColor: 'var(--border-thin)' }}>
 
                 {/* Time */}
-                <div className="p-4 flex flex-col items-center justify-center bg-slate-50/50 relative group">
-                    <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Time</span>
-                    <div id="timer-display" className="text-xl font-mono font-bold text-slate-700 flex items-center gap-2">
+                <div className="p-4 flex flex-col items-center justify-center relative group" style={{ backgroundColor: 'var(--bg-app)' }}>
+                    <span className="text-[10px] font-bold uppercase tracking-widest mb-1" style={{ color: 'var(--text-muted)' }}>Time</span>
+                    <div id="timer-display" className="text-xl font-mono font-bold flex items-center gap-2" style={{ color: 'var(--text-base)' }}>
                         {formatTime(timeSeconds)}
                     </div>
                 </div>
 
                 {/* Mistakes */}
-                <div className="p-4 flex flex-col items-center justify-center bg-slate-50/50">
-                    <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Mistakes</span>
+                <div className="p-4 flex flex-col items-center justify-center" style={{ backgroundColor: 'var(--bg-app)' }}>
+                    <span className="text-[10px] font-bold uppercase tracking-widest mb-1" style={{ color: 'var(--text-muted)' }}>Mistakes</span>
                     <div id="mistakes-display" className={`text-xl font-mono font-bold ${mistakes > 0 ? 'text-rose-500' : 'text-emerald-500'}`}>
                         {mistakes}
                     </div>
                 </div>
 
                 {/* Difficulty */}
-                <div className="p-4 flex flex-col items-center justify-center bg-slate-50/50">
-                    <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Difficulty</span>
-                    <div id="difficulty-display" className="text-sm font-bold text-slate-700 capitalize">
+                <div className="p-4 flex flex-col items-center justify-center" style={{ backgroundColor: 'var(--bg-app)' }}>
+                    <span className="text-[10px] font-bold uppercase tracking-widest mb-1" style={{ color: 'var(--text-muted)' }}>Difficulty</span>
+                    <div id="difficulty-display" className="text-sm font-bold capitalize" style={{ color: 'var(--text-base)' }}>
                         {difficulty}
                     </div>
                 </div>

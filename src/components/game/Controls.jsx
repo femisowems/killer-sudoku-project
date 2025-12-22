@@ -46,7 +46,7 @@ const Controls = () => {
 
 
             {/* Number Input Panel */}
-            <div className="bg-white p-5 rounded-3xl shadow-lg border border-slate-100">
+            <div className="p-5 rounded-3xl shadow-lg border" style={{ backgroundColor: 'var(--bg-panel)', borderColor: 'var(--border-thin)' }}>
                 <div className="grid grid-cols-5 gap-3">
                     {[1, 2, 3, 4, 5, 6, 7, 8, 9].map(num => {
                         const isComplete = numberCounts && numberCounts[num] >= 9;
@@ -56,9 +56,14 @@ const Controls = () => {
                                 onClick={() => !isComplete && onNumberInput(num)}
                                 disabled={isComplete}
                                 className={`aspect-square flex items-center justify-center text-xl font-bold rounded-2xl border shadow-sm transition-all duration-200 ${isComplete
-                                    ? 'bg-slate-100 text-slate-300 border-slate-100 cursor-not-allowed opacity-50'
-                                    : 'bg-slate-50 text-slate-700 border-slate-200 hover:bg-primary hover:text-white hover:border-primary hover:shadow-md active:scale-95'
+                                    ? 'cursor-not-allowed opacity-50'
+                                    : 'hover:bg-primary hover:text-white hover:border-primary hover:shadow-md active:scale-95'
                                     }`}
+                                style={{
+                                    backgroundColor: isComplete ? 'var(--bg-app)' : 'var(--bg-panel)',
+                                    color: isComplete ? 'var(--text-muted)' : 'var(--text-base)',
+                                    borderColor: 'var(--border-thin)'
+                                }}
                             >
                                 {num}
                             </button>
@@ -68,7 +73,8 @@ const Controls = () => {
                     {/* Clear Button */}
                     <button
                         onClick={onClear}
-                        className="aspect-square flex items-center justify-center bg-slate-100 text-slate-500 rounded-2xl border border-slate-200 hover:bg-rose-100 hover:text-rose-500 hover:border-rose-200 active:scale-95 transition-all duration-200"
+                        className="aspect-square flex items-center justify-center rounded-2xl border hover:bg-rose-100 hover:text-rose-500 hover:border-rose-200 active:scale-95 transition-all duration-200"
+                        style={{ backgroundColor: 'var(--bg-app)', color: 'var(--text-muted)', borderColor: 'var(--border-thin)' }}
                         aria-label="Clear"
                     >
                         <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">

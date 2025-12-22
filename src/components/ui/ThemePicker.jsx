@@ -19,7 +19,8 @@ const ThemePicker = () => {
         <div className="relative z-50">
             <button
                 onClick={toggleOpen}
-                className={`p-2 rounded-full transition-colors shadow-sm border ${theme === 'dark' ? 'bg-slate-800 border-slate-700 text-slate-300 hover:bg-slate-700' : 'bg-white border-slate-200 text-slate-600 hover:bg-slate-50'}`}
+                className="p-2 rounded-full transition-all shadow-sm border hover:brightness-95 active:scale-95"
+                style={{ backgroundColor: 'var(--bg-panel)', borderColor: 'var(--border-thin)', color: 'var(--text-base)' }}
                 title="Change Theme"
             >
                 <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
@@ -33,7 +34,8 @@ const ThemePicker = () => {
                         initial={{ opacity: 0, scale: 0.9, y: -10 }}
                         animate={{ opacity: 1, scale: 1, y: 0 }}
                         exit={{ opacity: 0, scale: 0.9, y: -10 }}
-                        className="absolute right-0 mt-2 p-2 bg-white rounded-xl shadow-xl border border-slate-100 flex flex-col gap-2 min-w-[120px]"
+                        className="absolute right-0 mt-2 p-2 rounded-xl shadow-xl border flex flex-col gap-2 min-w-[140px]"
+                        style={{ backgroundColor: 'var(--bg-panel)', borderColor: 'var(--border-thin)' }}
                     >
                         {themes.map((t) => (
                             <button
@@ -42,13 +44,17 @@ const ThemePicker = () => {
                                     setTheme(t.id);
                                     setIsOpen(false);
                                 }}
-                                className={`flex items-center gap-3 p-2 rounded-lg transition-colors hover:bg-slate-50 ${theme === t.id ? 'bg-slate-50' : ''}`}
+                                className="flex items-center gap-3 p-2 rounded-lg transition-colors hover:brightness-95"
+                                style={{
+                                    backgroundColor: theme === t.id ? 'var(--bg-app)' : 'transparent',
+                                    color: 'var(--text-base)'
+                                }}
                             >
                                 <div
                                     className={`w-6 h-6 rounded-full border shadow-sm ${t.ring}`}
                                     style={{ backgroundColor: t.color }}
                                 />
-                                <span className="text-sm font-medium text-slate-700">{t.label}</span>
+                                <span className="text-sm font-medium">{t.label}</span>
                                 {theme === t.id && (
                                     <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-primary ml-auto" viewBox="0 0 20 20" fill="currentColor">
                                         <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />

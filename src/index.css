@@ -5,12 +5,95 @@
 @tailwind utilities;
 
 @layer base {
+    :root {
+        --bg-app: #EBEBEB;
+        --bg-panel: #FFFFFF;
+        --text-base: #1e293b;
+        --text-muted: #64748b;
+        --border-thin: #cbd5e1;
+        --border-thick: #475569;
+        --primary-accent: #4f46e5;
+        --primary-accent-muted: rgba(79, 70, 229, 0.1);
+        --bg-selected: #4f46e5;
+        --text-selected: #ffffff;
+        --bg-highlight: #f0f4ff;
+        --bg-prefilled: #f1f5f9;
+        --text-prefilled: #0f172a;
+        --bg-error: #fecaca;
+        --text-error: #991b1b;
+        --bg-hint: #fef3c7;
+        --text-hint: #92400e;
+    }
+
+    [data-theme="platinum"] {
+        --bg-app: #EBEBEB;
+        --bg-panel: #FFFFFF;
+        --text-base: #1e293b;
+        --text-muted: #64748b;
+        --border-thin: #cbd5e1;
+        --border-thick: #475569;
+        --primary-accent: #4f46e5;
+        --primary-accent-muted: rgba(79, 70, 229, 0.1);
+        --bg-selected: #4f46e5;
+        --text-selected: #ffffff;
+        --bg-highlight: #f0f4ff;
+        --bg-prefilled: #f1f5f9;
+        --text-prefilled: #0f172a;
+        --bg-error: #fecaca;
+        --text-error: #991b1b;
+        --bg-hint: #fef3c7;
+        --text-hint: #92400e;
+    }
+
+    [data-theme="seashell"] {
+        --bg-app: #f7efe9;
+        --bg-panel: #fffbf7;
+        --text-base: #433422;
+        --text-muted: #8c7355;
+        --border-thin: #e3d5c5;
+        --border-thick: #7d6348;
+        --primary-accent: #d97706;
+        --primary-accent-muted: rgba(217, 119, 6, 0.1);
+        --bg-selected: #d97706;
+        --text-selected: #ffffff;
+        --bg-highlight: #fff7ed;
+        --bg-prefilled: #fdf2e9;
+        --text-prefilled: #433422;
+        --bg-error: #fee2e2;
+        --text-error: #991b1b;
+        --bg-hint: #fef3c7;
+        --text-hint: #92400e;
+    }
+
+    [data-theme="onyx"] {
+        --bg-app: #0f0f0f;
+        --bg-panel: #1a1a1a;
+        --text-base: #e2e8f0;
+        --text-muted: #94a3b8;
+        --border-thin: #334155;
+        --border-thick: #64748b;
+        --primary-accent: #818cf8;
+        --primary-accent-muted: rgba(129, 140, 248, 0.1);
+        --bg-selected: #312e81;
+        --text-selected: #ffffff;
+        --bg-highlight: #1e1b4b;
+        --bg-prefilled: #262626;
+        --text-prefilled: #ffffff;
+        --bg-error: #7f1d1d;
+        --text-error: #fecaca;
+        --bg-hint: #78350f;
+        --text-hint: #fef3c7;
+    }
+
     html {
         overflow-y: scroll;
     }
 
     body {
-        @apply font-sans antialiased text-slate-800 bg-slate-50;
+        @apply font-sans antialiased;
+        background-color: var(--bg-app);
+        color: var(--text-base);
+        transition: background-color 0.3s ease, color 0.3s ease;
     }
 }
 
