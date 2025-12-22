@@ -253,6 +253,8 @@ export function useSudokuGame(initialDifficulty = 'medium') {
     useEffect(() => {
         // Don't save if empty or won (handled by clearGameState on new game, but saving won game is fine for review)
         if (board.length === 0) return;
+        // Enforce 10s minimum playtime to avoid saving ephemeral starts
+        if (timerSeconds <= 10) return;
 
         const stateToSave = {
             difficulty,
@@ -274,6 +276,9 @@ export function useSudokuGame(initialDifficulty = 'medium') {
     // Save on Unload / Visibility Change to capture Timer
     useEffect(() => {
         const handleSave = () => {
+            // Enforce 10s minimum playtime to avoid saving ephemeral starts
+            if (timerSeconds <= 10) return;
+
             const stateToSave = {
                 difficulty,
                 board,
@@ -484,6 +489,7 @@ export function useSudokuGame(initialDifficulty = 'medium') {
 
         isPaused,
         togglePause,
+        setIsPaused,
         notes,
         isNotesMode,
 

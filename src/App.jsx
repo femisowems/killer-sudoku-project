@@ -15,8 +15,8 @@ import { useGame } from './context/GameContext';
 function App() {
   const {
     status, isWon, selectedCell, difficulty,
-    checkErrors, showErrors, togglePause, isPaused, toggleNotesMode, isNotesMode,
-    hintsRemaining, handleHint, solveGame
+    checkErrors, showErrors, togglePause, isPaused, setIsPaused, toggleNotesMode, isNotesMode,
+    hintsRemaining, handleHint, solveGame, timerSeconds
   } = useGame();
 
   const [showWinModal, setShowWinModal] = React.useState(false);
@@ -27,6 +27,13 @@ function App() {
   React.useEffect(() => {
     setHighlightedCageIndex(null);
   }, [selectedCell, difficulty]);
+
+  // Pause game when New Game Modal is open
+  React.useEffect(() => {
+    if (showNewGameModal && !isPaused && !isWon) {
+      setIsPaused(true);
+    }
+  }, [showNewGameModal, isPaused, isWon, setIsPaused, timerSeconds]);
 
   React.useEffect(() => {
     if (isWon) {
@@ -287,7 +294,7 @@ function App() {
       </div >
 
       <GamePausedModal
-        isOpen={isPaused}
+        isOpen={isPaused && !showNewGameModal}
       />
 
       <GameWonModal

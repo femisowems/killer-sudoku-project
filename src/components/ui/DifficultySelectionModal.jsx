@@ -4,15 +4,18 @@ import React from 'react';
 import { useGame } from '../../context/GameContext';
 
 const DifficultyModal = ({ isOpen, onClose }) => {
-    const { startNewGame, isWon, timerSeconds, mistakes } = useGame();
+    const { startNewGame, isWon, timerSeconds, mistakes, setIsPaused, difficulty } = useGame();
 
-    // Check if game is in progress (not won, and has some time or mistakes logged)
-    // We check timerSeconds > 0 as a proxy for "started playing"
-    // Also since we auto-start a new game on load if none exists, this is usually true unless freshly reset.
-    // However, the intent is "continue PREVIOUS session". If it's a fresh game (0s), allow continue too?
-    // User request: "if a previous game was in play".
-    // If timerSeconds > 0, definitely in play.
-    const hasActiveGame = !isWon && (timerSeconds > 0 || mistakes > 0);
+    const formatTime = (seconds) => {
+        const m = Math.floor(seconds / 60);
+        const s = seconds % 60;
+        return `${m}:${s.toString().padStart(2, '0')}`;
+    };
+
+    // Check if game is in progress (not won, and has specific progress)
+    // User request: "game has been played for longer than 10 seconds"
+    // We strictly enforce timerSeconds > 10.
+    const hasActiveGame = !isWon && timerSeconds > 10;
 
     // Helper to handle selection
     const onSelectDifficulty = (diff) => {
@@ -35,12 +38,22 @@ const DifficultyModal = ({ isOpen, onClose }) => {
 
                     <div className="space-y-3">
                         {hasActiveGame && (
-                            <button
-                                onClick={onClose}
-                                className="w-full py-4 bg-slate-800 hover:bg-slate-900 text-white font-bold rounded-xl transition-all hover:scale-[1.02] active:scale-[0.98] shadow-md mb-4 border-2 border-slate-700"
-                            >
-                                Continue Game
-                            </button>
+                            <>
+                                <button
+                                    onClick={() => {
+                                        setIsPaused(false);
+                                        onClose();
+                                    }}
+                                    className="w-full py-4 bg-slate-800 hover:bg-slate-900 text-white font-bold rounded-xl transition-all hover:scale-[1.02] active:scale-[0.98] shadow-md mb-4 border-2 border-slate-700"
+                                >
+                                    Continue Game
+                                </button>
+                                <div className="flex justify-center items-center gap-4 text-xs font-semibold text-slate-500 bg-slate-100 py-2 rounded-lg mb-4 uppercase tracking-wider">
+                                    <span>{difficulty}</span>
+                                    <span className="w-1 h-1 bg-slate-400 rounded-full"></span>
+                                    <span>{formatTime(timerSeconds)}</span>
+                                </div>
+                            </>
                         )}
                         <div className="border-t border-slate-100 my-4 pt-4" hidden={!hasActiveGame}></div>
 
@@ -74,7 +87,7 @@ const DifficultyModal = ({ isOpen, onClose }) => {
                     )}
                 </div>
             </div>
-        </div>
+        </div >
     );
 };
 
