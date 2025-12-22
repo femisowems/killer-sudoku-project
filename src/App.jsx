@@ -4,6 +4,7 @@ import Board from './components/game/Board';
 import Controls from './components/game/Controls';
 import StatusMessage from './components/ui/StatusMessage';
 import GameWonModal from './components/ui/GameWonModal';
+import GamePausedModal from './components/ui/GamePausedModal';
 import DifficultySelectionModal from './components/ui/DifficultySelectionModal';
 import CageCombinations from './components/game/CageCombinations';
 import GameInfo from './components/game/GameInfo';
@@ -13,7 +14,7 @@ import { useSudokuGame } from './hooks/useSudokuGame';
 function App() {
   const {
     board, solutionBoard, cages, cellToCageIndex, selectedCell,
-    status, isWon, difficulty, timerSeconds, mistakes, isPaused, isAutoSolved, showErrors, notes, isNotesMode,
+    status, isWon, difficulty, timerSeconds, mistakes, isPaused, isAutoSolved, showErrors, notes, isNotesMode, hintsRemaining,
     startNewGame, handleCellSelect, handleNumberInput, handleHint, checkErrors, isFixed, solveGame, togglePause, toggleNotesMode
   } = useSudokuGame();
 
@@ -102,16 +103,28 @@ function App() {
             </button>
             <button
               onClick={checkErrors}
-              className={`py-3 px-2 font-semibold rounded-xl shadow-sm active:scale-[0.98] transition-all text-sm sm:text-base flex items-center justify-center gap-2 border whitespace-nowrap ${showErrors ? 'bg-rose-100 text-rose-700 border-rose-200 ring-2 ring-rose-200' : 'bg-white text-slate-700 border-slate-200 hover:bg-slate-50 hover:border-slate-300'}`}
+              disabled={isWon}
+              className={`py-3 px-2 font-semibold rounded-xl shadow-sm active:scale-[0.98] transition-all text-sm sm:text-base flex items-center justify-center gap-2 border whitespace-nowrap ${isWon
+                ? 'bg-slate-100 text-slate-400 border-slate-200 cursor-not-allowed'
+                : showErrors
+                  ? 'bg-rose-100 text-rose-700 border-rose-200 ring-2 ring-rose-200'
+                  : 'bg-white text-slate-700 border-slate-200 hover:bg-slate-50 hover:border-slate-300'
+                }`}
             >
-              <svg xmlns="http://www.w3.org/2000/svg" className={`h-5 w-5 ${showErrors ? 'text-rose-500' : 'text-slate-400'}`} viewBox="0 0 20 20" fill="currentColor"><path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" /></svg>
+              <svg xmlns="http://www.w3.org/2000/svg" className={`h-5 w-5 ${isWon ? 'text-slate-400' : showErrors ? 'text-rose-500' : 'text-slate-400'}`} viewBox="0 0 20 20" fill="currentColor"><path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" /></svg>
               Check
             </button>
             {/* Notes & Hint Group */}
             <div className={`flex rounded-xl p-1 gap-1 border transition-colors ${isNotesMode ? 'bg-primary/10 border-primary/20' : 'bg-amber-50 border-amber-100'}`}>
               <button
                 onClick={toggleNotesMode}
-                className={`relative flex-1 flex items-center justify-center rounded-lg active:scale-95 transition-all shadow-sm ${isNotesMode ? 'bg-primary text-white hover:bg-primary/90' : 'text-amber-700 hover:bg-amber-100/50'}`}
+                disabled={isWon}
+                className={`relative flex-1 flex items-center justify-center rounded-lg active:scale-95 transition-all shadow-sm ${isWon
+                  ? 'bg-transparent text-slate-300 cursor-not-allowed'
+                  : isNotesMode
+                    ? 'bg-primary text-white hover:bg-primary/90'
+                    : 'text-amber-700 hover:bg-amber-100/50'
+                  }`}
                 title="Toggle Notes Mode"
               >
                 {/* Badge */}
@@ -124,9 +137,17 @@ function App() {
               </button>
               <button
                 onClick={handleHint}
-                className="flex-1 flex items-center justify-center rounded-lg hover:bg-amber-200 text-amber-600 active:scale-95 transition-all shadow-sm"
-                title="Get Hint"
+                disabled={isWon || hintsRemaining <= 0}
+                className={`relative flex-1 flex items-center justify-center rounded-lg active:scale-95 transition-all shadow-sm ${(isWon || hintsRemaining <= 0)
+                  ? 'bg-slate-50 text-slate-300 cursor-not-allowed'
+                  : 'hover:bg-amber-200 text-amber-600'
+                  }`}
+                title={isWon ? "Game Won" : hintsRemaining > 0 ? "Get Hint" : "No Hints Remaining"}
               >
+                {/* Badge */}
+                <div className={`absolute -top-2 -right-2 px-2 py-0.5 text-[10px] font-bold rounded-full border shadow-sm ${!isWon && hintsRemaining > 0 ? 'bg-amber-500 text-white border-white' : 'bg-slate-200 text-slate-400 border-white'}`}>
+                  {hintsRemaining}
+                </div>
                 <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" viewBox="0 0 20 20" fill="currentColor">
                   <path d="M11 3a1 1 0 10-2 0v1a1 1 0 102 0V3zM15.657 5.757a1 1 0 00-1.414-1.414l-.707.707a1 1 0 001.414 1.414l.707-.707zM18 10a1 1 0 01-1 1h-1a1 1 0 110-2h1a1 1 0 011 1zM5.05 6.464A1 1 0 106.464 5.05l-.707-.707a1 1 0 00-1.414 1.414l.707.707zM5 10a1 1 0 01-1 1H3a1 1 0 110-2h1a1 1 0 011 1zM8 16v-1h4v1a2 2 0 11-4 0zM12 14c.015-.34.208-.646.477-.859a4 4 0 10-4.954 0c.27.213.462.519.476.859h4.002z" />
                 </svg>
@@ -137,7 +158,13 @@ function App() {
             <div className="flex bg-slate-100 rounded-xl p-1 gap-1">
               <button
                 onClick={togglePause}
-                className={`flex-1 flex items-center justify-center rounded-lg active:scale-95 transition-all shadow-sm ${isPaused ? 'bg-primary text-white' : 'bg-white text-slate-600 hover:text-primary'}`}
+                disabled={isWon}
+                className={`flex-1 flex items-center justify-center rounded-lg active:scale-95 transition-all shadow-sm ${isWon
+                  ? 'bg-slate-100 text-slate-300 cursor-not-allowed'
+                  : isPaused
+                    ? 'bg-primary text-white'
+                    : 'bg-white text-slate-600 hover:text-primary'
+                  }`}
                 title={isPaused ? "Resume Game" : "Pause Game"}
               >
                 {isPaused ? (
@@ -148,7 +175,11 @@ function App() {
               </button>
               <button
                 onClick={solveGame}
-                className="flex-1 flex items-center justify-center bg-white text-rose-500 rounded-lg hover:bg-rose-50 hover:text-rose-600 active:scale-95 transition-all shadow-sm"
+                disabled={isWon}
+                className={`flex-1 flex items-center justify-center rounded-lg active:scale-95 transition-all shadow-sm ${isWon
+                  ? 'bg-slate-100 text-slate-300 cursor-not-allowed'
+                  : 'bg-white text-rose-500 hover:bg-rose-50 hover:text-rose-600'
+                  }`}
                 title="Solve Puzzle"
               >
                 <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" viewBox="0 0 20 20" fill="currentColor">
@@ -186,6 +217,14 @@ function App() {
         </aside>
 
       </div>
+
+      <GamePausedModal
+        isOpen={isPaused}
+        onResume={togglePause}
+        timeSeconds={timerSeconds}
+        mistakes={mistakes}
+        difficulty={difficulty}
+      />
 
       <GameWonModal
         isOpen={showWinModal}

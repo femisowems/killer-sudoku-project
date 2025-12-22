@@ -22,22 +22,7 @@ const Board = ({
     return (
         <div id="sudoku-board-container" className="relative bg-white w-full rounded-xl shadow-2xl overflow-hidden animate-pop-in border-4 border-slate-700">
             {isPaused && (
-                <div className="absolute inset-0 z-50 bg-slate-900/20 backdrop-blur-md flex flex-col items-center justify-center animate-fade-in">
-                    <button
-                        onClick={onTogglePause}
-                        className="group relative bg-white rounded-full p-6 shadow-2xl hover:scale-110 active:scale-95 transition-all duration-300 cursor-pointer mb-4 ring-8 ring-white/30"
-                    >
-                        <svg xmlns="http://www.w3.org/2000/svg" className="h-16 w-16 text-emerald-500 ml-2" viewBox="0 0 20 20" fill="currentColor">
-                            <path d="M6.3 2.841A1.5 1.5 0 004 4.11V15.89a1.5 1.5 0 002.3 1.269l9.344-5.89a1.5 1.5 0 000-2.538L6.3 2.84z" />
-                        </svg>
-                        <div className="absolute -bottom-8 left-1/2 -translate-x-1/2 whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity text-white text-sm font-bold bg-slate-800 px-2 py-1 rounded shadow-lg">
-                            Resume Game
-                        </div>
-                    </button>
-                    <div className="bg-white/90 px-6 py-2 rounded-full shadow-lg backdrop-blur text-slate-800 font-bold text-lg mt-9">
-                        Game Paused
-                    </div>
-                </div>
+                <div className="absolute inset-0 z-50 bg-slate-900/10 backdrop-blur-md transition-all duration-300"></div>
             )}
             <div
                 id="sudoku-grid"

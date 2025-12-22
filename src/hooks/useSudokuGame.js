@@ -19,6 +19,7 @@ export function useSudokuGame(initialDifficulty = 'medium') {
     const [cages, setCages] = useState([]);
     const [startingCells, setStartingCells] = useState([]);
     const [hintedCells, setHintedCells] = useState([]);
+    const [hintsRemaining, setHintsRemaining] = useState(3);
     const [notes, setNotes] = useState(Array(9).fill(0).map(() => Array(9).fill(new Set())));
     const [isNotesMode, setIsNotesMode] = useState(false);
     const [selectedCell, setSelectedCell] = useState(null);
@@ -66,6 +67,7 @@ export function useSudokuGame(initialDifficulty = 'medium') {
         setIsAutoSolved(false); // Reset auto-solve flag
         setShowErrors(false); // Reset error showing
         setHintedCells([]);
+        setHintsRemaining(3);
         setSelectedCell(null);
         setTimerSeconds(0);
         setIsTimerRunning(true);
@@ -256,6 +258,10 @@ export function useSudokuGame(initialDifficulty = 'medium') {
     }, []);
 
     const handleHint = useCallback(() => {
+        if (hintsRemaining <= 0) {
+            setStatus({ message: 'No hints remaining!', type: 'info' });
+            return;
+        }
         if (!selectedCell) {
             setStatus({ message: 'Please select an empty cell to get a hint.', type: 'info' });
             return;
@@ -272,8 +278,9 @@ export function useSudokuGame(initialDifficulty = 'medium') {
         newBoard[r][c] = correctValue;
         setBoard(newBoard);
         setHintedCells([...hintedCells, [r, c]]);
+        setHintsRemaining(prev => prev - 1);
         setStatus({ message: `Hint applied: The correct number is ${correctValue}.`, type: 'success' });
-    }, [selectedCell, isFixed, solutionBoard, board, hintedCells]);
+    }, [selectedCell, isFixed, solutionBoard, board, hintedCells, hintsRemaining]);
 
     const checkErrors = useCallback(() => {
         // If already won, do nothing
@@ -335,6 +342,8 @@ export function useSudokuGame(initialDifficulty = 'medium') {
         togglePause,
         notes,
         isNotesMode,
+        isNotesMode,
         toggleNotesMode,
+        hintsRemaining,
     };
 }
