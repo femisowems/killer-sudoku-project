@@ -63,7 +63,7 @@ function App() {
       style={{ backgroundColor: 'var(--bg-app)' }}
     >
       {/* Theme Picker (Fixed Top Right) */}
-      <div className="absolute top-4 right-4 z-50">
+      <div className="absolute top-2 right-2 sm:top-4 sm:right-4 z-50">
         <ThemePicker />
       </div>
 
