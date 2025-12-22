@@ -28,7 +28,7 @@ export function useSudokuGame(initialDifficulty = 'medium') {
     const [isTimerRunning, setIsTimerRunning] = useState(false);
     const [isPaused, setIsPaused] = useState(false);
     const [isAutoSolved, setIsAutoSolved] = useState(false);
-    const [showErrors, setShowErrors] = useState(false);
+    const [showErrors, setShowErrors] = useState(true);
     const [mistakes, setMistakes] = useState(0);
 
     // Worker Ref
@@ -82,7 +82,7 @@ export function useSudokuGame(initialDifficulty = 'medium') {
         setDifficulty(diff);
         setIsWon(false);
         setIsAutoSolved(false); // Reset auto-solve flag
-        setShowErrors(false); // Reset error showing
+        setShowErrors(true); // Reset error showing (default ON)
         setHintedCells([]);
         setHintsRemaining(3);
         setSelectedCell(null);
