@@ -38,22 +38,20 @@ const DifficultyModal = ({ isOpen, onClose }) => {
 
                     <div className="space-y-3">
                         {hasActiveGame && (
-                            <>
-                                <button
-                                    onClick={() => {
-                                        setIsPaused(false);
-                                        onClose();
-                                    }}
-                                    className="w-full py-4 bg-slate-800 hover:bg-slate-900 text-white font-bold rounded-xl transition-all hover:scale-[1.02] active:scale-[0.98] shadow-md mb-4 border-2 border-slate-700"
-                                >
-                                    Continue Game
-                                </button>
-                                <div className="flex justify-center items-center gap-4 text-xs font-semibold text-slate-500 bg-slate-100 py-2 rounded-lg mb-4 uppercase tracking-wider">
+                            <button
+                                onClick={() => {
+                                    setIsPaused(false);
+                                    onClose();
+                                }}
+                                className="w-full py-3 bg-slate-800 hover:bg-slate-900 text-white rounded-xl transition-all hover:scale-[1.02] active:scale-[0.98] shadow-md border-2 border-slate-700 flex flex-col items-center justify-center gap-1"
+                            >
+                                <span className="text-lg font-bold">Continue Game</span>
+                                <div className="flex items-center gap-2 text-xs font-medium text-slate-300 uppercase tracking-wider bg-slate-700/50 px-3 py-0.5 rounded-full">
                                     <span>{difficulty}</span>
                                     <span className="w-1 h-1 bg-slate-400 rounded-full"></span>
                                     <span>{formatTime(timerSeconds)}</span>
                                 </div>
-                            </>
+                            </button>
                         )}
                         <div className="border-t border-slate-100 my-4 pt-4" hidden={!hasActiveGame}></div>
 
