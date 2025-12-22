@@ -58,7 +58,7 @@ const GamePausedModal = ({ isOpen, onResume }) => {
                     </div>
 
                     <button
-                        onClick={onResume}
+                        onClick={togglePause}
                         className="w-full py-4 bg-primary hover:bg-primary/90 text-white font-bold rounded-xl shadow-lg shadow-primary/30 transform transition hover:-translate-y-1 active:scale-[0.98]"
                     >
                         Resume Game
