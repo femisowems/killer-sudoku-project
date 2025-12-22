@@ -16,7 +16,8 @@ function App() {
   const {
     status, isWon, selectedCell, difficulty,
     checkErrors, showErrors, togglePause, isPaused, setIsPaused, toggleNotesMode, isNotesMode,
-    hintsRemaining, handleHint, solveGame, timerSeconds
+    hintsRemaining, handleHint, solveGame, timerSeconds,
+    undo, redo, canUndo, canRedo
   } = useGame();
 
   const [showWinModal, setShowWinModal] = React.useState(false);
@@ -78,19 +79,40 @@ function App() {
               <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fillRule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clipRule="evenodd" /></svg>
               New
             </button>
-            <button
-              onClick={checkErrors}
-              disabled={isWon}
-              className={`py-3 px-2 font-semibold rounded-xl shadow-sm active:scale-[0.98] transition-all text-sm sm:text-base flex items-center justify-center gap-2 border whitespace-nowrap ${isWon
-                ? 'bg-slate-100 text-slate-400 border-slate-200 cursor-not-allowed'
-                : showErrors
-                  ? 'bg-rose-100 text-rose-700 border-rose-200 ring-2 ring-rose-200'
-                  : 'bg-white text-slate-700 border-slate-200 hover:bg-slate-50 hover:border-slate-300'
-                }`}
-            >
-              <svg xmlns="http://www.w3.org/2000/svg" className={`h-5 w-5 ${isWon ? 'text-slate-400' : showErrors ? 'text-rose-500' : 'text-slate-400'}`} viewBox="0 0 20 20" fill="currentColor"><path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" /></svg>
-              Check
-            </button>
+            {/* Check & Undo/Redo Group */}
+            <div className="col-span-1 flex gap-1">
+              <button
+                onClick={checkErrors}
+                disabled={isWon}
+                className={`flex-1 py-3 px-1 font-semibold rounded-xl shadow-sm active:scale-[0.98] transition-all text-sm flex items-center justify-center border ${isWon
+                  ? 'bg-slate-100 text-slate-400 border-slate-200 cursor-not-allowed'
+                  : showErrors
+                    ? 'bg-rose-100 text-rose-700 border-rose-200 ring-2 ring-rose-200'
+                    : 'bg-white text-slate-700 border-slate-200 hover:bg-slate-50 hover:border-slate-300'
+                  }`}
+                title="Check Errors"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" className={`h-5 w-5 ${isWon ? 'text-slate-400' : showErrors ? 'text-rose-500' : 'text-slate-400'}`} viewBox="0 0 20 20" fill="currentColor"><path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" /></svg>
+              </button>
+              <div className="flex flex-col gap-0.5">
+                <button
+                  onClick={undo}
+                  disabled={isWon || !canUndo}
+                  className={`flex-1 px-2 rounded-lg text-xs font-bold transition-all ${isWon || !canUndo ? 'text-slate-300 bg-slate-100' : 'bg-white text-slate-600 border border-slate-200 hover:bg-slate-50 active:scale-95'}`}
+                  title="Undo"
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor"><path fillRule="evenodd" d="M9.707 16.707a1 1 0 01-1.414 0l-6-6a1 1 0 010-1.414l6-6a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l4.293 4.293a1 1 0 010 1.414z" clipRule="evenodd" /></svg>
+                </button>
+                <button
+                  onClick={redo}
+                  disabled={isWon || !canRedo}
+                  className={`flex-1 px-2 rounded-lg text-xs font-bold transition-all ${isWon || !canRedo ? 'text-slate-300 bg-slate-100' : 'bg-white text-slate-600 border border-slate-200 hover:bg-slate-50 active:scale-95'}`}
+                  title="Redo"
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor"><path fillRule="evenodd" d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z" clipRule="evenodd" /></svg>
+                </button>
+              </div>
+            </div>
             {/* Notes & Hint Group */}
             <div className={`flex rounded-xl p-1 gap-1 border transition-colors ${isNotesMode ? 'bg-primary/10 border-primary/20' : 'bg-amber-50 border-amber-100'}`}>
               <button
@@ -185,19 +207,40 @@ function App() {
               <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fillRule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clipRule="evenodd" /></svg>
               New
             </button>
-            <button
-              onClick={checkErrors}
-              disabled={isWon}
-              className={`py-3 px-2 font-semibold rounded-xl shadow-sm active:scale-[0.98] transition-all text-sm sm:text-base flex items-center justify-center gap-2 border whitespace-nowrap ${isWon
-                ? 'bg-slate-100 text-slate-400 border-slate-200 cursor-not-allowed'
-                : showErrors
-                  ? 'bg-rose-100 text-rose-700 border-rose-200 ring-2 ring-rose-200'
-                  : 'bg-white text-slate-700 border-slate-200 hover:bg-slate-50 hover:border-slate-300'
-                }`}
-            >
-              <svg xmlns="http://www.w3.org/2000/svg" className={`h-5 w-5 ${isWon ? 'text-slate-400' : showErrors ? 'text-rose-500' : 'text-slate-400'}`} viewBox="0 0 20 20" fill="currentColor"><path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" /></svg>
-              Check
-            </button>
+            {/* Check & Undo/Redo Group */}
+            <div className="col-span-1 flex gap-1">
+              <button
+                onClick={checkErrors}
+                disabled={isWon}
+                className={`flex-1 py-3 px-1 font-semibold rounded-xl shadow-sm active:scale-[0.98] transition-all text-sm flex items-center justify-center border ${isWon
+                  ? 'bg-slate-100 text-slate-400 border-slate-200 cursor-not-allowed'
+                  : showErrors
+                    ? 'bg-rose-100 text-rose-700 border-rose-200 ring-2 ring-rose-200'
+                    : 'bg-white text-slate-700 border-slate-200 hover:bg-slate-50 hover:border-slate-300'
+                  }`}
+                title="Check Errors"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" className={`h-5 w-5 ${isWon ? 'text-slate-400' : showErrors ? 'text-rose-500' : 'text-slate-400'}`} viewBox="0 0 20 20" fill="currentColor"><path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" /></svg>
+              </button>
+              <div className="flex flex-col gap-0.5">
+                <button
+                  onClick={undo}
+                  disabled={isWon || !canUndo}
+                  className={`flex-1 px-2 rounded-lg text-xs font-bold transition-all ${isWon || !canUndo ? 'text-slate-300 bg-slate-100' : 'bg-white text-slate-600 border border-slate-200 hover:bg-slate-50 active:scale-95'}`}
+                  title="Undo"
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor"><path fillRule="evenodd" d="M9.707 16.707a1 1 0 01-1.414 0l-6-6a1 1 0 010-1.414l6-6a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l4.293 4.293a1 1 0 010 1.414z" clipRule="evenodd" /></svg>
+                </button>
+                <button
+                  onClick={redo}
+                  disabled={isWon || !canRedo}
+                  className={`flex-1 px-2 rounded-lg text-xs font-bold transition-all ${isWon || !canRedo ? 'text-slate-300 bg-slate-100' : 'bg-white text-slate-600 border border-slate-200 hover:bg-slate-50 active:scale-95'}`}
+                  title="Redo"
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor"><path fillRule="evenodd" d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z" clipRule="evenodd" /></svg>
+                </button>
+              </div>
+            </div>
             {/* Notes & Hint Group */}
             <div className={`flex rounded-xl p-1 gap-1 border transition-colors ${isNotesMode ? 'bg-primary/10 border-primary/20' : 'bg-amber-50 border-amber-100'}`}>
               <button

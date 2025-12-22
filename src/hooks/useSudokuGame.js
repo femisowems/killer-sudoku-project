@@ -31,6 +31,10 @@ export function useSudokuGame(initialDifficulty = 'medium') {
     const [showErrors, setShowErrors] = useState(true);
     const [mistakes, setMistakes] = useState(0);
 
+    // History for Undo/Redo
+    const [history, setHistory] = useState([]);
+    const [future, setFuture] = useState([]);
+
     // Worker Ref
     const workerRef = useRef(null);
 
@@ -92,6 +96,8 @@ export function useSudokuGame(initialDifficulty = 'medium') {
         setMistakes(0);
         setNotes(Array(9).fill(0).map(() => Array(9).fill(new Set()))); // Reset notes
         setIsNotesMode(false); // Reset notes mode
+        setHistory([]); // Reset history
+        setFuture([]); // Reset future
 
         // 1. Generate solution
         const newSolution = generateValidBoard();
@@ -143,7 +149,10 @@ export function useSudokuGame(initialDifficulty = 'medium') {
         setHintedCells(savedState.hintedCells);
         setHintsRemaining(savedState.hintsRemaining);
         setNotes(savedState.notes);
+        setNotes(savedState.notes);
         setMistakes(savedState.mistakes);
+        setHistory(savedState.history || []); // Load history if available
+        setFuture([]); // Reset future on load (simpler)
         setTimerSeconds(savedState.timerSeconds);
         setIsTimerRunning(true); // Resume timer on load
         setIsPaused(savedState.isPaused); // Or maybe force pause? Let's keep saved state.
@@ -268,10 +277,11 @@ export function useSudokuGame(initialDifficulty = 'medium') {
             timerSeconds,
             isPaused,
             isWon,
-            isAutoSolved
+            isAutoSolved,
+            history // Save history
         };
         saveGameState(stateToSave);
-    }, [board, notes, mistakes, hintsRemaining, isPaused, isWon, difficulty, timerSeconds, isAutoSolved, solutionBoard, startingCells, hintedCells]);
+    }, [board, notes, mistakes, hintsRemaining, isPaused, isWon, difficulty, timerSeconds, isAutoSolved, solutionBoard, startingCells, hintedCells, history]);
 
     // Save on Unload / Visibility Change to capture Timer
     useEffect(() => {
@@ -291,7 +301,8 @@ export function useSudokuGame(initialDifficulty = 'medium') {
                 timerSeconds, // Captures current timer
                 isPaused,
                 isWon,
-                isAutoSolved
+                isAutoSolved,
+                history // Save history
             };
             saveGameState(stateToSave);
         };
@@ -302,36 +313,52 @@ export function useSudokuGame(initialDifficulty = 'medium') {
             window.removeEventListener('visibilitychange', handleSave);
             window.removeEventListener('pagehide', handleSave);
         };
-    }, [difficulty, board, solutionBoard, startingCells, hintedCells, hintsRemaining, notes, mistakes, timerSeconds, isPaused, isWon, isAutoSolved]);
 
-    // Keyboard Navigation
-    useEffect(() => {
-        const handleKeyDown = (e) => {
-            if (!selectedCell) return;
+    }, [difficulty, board, solutionBoard, startingCells, hintedCells, hintsRemaining, notes, mistakes, timerSeconds, isPaused, isWon, isAutoSolved, history]);
 
-            const { r, c } = selectedCell;
-            let newR = r;
-            let newC = c;
+    // History Helpers
+    const addToHistory = useCallback(() => {
+        // Deep copy board and notes (notes are Set, so need careful copy)
+        const currentBoard = board.map(row => [...row]);
+        const currentNotes = notes.map(row => row.map(set => new Set(set)));
 
-            if (e.key === 'ArrowUp') {
-                newR = Math.max(0, r - 1);
-            } else if (e.key === 'ArrowDown') {
-                newR = Math.min(8, r + 1);
-            } else if (e.key === 'ArrowLeft') {
-                newC = Math.max(0, c - 1);
-            } else if (e.key === 'ArrowRight') {
-                newC = Math.min(8, c + 1);
-            } else {
-                return; // Not an arrow key
-            }
+        setHistory(prev => [...prev, { board: currentBoard, notes: currentNotes }]);
+        setFuture([]); // Clear future on new move
+    }, [board, notes]);
 
-            e.preventDefault(); // Prevent scrolling
-            setSelectedCell({ r: newR, c: newC });
-        };
+    const undo = useCallback(() => {
+        if (!isPaused && !isWon && history.length > 0) {
+            const previousState = history[history.length - 1];
+            const newHistory = history.slice(0, -1);
 
-        window.addEventListener('keydown', handleKeyDown);
-        return () => window.removeEventListener('keydown', handleKeyDown);
-    }, [selectedCell]);
+            // Save current state to future before undoing
+            const currentBoard = board.map(row => [...row]);
+            const currentNotes = notes.map(row => row.map(set => new Set(set)));
+            setFuture(prev => [{ board: currentBoard, notes: currentNotes }, ...prev]);
+
+            // Apply previous state
+            setBoard(previousState.board);
+            setNotes(previousState.notes);
+            setHistory(newHistory);
+        }
+    }, [history, board, notes, isPaused, isWon]);
+
+    const redo = useCallback(() => {
+        if (!isPaused && !isWon && future.length > 0) {
+            const nextState = future[0];
+            const newFuture = future.slice(1);
+
+            // Save current state to history before redoing
+            const currentBoard = board.map(row => [...row]);
+            const currentNotes = notes.map(row => row.map(set => new Set(set)));
+            setHistory(prev => [...prev, { board: currentBoard, notes: currentNotes }]);
+
+            // Apply next state
+            setBoard(nextState.board);
+            setNotes(nextState.notes);
+            setFuture(newFuture);
+        }
+    }, [future, board, notes, isPaused, isWon]);
 
     const handleCellSelect = useCallback((r, c) => {
         if (selectedCell && selectedCell.r === r && selectedCell.c === c) {
@@ -363,10 +390,13 @@ export function useSudokuGame(initialDifficulty = 'medium') {
         // Avoid unnecessary updates
         if (!isNotesMode && board[r][c] === number) return;
 
-        // Notes Mode Logic
+        // Determine change
         if (isNotesMode) {
             // Cannot add notes to a cell with a value
             if (board[r][c] !== 0) return;
+
+            // Save state before changing notes
+            addToHistory();
 
             const currentNotes = new Set(notes[r][c]);
             if (currentNotes.has(number)) {
@@ -382,6 +412,9 @@ export function useSudokuGame(initialDifficulty = 'medium') {
         }
 
         // Standard Input Mode
+        // Save state before changing board
+        addToHistory();
+
         const newBoard = [...board.map(row => [...row])];
         newBoard[r][c] = number;
         setBoard(newBoard);
@@ -393,7 +426,7 @@ export function useSudokuGame(initialDifficulty = 'medium') {
             setNotes(newNotes);
         }
 
-        // Track mistakes
+        // Track mistakes (User rule: Mistakes always increase, never undo)
         if (number !== 0 && number !== solutionBoard[r][c]) {
             setMistakes(prev => prev + 1);
         }
@@ -463,8 +496,90 @@ export function useSudokuGame(initialDifficulty = 'medium') {
     }, [isWon]);
 
     // Calculate visible mistakes (dynamic conflict count)
-    // Calculate visible mistakes (dynamic conflict count) - REMOVED in favor of persistent state
     // const mistakes = useMemo(...)
+
+    // Keyboard Navigation (Moved here to ensure handlers are defined)
+    useEffect(() => {
+        const handleKeyDown = (e) => {
+            // Ignore keyboard events if modifiers are pressed (Cmd, Ctrl, etc.)
+            if (e.ctrlKey || e.metaKey || e.altKey) return;
+
+            // Global Hotkeys
+            if (e.key.toLowerCase() === 'p') {
+                togglePause();
+                return;
+            }
+
+            // If game is paused or won, block other inputs
+            if (isPaused || isWon) return;
+
+            // Note Mode Toggle
+            if (e.key.toLowerCase() === 'n') {
+                toggleNotesMode();
+                return;
+            }
+
+            // The rest requires a selected cell
+            if (!selectedCell) return;
+
+            const { r, c } = selectedCell;
+            let newR = r;
+            let newC = c;
+
+            // Navigation
+            if (e.key === 'ArrowUp') {
+                newR = Math.max(0, r - 1);
+                e.preventDefault();
+                setSelectedCell({ r: newR, c: newC });
+                return;
+            } else if (e.key === 'ArrowDown') {
+                newR = Math.min(8, r + 1);
+                e.preventDefault();
+                setSelectedCell({ r: newR, c: newC });
+                return;
+            } else if (e.key === 'ArrowLeft') {
+                newC = Math.max(0, c - 1);
+                e.preventDefault();
+                setSelectedCell({ r: newR, c: newC });
+                return;
+            } else if (e.key === 'ArrowRight') {
+                newC = Math.min(8, c + 1);
+                e.preventDefault();
+                setSelectedCell({ r: newR, c: newC });
+                return;
+            }
+
+            // Number Input
+            if (e.key >= '1' && e.key <= '9') {
+                handleNumberInput(parseInt(e.key, 10));
+                return;
+            }
+
+            // Delete / Backspace
+            if (e.key === 'Backspace' || e.key === 'Delete') {
+                handleNumberInput(0);
+                return;
+            }
+
+            // Undo (Ctrl+Z / Cmd+Z)
+            if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'z' && !e.shiftKey) {
+                undo();
+                return;
+            }
+
+            // Redo (Ctrl+Y / Cmd+Y / Cmd+Shift+Z)
+            if (
+                ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'y') ||
+                ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key.toLowerCase() === 'z')
+            ) {
+                redo();
+                return;
+            }
+        };
+
+        window.addEventListener('keydown', handleKeyDown);
+        return () => window.removeEventListener('keydown', handleKeyDown);
+    }, [selectedCell, isPaused, isWon, handleNumberInput, toggleNotesMode, togglePause, undo, redo]);
 
     return {
         board,
@@ -495,5 +610,9 @@ export function useSudokuGame(initialDifficulty = 'medium') {
 
         toggleNotesMode,
         hintsRemaining,
+        undo,
+        redo,
+        canUndo: history.length > 0,
+        canRedo: future.length > 0
     };
 }
