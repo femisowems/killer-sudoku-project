@@ -1,27 +1,41 @@
 # Killer Sudoku
 
-A modern, responsive implementation of Killer Sudoku built with React and Tailwind CSS.
+![License](https://img.shields.io/badge/license-MIT-blue.svg)
+![React](https://img.shields.io/badge/React-18.x-blue)
+![Vite](https://img.shields.io/badge/Vite-4.x-purple)
+![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-3.x-38b2ac)
+
+A modern, responsive implementation of Killer Sudoku built with React and Tailwind CSS. Experience the classic puzzle game with a polished UI, smart helpers, and real-time validation.
 
 <p align="center">
-  <img src="./public/assets/demo.webp" width="80%">
+  <img src="./public/assets/demo.webp" width="100%" alt="Killer Sudoku Gameplay Demo">
 </p>
 
 ## Features
 
-- **Classic Killer Sudoku Rules**: Fill the grid so that every row, column, and 3x3 box contains digits 1-9. Additionally, dashed "cages" must sum to the specified target number without repeating digits.
-- **Dynamic Puzzle Generation**: Generates new puzzles on demand with varying difficulty levels (Easy, Medium, Hard).
-- **Responsive Design**: optimized for both desktop and mobile, featuring a flexible 3-column layout on large screens.
-- **Smart Highlighting**: Visual cues for selected cells, related cages, and error conflicts.
-- **Helper Tools**: 
-    - **Cage Combinations**: View valid number combinations for any selected cage.
-    - **Hint System**: Get unstuck with built-in hints.
-- **Keyboard support**: Navigate the grid using arrow keys.
+- **Classic Killer Sudoku Rules**: Fill the grid so that every row, column, and 3x3 box contains digits 1-9. Dashed "cages" must sum to the specified target number without repeating digits.
+- **Dynamic Puzzle Generation**: Instantly generate new puzzles with selectable difficulty levels:
+    - **Easy**: Great for beginners.
+    - **Medium**: A balanced challenge.
+    - **Hard**: For Sudoku veterans.
+- **Smart Highlighting**: 
+    - Real-time error detection for row/column/box and cage sum conflicts.
+    - Visual cues for selected cells and related cages.
+- **Helpful Tools**:
+    - **Mistakes Counter**: Keep track of your errors (optional validation).
+    - **Notes Mode**: Annotate cells with potential numbers (coming soon). 
+    - **Cage Combinations**: View valid number combinations for any selected cage to help deduce the solution.
+    - **Pause/Resume**: Take a break without losing your progress (blurs board to prevent peeking).
+- **Responsive Design**: Fully optimized for desktop and mobile devices. Features a flexible layout that adapts to screen size.
+- **Keyboard Support**: Full navigation using arrow keys and number input.
+- **Win Celebration**: Confetti animation upon successfully completing the puzzle.
 
 ## Tech Stack
 
 - **Frontend**: React (Vite)
 - **Styling**: Tailwind CSS
-- **State Management**: React Hooks (`useState`, `useEffect`, `useCallback`)
+- **State Management**: React Hooks (`useState`, `useReducer`, `useCallback`, `useEffect`)
+- **Icons**: Lucide React
 
 ## Installation
 
@@ -43,11 +57,11 @@ A modern, responsive implementation of Killer Sudoku built with React and Tailwi
 
 ## Key Components
 
-- `SudokuBoard`: Renders the main grid and handles interaction.
-- `SudokuCell`: Individual cell component with complex logic for borders, highlighting, and input.
-- `Controls`: Game controls for difficulty, new game, and number input.
-- `CageCombinations`: Helper component to show math combinations for cages.
-- `sudokuLogic.js`: Core game logic including generation and validation.
+- `SudokuBoard`: The core grid component handling rendering and interactions.
+- `SudokuCell`: Individual cell component with logic for borders, selection, and computed styling.
+- `GameContext`: Centralized state management for the game board, timer, and difficulty.
+- `DifficultySelectionModal`: Modal for choosing game difficulty.
+- `ControlPanel`: UI for game controls (New Game, Pause, Check, etc.).
 
 ## License
 
