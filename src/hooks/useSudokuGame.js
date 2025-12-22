@@ -433,7 +433,7 @@ export function useSudokuGame(initialDifficulty = 'medium') {
 
         // Check for immediate win (optional here, but good for feedback)
         // We'll leave win check to a separate effect or function call
-    }, [selectedCell, isFixed, board, solutionBoard, isNotesMode, notes]);
+    }, [selectedCell, isFixed, board, solutionBoard, isNotesMode, notes, addToHistory]);
 
     const toggleNotesMode = useCallback(() => {
         setIsNotesMode(prev => !prev);
