@@ -31,10 +31,10 @@ const DifficultyModal = ({ isOpen, onClose }) => {
             <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm transition-opacity" onClick={hasActiveGame ? onClose : undefined}></div>
 
             {/* Modal Card */}
-            <div className="relative bg-white rounded-3xl shadow-2xl p-8 max-w-sm w-full text-center animate-pop-in border-4 border-slate-100 overflow-hidden">
+            <div className="relative rounded-3xl shadow-2xl p-8 max-w-sm w-full text-center animate-pop-in border-4 overflow-hidden" style={{ backgroundColor: 'var(--bg-panel)', borderColor: 'var(--border-thin)' }}>
                 <div className="relative z-10">
-                    <h2 className="text-3xl font-extrabold text-slate-800 mb-2 tracking-tight">New Game</h2>
-                    <p className="text-slate-500 mb-6">Select a difficulty level to start.</p>
+                    <h2 className="text-3xl font-extrabold mb-2 tracking-tight" style={{ color: 'var(--text-base)' }}>New Game</h2>
+                    <p className="mb-6" style={{ color: 'var(--text-muted)' }}>Select a difficulty level to start.</p>
 
                     <div className="space-y-3">
                         {hasActiveGame && (
@@ -43,33 +43,34 @@ const DifficultyModal = ({ isOpen, onClose }) => {
                                     setIsPaused(false);
                                     onClose();
                                 }}
-                                className="w-full py-3 bg-slate-800 hover:bg-slate-900 text-white rounded-xl transition-all hover:scale-[1.02] active:scale-[0.98] shadow-md border-2 border-slate-700 flex flex-col items-center justify-center gap-1"
+                                className="w-full py-3 text-white rounded-xl transition-all hover:scale-[1.02] active:scale-[0.98] shadow-md border-2 flex flex-col items-center justify-center gap-1"
+                                style={{ backgroundColor: 'var(--border-thick)', borderColor: 'var(--border-thin)' }}
                             >
                                 <span className="text-lg font-bold">Continue Game</span>
-                                <div className="flex items-center gap-2 text-xs font-medium text-slate-300 uppercase tracking-wider bg-slate-700/50 px-3 py-0.5 rounded-full">
+                                <div className="flex items-center gap-2 text-xs font-medium uppercase tracking-wider px-3 py-0.5 rounded-full" style={{ backgroundColor: 'rgba(255,255,255,0.1)', color: 'rgba(255,255,255,0.8)' }}>
                                     <span>{difficulty}</span>
-                                    <span className="w-1 h-1 bg-slate-400 rounded-full"></span>
+                                    <span className="w-1 h-1 bg-white/40 rounded-full"></span>
                                     <span>{formatTime(timerSeconds)}</span>
                                 </div>
                             </button>
                         )}
-                        <div className="border-t border-slate-100 my-4 pt-4" hidden={!hasActiveGame}></div>
+                        <div className="border-t my-4 pt-4" style={{ borderColor: 'var(--border-thin)' }} hidden={!hasActiveGame}></div>
 
                         <button
                             onClick={() => onSelectDifficulty('easy')}
-                            className="w-full py-4 bg-emerald-100 hover:bg-emerald-200 text-emerald-800 font-bold rounded-xl transition-all hover:scale-[1.02] active:scale-[0.98]"
+                            className="w-full py-4 bg-emerald-100 dark:bg-emerald-950/30 hover:bg-emerald-200 dark:hover:bg-emerald-900/40 text-emerald-800 dark:text-emerald-300 font-bold rounded-xl transition-all hover:scale-[1.02] active:scale-[0.98]"
                         >
                             Easy
                         </button>
                         <button
                             onClick={() => onSelectDifficulty('medium')}
-                            className="w-full py-4 bg-amber-100 hover:bg-amber-200 text-amber-800 font-bold rounded-xl transition-all hover:scale-[1.02] active:scale-[0.98]"
+                            className="w-full py-4 bg-amber-100 dark:bg-amber-950/30 hover:bg-amber-200 dark:hover:bg-amber-900/40 text-amber-800 dark:text-amber-300 font-bold rounded-xl transition-all hover:scale-[1.02] active:scale-[0.98]"
                         >
                             Medium
                         </button>
                         <button
                             onClick={() => onSelectDifficulty('hard')}
-                            className="w-full py-4 bg-rose-100 hover:bg-rose-200 text-rose-800 font-bold rounded-xl transition-all hover:scale-[1.02] active:scale-[0.98]"
+                            className="w-full py-4 bg-rose-100 dark:bg-rose-950/30 hover:bg-rose-200 dark:hover:bg-rose-900/40 text-rose-800 dark:text-rose-300 font-bold rounded-xl transition-all hover:scale-[1.02] active:scale-[0.98]"
                         >
                             Hard
                         </button>
@@ -78,7 +79,8 @@ const DifficultyModal = ({ isOpen, onClose }) => {
                     {!hasActiveGame && (
                         <button
                             onClick={onClose}
-                            className="mt-6 text-slate-400 hover:text-slate-600 text-sm font-medium transition-colors"
+                            className="mt-6 text-sm font-medium transition-colors hover:opacity-80"
+                            style={{ color: 'var(--text-muted)' }}
                         >
                             Cancel
                         </button>

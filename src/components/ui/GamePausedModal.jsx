@@ -42,33 +42,34 @@ const GamePausedModal = ({ isOpen }) => {
                         animate={{ scale: 1, opacity: 1, y: 0 }}
                         exit={{ scale: 0.9, opacity: 0, y: 20 }}
                         transition={{ type: "spring", stiffness: 300, damping: 25 }}
-                        className="relative bg-white rounded-3xl shadow-2xl p-8 max-w-sm w-full text-center border-4 border-slate-100 overflow-hidden"
+                        className="relative rounded-3xl shadow-2xl p-8 max-w-sm w-full text-center border-4 overflow-hidden"
+                        style={{ backgroundColor: 'var(--bg-panel)', borderColor: 'var(--border-thin)' }}
                     >
-                        {/* Decorative Background blob */}
-                        <div className="absolute -top-10 -right-10 w-32 h-32 bg-slate-100 rounded-full blur-3xl opacity-50"></div>
-                        <div className="absolute -bottom-10 -left-10 w-32 h-32 bg-primary/20 rounded-full blur-3xl opacity-50"></div>
+                        {/* Decorative Background blobs - simplified/themed */}
+                        <div className="absolute -top-10 -right-10 w-32 h-32 rounded-full blur-3xl opacity-20" style={{ backgroundColor: 'var(--primary-accent)' }}></div>
+                        <div className="absolute -bottom-10 -left-10 w-32 h-32 rounded-full blur-3xl opacity-20" style={{ backgroundColor: 'var(--primary-accent)' }}></div>
 
                         <div className="relative z-10">
-                            <div className="w-20 h-20 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-6 text-4xl shadow-inner text-slate-400">
+                            <div className="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-6 text-2xl shadow-inner" style={{ backgroundColor: 'var(--bg-app)', color: 'var(--text-muted)' }}>
                                 ⏸️
                             </div>
 
-                            <h2 className="text-3xl font-extrabold text-slate-800 mb-2 tracking-tight">Game Paused</h2>
-                            <p className="text-slate-500 mb-8">Take a break! The timer is paused.</p>
+                            <h2 className="text-3xl font-extrabold mb-2 tracking-tight" style={{ color: 'var(--text-base)' }}>Game Paused</h2>
+                            <p className="mb-8" style={{ color: 'var(--text-muted)' }}>Take a break! The timer is paused.</p>
 
                             {/* Stats Grid */}
                             <div className="grid grid-cols-3 gap-2 mb-8">
-                                <div className="bg-slate-50 p-3 rounded-2xl border border-slate-100 flex flex-col items-center">
-                                    <span className="text-[10px] uppercase font-bold text-slate-400 tracking-wider">Time</span>
-                                    <span className="font-mono font-bold text-slate-700 text-lg">{formatTime(timeSeconds)}</span>
+                                <div className="p-3 rounded-2xl border flex flex-col items-center" style={{ backgroundColor: 'var(--bg-app)', borderColor: 'var(--border-thin)' }}>
+                                    <span className="text-[10px] uppercase font-bold tracking-wider" style={{ color: 'var(--text-muted)' }}>Time</span>
+                                    <span className="font-mono font-bold text-lg" style={{ color: 'var(--text-base)' }}>{formatTime(timeSeconds)}</span>
                                 </div>
-                                <div className="bg-slate-50 p-3 rounded-2xl border border-slate-100 flex flex-col items-center">
-                                    <span className="text-[10px] uppercase font-bold text-slate-400 tracking-wider">Mistakes</span>
+                                <div className="p-3 rounded-2xl border flex flex-col items-center" style={{ backgroundColor: 'var(--bg-app)', borderColor: 'var(--border-thin)' }}>
+                                    <span className="text-[10px] uppercase font-bold tracking-wider" style={{ color: 'var(--text-muted)' }}>Mistakes</span>
                                     <span className={`font-mono font-bold text-lg ${mistakes > 0 ? 'text-rose-500' : 'text-emerald-500'}`}>{mistakes}</span>
                                 </div>
-                                <div className="bg-slate-50 p-3 rounded-2xl border border-slate-100 flex flex-col items-center">
-                                    <span className="text-[10px] uppercase font-bold text-slate-400 tracking-wider">Mode</span>
-                                    <span className="font-bold text-slate-700 capitalize text-sm h-[28px] flex items-center">{difficulty}</span>
+                                <div className="p-3 rounded-2xl border flex flex-col items-center" style={{ backgroundColor: 'var(--bg-app)', borderColor: 'var(--border-thin)' }}>
+                                    <span className="text-[10px] uppercase font-bold tracking-wider" style={{ color: 'var(--text-muted)' }}>Mode</span>
+                                    <span className="font-bold capitalize text-sm h-[28px] flex items-center" style={{ color: 'var(--text-base)' }}>{difficulty}</span>
                                 </div>
                             </div>
 
