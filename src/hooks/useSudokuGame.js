@@ -271,7 +271,7 @@ export function useSudokuGame(initialDifficulty = 'medium') {
             isAutoSolved
         };
         saveGameState(stateToSave);
-    }, [board, notes, mistakes, hintsRemaining, isPaused, isWon, difficulty, timerSeconds /* Adding timerSeconds ensures exact save on tick, but might be heavy. Let's rely on event listeners for exact time or 1s lag is acceptable. Actually, including timerSeconds means writing to localstorage every second. Better to EXCLUDE timerSeconds from dependency and only save when other things change OR on unload */]);
+    }, [board, notes, mistakes, hintsRemaining, isPaused, isWon, difficulty, timerSeconds, isAutoSolved, solutionBoard, startingCells, hintedCells]);
 
     // Save on Unload / Visibility Change to capture Timer
     useEffect(() => {

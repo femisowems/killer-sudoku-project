@@ -4,7 +4,7 @@ import React from 'react';
 import { useGame } from '../../context/GameContext';
 
 const DifficultyModal = ({ isOpen, onClose }) => {
-    const { startNewGame, isWon, timerSeconds, mistakes, setIsPaused, difficulty } = useGame();
+    const { startNewGame, isWon, timerSeconds, setIsPaused, difficulty } = useGame();
 
     const formatTime = (seconds) => {
         const m = Math.floor(seconds / 60);
