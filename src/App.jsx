@@ -243,14 +243,7 @@ function App() {
           setShowNewGameModal(false);
         }}
       />
-      <DifficultySelectionModal
-        isOpen={showNewGameModal}
-        onClose={() => setShowNewGameModal(false)}
-        onSelectDifficulty={(diff) => {
-          startNewGame(diff);
-          setShowNewGameModal(false);
-        }}
-      />
+
 
       <footer className="mt-12 text-center text-slate-400 text-sm font-medium">
         <p>
