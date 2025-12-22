@@ -92,4 +92,4 @@ const Board = ({
     );
 };
 
-export default Board;
+export default React.memo(Board);
