@@ -11,6 +11,7 @@ import {
 import {
     CAGE_SHAPES
 } from '../constants/sudoku-constants';
+import { saveGameState, loadGameState, clearGameState } from '../utils/storage';
 
 export function useSudokuGame(initialDifficulty = 'medium') {
     const [difficulty, setDifficulty] = useState(initialDifficulty);
@@ -60,6 +61,25 @@ export function useSudokuGame(initialDifficulty = 'medium') {
         };
     }, []);
 
+    // Helper to calculate cage sums and map cells to cages
+    const setupCagesAndMap = (solution) => {
+        // Calculate cage sums
+        const newCages = CAGE_SHAPES.map(cage => {
+            const sum = cage.cells.reduce((acc, [r, c]) => acc + solution[r][c], 0);
+            return { ...cage, sum };
+        });
+
+        // Map cells to cages
+        const newCellToCage = Array(9).fill(0).map(() => Array(9).fill(-1));
+        newCages.forEach((cage, index) => {
+            cage.cells.forEach(([r, c]) => {
+                newCellToCage[r][c] = index;
+            });
+        });
+
+        return { cages: newCages, cellToCageIndex: newCellToCage };
+    };
+
     // Initialize game
     const startNewGame = useCallback((diff = difficulty) => {
         setDifficulty(diff);
@@ -80,20 +100,9 @@ export function useSudokuGame(initialDifficulty = 'medium') {
         const newSolution = generateValidBoard();
         setSolutionBoard(newSolution);
 
-        // 2. Calculate cage sums
-        const newCages = CAGE_SHAPES.map(cage => {
-            const sum = cage.cells.reduce((acc, [r, c]) => acc + newSolution[r][c], 0);
-            return { ...cage, sum };
-        });
+        // Calculate and set derived cage data
+        const { cages: newCages, cellToCageIndex: newCellToCage } = setupCagesAndMap(newSolution);
         setCages(newCages);
-
-        // 3. Map cells to cages
-        const newCellToCage = Array(9).fill(0).map(() => Array(9).fill(-1));
-        newCages.forEach((cage, index) => {
-            cage.cells.forEach(([r, c]) => {
-                newCellToCage[r][c] = index;
-            });
-        });
         setCellToCageIndex(newCellToCage);
 
         // 4. Setup starting board
@@ -114,12 +123,69 @@ export function useSudokuGame(initialDifficulty = 'medium') {
             });
         }
 
+        // Clear any saved state
+        clearGameState();
+
         setStatus({ message: `New ${diff.charAt(0).toUpperCase() + diff.slice(1)} game started. Good luck!`, type: 'info' });
     }, [difficulty]);
 
-    // Initial load
+    // Restore game from saved state
+    const restoreGame = useCallback((savedState) => {
+        // Validation: Ensure core data exists to prevent crash
+        if (!savedState || !savedState.solutionBoard || savedState.solutionBoard.length !== 9) {
+            console.error('Saved state is invalid or corrupted. Starting new game.');
+            clearGameState();
+            startNewGame(initialDifficulty);
+            return;
+        }
+
+        setDifficulty(savedState.difficulty);
+        setBoard(savedState.board);
+        setSolutionBoard(savedState.solutionBoard);
+        setStartingCells(savedState.startingCells);
+        setHintedCells(savedState.hintedCells);
+        setHintsRemaining(savedState.hintsRemaining);
+        setNotes(savedState.notes);
+        setMistakes(savedState.mistakes);
+        setTimerSeconds(savedState.timerSeconds);
+        setIsTimerRunning(true); // Resume timer on load
+        setIsPaused(savedState.isPaused); // Or maybe force pause? Let's keep saved state.
+        setIsWon(savedState.isWon);
+        setIsAutoSolved(savedState.isAutoSolved);
+
+        // Cages and CellMap must be derived from solution (or constants)
+        try {
+            const { cages: restoredCages, cellToCageIndex: restoredMap } = setupCagesAndMap(savedState.solutionBoard);
+            setCages(restoredCages);
+            setCellToCageIndex(restoredMap);
+        } catch (e) {
+            console.error('Failed to reconstruct cages from saved solution:', e);
+            clearGameState();
+            startNewGame(initialDifficulty);
+            return;
+        }
+
+        setStatus({ message: 'Game restored', type: 'info' });
+
+        // Re-validate if needed
+        if (workerRef.current) {
+            workerRef.current.postMessage({
+                type: 'validate',
+                payload: { board: savedState.board }
+            });
+        }
+
+    }, [startNewGame, initialDifficulty]);
+
+    // Initial load - check storage first
     useEffect(() => {
-        startNewGame(initialDifficulty);
+        const savedState = loadGameState();
+        if (savedState) {
+            restoreGame(savedState);
+        } else {
+            startNewGame(initialDifficulty);
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
     // Timer Interval
@@ -185,6 +251,56 @@ export function useSudokuGame(initialDifficulty = 'medium') {
             events.forEach(event => window.removeEventListener(event, handleActivity));
         };
     }, [resetIdleTimer]);
+
+    // Auto-Save Effect
+    useEffect(() => {
+        // Don't save if empty or won (handled by clearGameState on new game, but saving won game is fine for review)
+        if (board.length === 0) return;
+
+        const stateToSave = {
+            difficulty,
+            board,
+            solutionBoard,
+            startingCells,
+            hintedCells,
+            hintsRemaining,
+            notes,
+            mistakes,
+            timerSeconds,
+            isPaused,
+            isWon,
+            isAutoSolved
+        };
+        saveGameState(stateToSave);
+    }, [board, notes, mistakes, hintsRemaining, isPaused, isWon, difficulty, timerSeconds /* Adding timerSeconds ensures exact save on tick, but might be heavy. Let's rely on event listeners for exact time or 1s lag is acceptable. Actually, including timerSeconds means writing to localstorage every second. Better to EXCLUDE timerSeconds from dependency and only save when other things change OR on unload */]);
+
+    // Save on Unload / Visibility Change to capture Timer
+    useEffect(() => {
+        const handleSave = () => {
+            const stateToSave = {
+                difficulty,
+                board,
+                solutionBoard,
+                startingCells,
+                hintedCells,
+                hintsRemaining,
+                notes,
+                mistakes,
+                timerSeconds, // Captures current timer
+                isPaused,
+                isWon,
+                isAutoSolved
+            };
+            saveGameState(stateToSave);
+        };
+
+        window.addEventListener('visibilitychange', handleSave);
+        window.addEventListener('pagehide', handleSave);
+        return () => {
+            window.removeEventListener('visibilitychange', handleSave);
+            window.removeEventListener('pagehide', handleSave);
+        };
+    }, [difficulty, board, solutionBoard, startingCells, hintedCells, hintsRemaining, notes, mistakes, timerSeconds, isPaused, isWon, isAutoSolved]);
 
     // Keyboard Navigation
     useEffect(() => {
