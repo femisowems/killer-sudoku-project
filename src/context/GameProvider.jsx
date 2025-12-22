@@ -80,7 +80,7 @@ export const GameProvider = ({ children }) => {
     }, [isWon, difficulty, timerSeconds, isAutoSolved]);
 
     // Theme State
-    const [theme, setTheme] = React.useState('white');
+    const [theme, setTheme] = React.useState('platinum');
 
     // Load theme on mount
     React.useEffect(() => {
