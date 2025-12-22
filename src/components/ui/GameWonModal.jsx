@@ -1,6 +1,7 @@
 
 import React from 'react';
 import confetti from 'canvas-confetti';
+// eslint-disable-next-line no-unused-vars
 import { motion, AnimatePresence } from 'framer-motion';
 
 import { useGame } from '../../context/GameContext';
@@ -35,6 +36,12 @@ const WinModal = ({ isOpen, onClose, onViewSolved }) => {
             return () => clearInterval(interval);
         }
     }, [isOpen]);
+
+    const formatTime = (totalSeconds) => {
+        const minutes = Math.floor(totalSeconds / 60);
+        const seconds = totalSeconds % 60;
+        return `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+    };
 
     return (
         <AnimatePresence>

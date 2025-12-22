@@ -1,9 +1,10 @@
 import React from 'react';
+// eslint-disable-next-line no-unused-vars
 import { motion, AnimatePresence } from 'framer-motion';
 
 import { useGame } from '../../context/GameContext';
 
-const GamePausedModal = ({ isOpen, onResume }) => {
+const GamePausedModal = ({ isOpen }) => {
     // Note: isOpen and onResume passed from App because App controls modal rendering?
     // Actually, isPaused is in context, so we could check context.isPaused instead of props.isOpen.
     // togglePause is also in context.
