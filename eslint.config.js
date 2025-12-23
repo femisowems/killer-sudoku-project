@@ -28,6 +28,9 @@ export default [
         { allowConstantExport: true },
       ],
       'no-unused-vars': ['error', { varsIgnorePattern: '^[A-Z_]' }],
+      'no-console': ['warn', { allow: ['warn', 'error'] }],
+      'no-debugger': 'warn',
     },
+    settings: { react: { version: '18.2' } },
   },
 ]
