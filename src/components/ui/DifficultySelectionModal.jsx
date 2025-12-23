@@ -58,19 +58,22 @@ const DifficultyModal = ({ isOpen, onClose }) => {
 
                         <button
                             onClick={() => onSelectDifficulty('easy')}
-                            className="w-full py-4 bg-emerald-100 dark:bg-emerald-950/30 hover:bg-emerald-200 dark:hover:bg-emerald-900/40 text-emerald-800 dark:text-emerald-300 font-bold rounded-xl transition-all hover:scale-[1.02] active:scale-[0.98]"
+                            className="w-full py-4 font-bold rounded-xl transition-all hover:scale-[1.02] active:scale-[0.98] hover:brightness-95"
+                            style={{ backgroundColor: 'var(--bg-easy)', color: 'var(--text-easy)' }}
                         >
                             Easy
                         </button>
                         <button
                             onClick={() => onSelectDifficulty('medium')}
-                            className="w-full py-4 bg-amber-100 dark:bg-amber-950/30 hover:bg-amber-200 dark:hover:bg-amber-900/40 text-amber-800 dark:text-amber-300 font-bold rounded-xl transition-all hover:scale-[1.02] active:scale-[0.98]"
+                            className="w-full py-4 font-bold rounded-xl transition-all hover:scale-[1.02] active:scale-[0.98] hover:brightness-95"
+                            style={{ backgroundColor: 'var(--bg-medium)', color: 'var(--text-medium)' }}
                         >
                             Medium
                         </button>
                         <button
                             onClick={() => onSelectDifficulty('hard')}
-                            className="w-full py-4 bg-rose-100 dark:bg-rose-950/30 hover:bg-rose-200 dark:hover:bg-rose-900/40 text-rose-800 dark:text-rose-300 font-bold rounded-xl transition-all hover:scale-[1.02] active:scale-[0.98]"
+                            className="w-full py-4 font-bold rounded-xl transition-all hover:scale-[1.02] active:scale-[0.98] hover:brightness-95"
+                            style={{ backgroundColor: 'var(--bg-hard)', color: 'var(--text-hard)' }}
                         >
                             Hard
                         </button>
