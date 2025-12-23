@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { motion } from 'framer-motion';
+
 import { useGame } from '../../context/GameContext';
 
 const SettingsModal = ({ isOpen, onClose }) => {
@@ -14,10 +14,7 @@ const SettingsModal = ({ isOpen, onClose }) => {
             <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm transition-opacity" onClick={onClose}></div>
 
             {/* Modal Card */}
-            <motion.div
-                initial={{ opacity: 0, scale: 0.9, y: 20 }}
-                animate={{ opacity: 1, scale: 1, y: 0 }}
-                exit={{ opacity: 0, scale: 0.9, y: 20 }}
+            <div
                 className="relative rounded-3xl shadow-2xl p-8 max-w-sm w-full animate-pop-in border-4 overflow-hidden"
                 style={{ backgroundColor: 'var(--bg-panel)', borderColor: 'var(--border-thin)' }}
             >
@@ -94,7 +91,7 @@ const SettingsModal = ({ isOpen, onClose }) => {
                 {/* Decorative Blobs */}
                 <div className="absolute -top-10 -right-10 w-32 h-32 rounded-full opacity-10 blur-3xl pointer-events-none" style={{ backgroundColor: 'var(--primary-accent)' }}></div>
                 <div className="absolute -bottom-10 -left-10 w-32 h-32 rounded-full opacity-10 blur-3xl pointer-events-none" style={{ backgroundColor: 'var(--primary-accent)' }}></div>
-            </motion.div>
+            </div>
         </div >
     );
 };

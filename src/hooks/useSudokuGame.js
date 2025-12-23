@@ -61,8 +61,6 @@ export function useSudokuGame(initialDifficulty = 'medium') {
                 if (!unique) {
                     console.warn(`Generated puzzle has ${solutionCount} solutions. It might not be a valid Sudoku.`);
                     // Optionally set a status message here, but careful not to spam user
-                } else {
-
                 }
             }
         };
