@@ -31,7 +31,7 @@ function App() {
   const [showWinModal, setShowWinModal] = React.useState(false);
   const [showNewGameModal, setShowNewGameModal] = React.useState(true);
   const [showSettingsModal, setShowSettingsModal] = React.useState(false);
-  const [showSettingsModalVisible, setShowSettingsModalVisible] = React.useState(false); // For animation persistence if needed, but lets keep it simple first
+
   const [highlightedCageIndex, setHighlightedCageIndex] = React.useState(null);
 
   // Clear highlight when selection changes or board updates

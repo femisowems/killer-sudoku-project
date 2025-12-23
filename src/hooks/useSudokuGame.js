@@ -62,7 +62,7 @@ export function useSudokuGame(initialDifficulty = 'medium') {
                     console.warn(`Generated puzzle has ${solutionCount} solutions. It might not be a valid Sudoku.`);
                     // Optionally set a status message here, but careful not to spam user
                 } else {
-                    console.log('Puzzle validated: Unique solution found.');
+
                 }
             }
         };
@@ -460,7 +460,7 @@ export function useSudokuGame(initialDifficulty = 'medium') {
 
         // Check for immediate win (optional here, but good for feedback)
         // We'll leave win check to a separate effect or function call
-    }, [selectedCell, isFixed, board, solutionBoard, isNotesMode, notes, addToHistory]);
+    }, [selectedCell, isFixed, board, solutionBoard, isNotesMode, notes, addToHistory, autoRemoveNotes, cages, cellToCageIndex]);
 
     const toggleNotesMode = useCallback(() => {
         setIsNotesMode(prev => !prev);
