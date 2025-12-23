@@ -30,6 +30,7 @@ export function useSudokuGame(initialDifficulty = 'medium') {
     const [isAutoSolved, setIsAutoSolved] = useState(false);
     const [showErrors, setShowErrors] = useState(true);
     const [mistakes, setMistakes] = useState(0);
+    const [autoRemoveNotes, setAutoRemoveNotes] = useState(true);
 
     // History for Undo/Redo
     const [history, setHistory] = useState([]);
@@ -158,6 +159,9 @@ export function useSudokuGame(initialDifficulty = 'medium') {
         setIsPaused(savedState.isPaused); // Or maybe force pause? Let's keep saved state.
         setIsWon(savedState.isWon);
         setIsAutoSolved(savedState.isAutoSolved);
+        if (savedState.autoRemoveNotes !== undefined) {
+            setAutoRemoveNotes(savedState.autoRemoveNotes);
+        }
 
         // Cages and CellMap must be derived from solution (or constants)
         try {
@@ -278,6 +282,7 @@ export function useSudokuGame(initialDifficulty = 'medium') {
             isPaused,
             isWon,
             isAutoSolved,
+            autoRemoveNotes,
             history // Save history
         };
         saveGameState(stateToSave);
@@ -302,6 +307,7 @@ export function useSudokuGame(initialDifficulty = 'medium') {
                 isPaused,
                 isWon,
                 isAutoSolved,
+                autoRemoveNotes,
                 history // Save history
             };
             saveGameState(stateToSave);
@@ -314,7 +320,7 @@ export function useSudokuGame(initialDifficulty = 'medium') {
             window.removeEventListener('pagehide', handleSave);
         };
 
-    }, [difficulty, board, solutionBoard, startingCells, hintedCells, hintsRemaining, notes, mistakes, timerSeconds, isPaused, isWon, isAutoSolved, history]);
+    }, [difficulty, board, solutionBoard, startingCells, hintedCells, hintsRemaining, notes, mistakes, timerSeconds, isPaused, isWon, isAutoSolved, history, autoRemoveNotes]);
 
     // History Helpers
     const addToHistory = useCallback(() => {
@@ -419,16 +425,65 @@ export function useSudokuGame(initialDifficulty = 'medium') {
         newBoard[r][c] = number;
         setBoard(newBoard);
 
-        // Clear notes for this cell when a number is placed
-        if (number !== 0) {
-            const newNotes = [...notes.map(row => [...row])];
-            newNotes[r][c] = new Set();
-            setNotes(newNotes);
-        }
-
         // Track mistakes (User rule: Mistakes always increase, never undo)
         if (number !== 0 && number !== solutionBoard[r][c]) {
             setMistakes(prev => prev + 1);
+        }
+
+        // --- Smart Note Auto-Removal ---
+        if (autoRemoveNotes && number !== 0) {
+            const finalNotes = [...notes.map(row => [...row])];
+
+            // 1. Clear this cell's notes
+            finalNotes[r][c] = new Set();
+
+            // 2. Clear from Row and Column
+            for (let i = 0; i < 9; i++) {
+                if (finalNotes[r][i].has(number)) {
+                    const next = new Set(finalNotes[r][i]);
+                    next.delete(number);
+                    finalNotes[r][i] = next;
+                }
+                if (finalNotes[i][c].has(number)) {
+                    const next = new Set(finalNotes[i][c]);
+                    next.delete(number);
+                    finalNotes[i][c] = next;
+                }
+            }
+
+            // 3. Clear from 3x3 Block
+            const startRow = Math.floor(r / 3) * 3;
+            const startCol = Math.floor(c / 3) * 3;
+            for (let i = 0; i < 3; i++) {
+                for (let j = 0; j < 3; j++) {
+                    const nr = startRow + i;
+                    const nc = startCol + j;
+                    if (finalNotes[nr][nc].has(number)) {
+                        const next = new Set(finalNotes[nr][nc]);
+                        next.delete(number);
+                        finalNotes[nr][nc] = next;
+                    }
+                }
+            }
+
+            // 4. Clear from Cage
+            const cageIdx = cellToCageIndex[r][c];
+            if (cageIdx !== -1) {
+                cages[cageIdx].cells.forEach(([cr, cc]) => {
+                    if (finalNotes[cr][cc].has(number)) {
+                        const next = new Set(finalNotes[cr][cc]);
+                        next.delete(number);
+                        finalNotes[cr][cc] = next;
+                    }
+                });
+            }
+
+            setNotes(finalNotes);
+        } else if (number !== 0) {
+            // Standard single-cell note clear if auto-removal is off
+            const newNotes = [...notes.map(row => [...row])];
+            newNotes[r][c] = new Set();
+            setNotes(newNotes);
         }
 
         // Check for immediate win (optional here, but good for feedback)
@@ -610,6 +665,8 @@ export function useSudokuGame(initialDifficulty = 'medium') {
 
         toggleNotesMode,
         hintsRemaining,
+        autoRemoveNotes,
+        setAutoRemoveNotes,
         undo,
         redo,
         canUndo: history.length > 0,

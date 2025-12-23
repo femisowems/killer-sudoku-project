@@ -98,8 +98,8 @@ const Cell = ({
         zIndexClass = 'z-30';
     }
     else if (isSameValue) {
-        themeStyles.backgroundColor = 'var(--bg-highlight)';
-        themeStyles.color = 'var(--primary-accent)';
+        themeStyles.backgroundColor = 'var(--bg-same-value)';
+        themeStyles.color = 'var(--text-user-input)';
         themeStyles.fontWeight = 'bold';
     }
     else if (isCageHighlighted) {
@@ -118,12 +118,12 @@ const Cell = ({
     }
     else if (isHighlighted) {
         themeStyles.backgroundColor = 'var(--bg-highlight)';
-        themeStyles.color = 'var(--primary-accent)';
+        themeStyles.color = 'var(--text-user-input)';
         themeStyles.fontWeight = 'bold';
     }
     else if (value !== 0) {
         // User entered value
-        themeStyles.color = 'var(--primary-accent)';
+        themeStyles.color = 'var(--text-user-input)';
         themeStyles.fontWeight = 'bold';
     }
 

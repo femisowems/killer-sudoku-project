@@ -11,6 +11,7 @@ import CageCombinations from './components/game/CageCombinations';
 import GameInfo from './components/game/GameInfo';
 import Scoreboard from './components/game/Scoreboard';
 import ThemePicker from './components/ui/ThemePicker';
+import SettingsModal from './components/ui/SettingsModal';
 import { useGame } from './context/GameContext';
 
 const THEME_COLORS = {
@@ -29,6 +30,8 @@ function App() {
 
   const [showWinModal, setShowWinModal] = React.useState(false);
   const [showNewGameModal, setShowNewGameModal] = React.useState(true);
+  const [showSettingsModal, setShowSettingsModal] = React.useState(false);
+  const [showSettingsModalVisible, setShowSettingsModalVisible] = React.useState(false); // For animation persistence if needed, but lets keep it simple first
   const [highlightedCageIndex, setHighlightedCageIndex] = React.useState(null);
 
   // Clear highlight when selection changes or board updates
@@ -62,9 +65,19 @@ function App() {
       className="min-h-screen flex flex-col items-center py-6 px-2 md:py-10 md:px-4 font-sans transition-colors duration-300"
       style={{ backgroundColor: 'var(--bg-app)' }}
     >
-      {/* Theme Picker (Fixed Top Right) */}
-      <div className="absolute top-2 right-2 sm:top-4 sm:right-4 z-50">
+      {/* Top Right Controls (Fixed) */}
+      <div className="absolute top-2 right-2 sm:top-4 sm:right-4 z-50 flex flex-col gap-2">
         <ThemePicker />
+        <button
+          onClick={() => setShowSettingsModal(true)}
+          className="p-2 rounded-full transition-all shadow-sm border hover:brightness-95 active:scale-95"
+          style={{ backgroundColor: 'var(--bg-panel)', borderColor: 'var(--border-thin)', color: 'var(--text-base)' }}
+          title="Settings"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+            <path fillRule="evenodd" d="M11.49 3.17c-.38-1.56-2.6-1.56-2.98 0a1.532 1.532 0 01-2.286.948c-1.372-.836-2.942.734-2.106 2.106.54.886.061 2.042-.947 2.287-1.561.379-1.561 2.6 0 2.978a1.532 1.532 0 01.947 2.287c-.836 1.372.734 2.942 2.106 2.106a1.532 1.532 0 012.287.947c.379 1.561 2.6 1.561 2.978 0a1.533 1.533 0 012.287-.947c1.372.836 2.942-.734 2.106-2.106a1.533 1.533 0 01.947-2.287c1.561-.379 1.561-2.6 0-2.978a1.532 1.532 0 01-.947-2.287c.836-1.372-.734-2.942-2.106-2.106a1.532 1.532 0 01-2.287-.947zM10 13a3 3 0 100-6 3 3 0 000 6z" clipRule="evenodd" />
+          </svg>
+        </button>
       </div>
 
       {/* Header & Status */}
@@ -376,6 +389,11 @@ function App() {
       <DifficultySelectionModal
         isOpen={showNewGameModal}
         onClose={() => setShowNewGameModal(false)}
+      />
+
+      <SettingsModal
+        isOpen={showSettingsModal}
+        onClose={() => setShowSettingsModal(false)}
       />
 
       <footer className="mt-12 text-center text-sm font-medium" style={{ color: 'var(--text-muted)' }}>

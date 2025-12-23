@@ -10,8 +10,8 @@
         --bg-panel: #FFFFFF;
         --text-base: #1e293b;
         --text-muted: #64748b;
-        --border-thin: #cbd5e1;
-        --border-thick: #475569;
+        --border-thin: #94a3b8;
+        --border-thick: #0f172a;
         --primary-accent: #4f46e5;
         --primary-accent-muted: rgba(79, 70, 229, 0.1);
         --bg-selected: #4f46e5;
@@ -29,6 +29,8 @@
         --text-medium: #92400e;
         --bg-hard: #fee2e2;
         --text-hard: #991b1b;
+        --text-user-input: #2563eb;
+        --bg-same-value: #dbeafe;
     }
 
     [data-theme="platinum"] {
@@ -36,8 +38,8 @@
         --bg-panel: #FFFFFF;
         --text-base: #1e293b;
         --text-muted: #64748b;
-        --border-thin: #cbd5e1;
-        --border-thick: #475569;
+        --border-thin: #94a3b8;
+        --border-thick: #0f172a;
         --primary-accent: #4f46e5;
         --primary-accent-muted: rgba(79, 70, 229, 0.1);
         --bg-selected: #4f46e5;
@@ -55,6 +57,8 @@
         --text-medium: #92400e;
         --bg-hard: #fee2e2;
         --text-hard: #991b1b;
+        --text-user-input: #2563eb;
+        --bg-same-value: #d5d4d4;
     }
 
     [data-theme="seashell"] {
@@ -62,8 +66,8 @@
         --bg-panel: #fffbf7;
         --text-base: #433422;
         --text-muted: #8c7355;
-        --border-thin: #e3d5c5;
-        --border-thick: #7d6348;
+        --border-thin: #d1bba4;
+        --border-thick: #433422;
         --primary-accent: #d97706;
         --primary-accent-muted: rgba(217, 119, 6, 0.1);
         --bg-selected: #d97706;
@@ -81,6 +85,8 @@
         --text-medium: #92400e;
         --bg-hard: #fef2f2;
         --text-hard: #991b1b;
+        --text-user-input: #ea580c;
+        --bg-same-value: #f8dcb8;
     }
 
     [data-theme="onyx"] {
@@ -88,8 +94,8 @@
         --bg-panel: #1a1a1a;
         --text-base: #e2e8f0;
         --text-muted: #94a3b8;
-        --border-thin: #334155;
-        --border-thick: #64748b;
+        --border-thin: #475569;
+        --border-thick: #cbd5e1;
         --primary-accent: #818cf8;
         --primary-accent-muted: rgba(129, 140, 248, 0.1);
         --bg-selected: #312e81;
@@ -107,6 +113,8 @@
         --text-medium: #fef3c7;
         --bg-hard: #7f1d1d;
         --text-hard: #fecaca;
+        --text-user-input: #60affa;
+        --bg-same-value: #666666;
     }
 
     html {
