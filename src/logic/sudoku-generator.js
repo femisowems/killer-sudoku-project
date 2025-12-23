@@ -1,9 +1,19 @@
-import { SEED_BOARD, DIFFICULTY_COUNTS, CAGE_SHAPES } from '../constants/sudoku-constants';
+import { DIFFICULTY_COUNTS, CAGE_SHAPES } from '../constants/sudoku-constants';
+
+// Pre-compute cell-to-cage map for quick constraint checks
+const CELL_TO_CAGE = Array(9).fill(0).map(() => Array(9).fill(-1));
+CAGE_SHAPES.forEach((cage, index) => {
+    cage.cells.forEach(([r, c]) => {
+        CELL_TO_CAGE[r][c] = index;
+    });
+});
 
 export function generatePuzzle(difficulty) {
     const count = DIFFICULTY_COUNTS[difficulty] || 30;
 
-    // 1. Map cells to their cage index for quick lookup
+    // 1. Map cells to their cage index for quick lookup (Shadowing global for clarity in this scope if needed, but we can reuse global)
+    // Actually, let's reuse the global CELL_TO_CAGE for efficiency, or just use the logic below.
+    // The original logic used a local map. I'll stick to the original logic for safety in this function to avoid regression.
     const cellToCage = new Array(9).fill(0).map(() => new Array(9).fill(-1));
     CAGE_SHAPES.forEach((cage, index) => {
         cage.cells.forEach(([r, c]) => {
@@ -45,11 +55,8 @@ export function generatePuzzle(difficulty) {
                 cageRevealedCount[cageIdx]++;
             } else {
                 // Skip this cell to keep at least one hidden in the cage
-                // Note: In very rare cases (small board/high count), we might run out of candidates.
-                // But for standard Sudoku (81 cells) and typical counts (30-40), this is fine.
             }
         } else {
-            // Fallback for cells not in a cage (shouldn't happen in valid Killer Sudoku)
             selectedCells.push([r, c]);
         }
     }
@@ -57,90 +64,87 @@ export function generatePuzzle(difficulty) {
     return selectedCells;
 }
 
-// Helper to swap two rows
-function swapRows(board, r1, r2) {
-    const temp = board[r1];
-    board[r1] = board[r2];
-    board[r2] = temp;
-}
-
-// Helper to swap two columns
-function swapCols(board, c1, c2) {
+/**
+ * Checks if placing a number is valid according to Sudoku and Killer Sudoku rules
+ */
+function isValid(board, r, c, num) {
+    // 1. Row Check
     for (let i = 0; i < 9; i++) {
-        const temp = board[i][c1];
-        board[i][c1] = board[i][c2];
-        board[i][c2] = temp;
+        if (board[r][i] === num) return false;
     }
-}
 
-// Helper to transpose board
-function transpose(board) {
-    const newBoard = Array(9).fill(0).map(() => Array(9).fill(0));
-    for (let r = 0; r < 9; r++) {
-        for (let c = 0; c < 9; c++) {
-            newBoard[c][r] = board[r][c];
+    // 2. Col Check
+    for (let i = 0; i < 9; i++) {
+        if (board[i][c] === num) return false;
+    }
+
+    // 3. Box Check
+    const startRow = Math.floor(r / 3) * 3;
+    const startCol = Math.floor(c / 3) * 3;
+    for (let i = 0; i < 3; i++) {
+        for (let j = 0; j < 3; j++) {
+            if (board[startRow + i][startCol + j] === num) return false;
         }
     }
-    return newBoard;
-}
 
-// Check if the board satisfies Killer Sudoku cage uniqueness rules
-function isKillerValid(board) {
-    for (const cage of CAGE_SHAPES) {
-        const values = new Set();
-        for (const [r, c] of cage.cells) {
-            const val = board[r][c];
-            if (values.has(val)) return false;
-            values.add(val);
+    // 4. Killer Cage Uniqueness Check
+    // Use the pre-computed global map
+    const cageIndex = CELL_TO_CAGE[r][c];
+    if (cageIndex !== -1) {
+        const cage = CAGE_SHAPES[cageIndex];
+        // Check if num exists in any OTHER cell of this cage
+        for (const [cr, cc] of cage.cells) {
+            // We only care if the cell has a value (is not 0)
+            if (board[cr][cc] === num) return false;
         }
     }
+
     return true;
 }
 
-// Generate a randomised valid board from the seed
-export function generateValidBoard() {
-    let attempts = 0;
-    const MAX_ATTEMPTS = 500;
+/**
+ * Recursively fills the board using randomized backtracking
+ */
+function solveBoard(board) {
+    for (let r = 0; r < 9; r++) {
+        for (let c = 0; c < 9; c++) {
+            if (board[r][c] === 0) {
+                // Try numbers 1-9 in random order for randomness
+                const nums = [1, 2, 3, 4, 5, 6, 7, 8, 9];
+                // Fisher-Yates shuffle
+                for (let i = nums.length - 1; i > 0; i--) {
+                    const j = Math.floor(Math.random() * (i + 1));
+                    [nums[i], nums[j]] = [nums[j], nums[i]];
+                }
 
-    while (attempts < MAX_ATTEMPTS) {
-        // Deep copy seed
-        let board = JSON.parse(JSON.stringify(SEED_BOARD));
-
-        // 1. Shuffle Row Groups
-        if (Math.random() > 0.5) { // Swap band 0 and 1
-            for (let i = 0; i < 3; i++) swapRows(board, i, i + 3);
+                for (const num of nums) {
+                    if (isValid(board, r, c, num)) {
+                        board[r][c] = num;
+                        if (solveBoard(board)) return true;
+                        board[r][c] = 0; // Backtrack
+                    }
+                }
+                return false; // No valid number found for this cell
+            }
         }
-        if (Math.random() > 0.5) { // Swap band 1 and 2
-            for (let i = 0; i < 3; i++) swapRows(board, i + 3, i + 6);
-        }
-
-        // 2. Shuffle Rows within bands
-        for (let b = 0; b < 3; b++) {
-            if (Math.random() > 0.5) swapRows(board, b * 3, b * 3 + 1);
-            if (Math.random() > 0.5) swapRows(board, b * 3 + 1, b * 3 + 2);
-            if (Math.random() > 0.5) swapRows(board, b * 3, b * 3 + 2);
-        }
-
-        // 3. Shuffle Columns within bands
-        for (let b = 0; b < 3; b++) {
-            if (Math.random() > 0.5) swapCols(board, b * 3, b * 3 + 1);
-            if (Math.random() > 0.5) swapCols(board, b * 3 + 1, b * 3 + 2);
-            if (Math.random() > 0.5) swapCols(board, b * 3, b * 3 + 2);
-        }
-
-        // 4. Randomly Transpose
-        if (Math.random() > 0.5) {
-            board = transpose(board);
-        }
-
-        // 5. Verify Killer Constraints (Cage Uniqueness)
-        if (isKillerValid(board)) {
-            return board;
-        }
-
-        attempts++;
     }
+    return true; // Board full
+}
 
-    console.warn(`Failed to generate a valid Killer Sudoku board in ${MAX_ATTEMPTS} attempts. Returning a potentially invalid board.`);
-    return JSON.parse(JSON.stringify(SEED_BOARD)); // Fallback to seed if all else fails (should be rare/impossible if seed is valid)
+/**
+ * Generates a completely new valid Sudoku board from scratch.
+ * @returns {number[][]} 9x9 valid Sudoku grid
+ */
+export function generateValidBoard() {
+    // Create new empty 9x9 board
+    const board = Array(9).fill(0).map(() => Array(9).fill(0));
+
+    // Fill it with valid numbers
+    if (solveBoard(board)) {
+        return board;
+    } else {
+        // Fallback (extremely unlikely for an empty board)
+        console.error("Failed to generate a valid board. This should not happen.");
+        return board; // Will be incomplete/empty, suggesting serious logic error
+    }
 }
