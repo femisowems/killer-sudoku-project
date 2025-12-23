@@ -8,6 +8,7 @@
     :root {
         --bg-app: #EBEBEB;
         --bg-panel: #FFFFFF;
+        --bg-panel-alt: #f8fafc;
         --text-base: #1e293b;
         --text-muted: #64748b;
         --border-thin: #94a3b8;
@@ -29,13 +30,14 @@
         --text-medium: #92400e;
         --bg-hard: #fee2e2;
         --text-hard: #991b1b;
-        --text-user-input: #2563eb;
+        --text-user-input: #475569;
         --bg-same-value: #dbeafe;
     }
 
     [data-theme="platinum"] {
         --bg-app: #EBEBEB;
         --bg-panel: #FFFFFF;
+        --bg-panel-alt: #f8fafc;
         --text-base: #1e293b;
         --text-muted: #64748b;
         --border-thin: #94a3b8;
@@ -57,13 +59,14 @@
         --text-medium: #92400e;
         --bg-hard: #fee2e2;
         --text-hard: #991b1b;
-        --text-user-input: #2563eb;
+        --text-user-input: #475569;
         --bg-same-value: #d5d4d4;
     }
 
     [data-theme="seashell"] {
         --bg-app: #f7efe9;
         --bg-panel: #fffbf7;
+        --bg-panel-alt: #fff3ec;
         --text-base: #433422;
         --text-muted: #8c7355;
         --border-thin: #d1bba4;
@@ -85,13 +88,14 @@
         --text-medium: #92400e;
         --bg-hard: #fef2f2;
         --text-hard: #991b1b;
-        --text-user-input: #ea580c;
+        --text-user-input: #8c5f35;
         --bg-same-value: #f8dcb8;
     }
 
     [data-theme="onyx"] {
         --bg-app: #0f0f0f;
         --bg-panel: #1a1a1a;
+        --bg-panel-alt: #212121;
         --text-base: #e2e8f0;
         --text-muted: #94a3b8;
         --border-thin: #475569;
@@ -113,7 +117,7 @@
         --text-medium: #fef3c7;
         --bg-hard: #7f1d1d;
         --text-hard: #fecaca;
-        --text-user-input: #e4e4e4;
+        --text-user-input: #94a3b8;
         --bg-same-value: #9f9e9e;
     }
 

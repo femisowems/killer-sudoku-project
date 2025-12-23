@@ -76,6 +76,15 @@ const Cell = ({
         color: 'var(--text-base)'
     };
 
+    // Checkerboard pattern for 3x3 blocks
+    const blockRow = Math.floor(r / 3);
+    const blockCol = Math.floor(c / 3);
+    const isOddBlock = (blockRow + blockCol) % 2 !== 0;
+
+    if (isOddBlock) {
+        themeStyles.backgroundColor = 'var(--bg-panel-alt)';
+    }
+
     if (isError) {
         themeStyles.backgroundColor = 'var(--bg-error)';
         themeStyles.color = 'var(--text-error)';
@@ -99,7 +108,6 @@ const Cell = ({
     }
     else if (isSameValue) {
         themeStyles.backgroundColor = 'var(--bg-same-value)';
-        themeStyles.color = 'var(--text-user-input)';
         themeStyles.fontWeight = 'bold';
     }
     else if (isCageHighlighted) {
@@ -118,7 +126,6 @@ const Cell = ({
     }
     else if (isHighlighted) {
         themeStyles.backgroundColor = 'var(--bg-highlight)';
-        themeStyles.color = 'var(--text-user-input)';
         themeStyles.fontWeight = 'bold';
     }
     else if (value !== 0) {
