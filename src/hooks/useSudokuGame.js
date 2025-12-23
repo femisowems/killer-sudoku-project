@@ -8,8 +8,13 @@ import {
 import {
     CAGE_SHAPES
 } from '../constants/sudoku-constants';
+import { calculateSmartNoteUpdates } from '../logic/game-logic';
 import { saveGameState, loadGameState, clearGameState } from '../utils/storage';
 
+/**
+ * Main game hook managing Sudoku state, validation, and history.
+ * @param {string} initialDifficulty - 'easy', 'medium', 'hard'
+ */
 export function useSudokuGame(initialDifficulty = 'medium') {
     const [difficulty, setDifficulty] = useState(initialDifficulty);
     const [board, setBoard] = useState(Array(9).fill(0).map(() => Array(9).fill(0)));
@@ -284,13 +289,9 @@ export function useSudokuGame(initialDifficulty = 'medium') {
     }, [resetIdleTimer]);
 
     // Auto-Save Effect
-    useEffect(() => {
-        // Don't save if empty or won (handled by clearGameState on new game, but saving won game is fine for review)
-        if (board.length === 0) return;
-        // Enforce 10s minimum playtime to avoid saving ephemeral starts
-        if (timerSeconds <= 10) return;
-
-        const stateToSave = {
+    // Helper to get current game state for saving
+    const getGameState = useCallback(() => {
+        return {
             difficulty,
             board,
             solutionBoard,
@@ -307,37 +308,26 @@ export function useSudokuGame(initialDifficulty = 'medium') {
             showHighlights,
             maxHints,
             hintsUsed,
-            history // Save history
+            history
         };
-        saveGameState(stateToSave);
-    }, [board, notes, mistakes, hintsRemaining, isPaused, isWon, difficulty, timerSeconds, isAutoSolved, solutionBoard, startingCells, hintedCells, history]);
+    }, [difficulty, board, solutionBoard, startingCells, hintedCells, hintsRemaining, notes, mistakes, timerSeconds, isPaused, isWon, isAutoSolved, autoRemoveNotes, showHighlights, maxHints, hintsUsed, history]);
+
+    // Auto-Save Effect
+    useEffect(() => {
+        // Don't save if empty or won (handled by clearGameState on new game, but saving won game is fine for review)
+        if (board.length === 0) return;
+        // Enforce 10s minimum playtime to avoid saving ephemeral starts
+        if (timerSeconds <= 10) return;
+
+        saveGameState(getGameState());
+    }, [getGameState, board, timerSeconds]);
 
     // Save on Unload / Visibility Change to capture Timer
     useEffect(() => {
         const handleSave = () => {
             // Enforce 10s minimum playtime to avoid saving ephemeral starts
             if (timerSeconds <= 10) return;
-
-            const stateToSave = {
-                difficulty,
-                board,
-                solutionBoard,
-                startingCells,
-                hintedCells,
-                hintsRemaining,
-                notes,
-                mistakes,
-                timerSeconds, // Captures current timer
-                isPaused,
-                isWon,
-                isAutoSolved,
-                autoRemoveNotes,
-                showHighlights,
-                maxHints,
-                hintsUsed,
-                history // Save history
-            };
-            saveGameState(stateToSave);
+            saveGameState(getGameState());
         };
 
         window.addEventListener('visibilitychange', handleSave);
@@ -347,7 +337,7 @@ export function useSudokuGame(initialDifficulty = 'medium') {
             window.removeEventListener('pagehide', handleSave);
         };
 
-    }, [difficulty, board, solutionBoard, startingCells, hintedCells, hintsRemaining, notes, mistakes, timerSeconds, isPaused, isWon, isAutoSolved, history, autoRemoveNotes]);
+    }, [getGameState, timerSeconds]);
 
     // History Helpers
     const addToHistory = useCallback(() => {
@@ -459,56 +449,11 @@ export function useSudokuGame(initialDifficulty = 'medium') {
 
         // --- Smart Note Auto-Removal ---
         if (autoRemoveNotes && number !== 0) {
-            const finalNotes = [...notes.map(row => [...row])];
-
-            // 1. Clear this cell's notes
-            finalNotes[r][c] = new Set();
-
-            // 2. Clear from Row and Column
-            for (let i = 0; i < 9; i++) {
-                if (finalNotes[r][i].has(number)) {
-                    const next = new Set(finalNotes[r][i]);
-                    next.delete(number);
-                    finalNotes[r][i] = next;
-                }
-                if (finalNotes[i][c].has(number)) {
-                    const next = new Set(finalNotes[i][c]);
-                    next.delete(number);
-                    finalNotes[i][c] = next;
-                }
-            }
-
-            // 3. Clear from 3x3 Block
-            const startRow = Math.floor(r / 3) * 3;
-            const startCol = Math.floor(c / 3) * 3;
-            for (let i = 0; i < 3; i++) {
-                for (let j = 0; j < 3; j++) {
-                    const nr = startRow + i;
-                    const nc = startCol + j;
-                    if (finalNotes[nr][nc].has(number)) {
-                        const next = new Set(finalNotes[nr][nc]);
-                        next.delete(number);
-                        finalNotes[nr][nc] = next;
-                    }
-                }
-            }
-
-            // 4. Clear from Cage
-            const cageIdx = cellToCageIndex[r][c];
-            if (cageIdx !== -1) {
-                cages[cageIdx].cells.forEach(([cr, cc]) => {
-                    if (finalNotes[cr][cc].has(number)) {
-                        const next = new Set(finalNotes[cr][cc]);
-                        next.delete(number);
-                        finalNotes[cr][cc] = next;
-                    }
-                });
-            }
-
+            const finalNotes = calculateSmartNoteUpdates(notes, r, c, number, cellToCageIndex, cages);
             setNotes(finalNotes);
         } else if (number !== 0) {
             // Standard single-cell note clear if auto-removal is off
-            const newNotes = [...notes.map(row => [...row])];
+            const newNotes = notes.map(row => row.map(set => new Set(set)));
             newNotes[r][c] = new Set();
             setNotes(newNotes);
         }
