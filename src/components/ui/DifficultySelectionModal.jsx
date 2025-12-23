@@ -44,7 +44,7 @@ const DifficultyModal = ({ isOpen, onClose }) => {
                                     onClose();
                                 }}
                                 className="w-full py-3 text-white rounded-xl transition-all hover:scale-[1.02] active:scale-[0.98] shadow-md border-2 flex flex-col items-center justify-center gap-1"
-                                style={{ backgroundColor: 'var(--border-thick)', borderColor: 'var(--border-thin)' }}
+                                style={{ backgroundColor: 'var(--primary-accent)', borderColor: 'var(--primary-accent)' }}
                             >
                                 <span className="text-lg font-bold">Continue Game</span>
                                 <div className="flex items-center gap-2 text-xs font-medium uppercase tracking-wider px-3 py-0.5 rounded-full" style={{ backgroundColor: 'rgba(255,255,255,0.1)', color: 'rgba(255,255,255,0.8)' }}>

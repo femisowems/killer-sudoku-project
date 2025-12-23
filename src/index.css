@@ -24,12 +24,12 @@
         --text-error: #991b1b;
         --bg-hint: #fef3c7;
         --text-hint: #92400e;
-        --bg-easy: #d1fae5;
-        --text-easy: #065f46;
-        --bg-medium: #fef3c7;
-        --text-medium: #92400e;
-        --bg-hard: #fee2e2;
-        --text-hard: #991b1b;
+        --bg-easy: #059669;
+        --text-easy: #ffffff;
+        --bg-medium: #d97706;
+        --text-medium: #ffffff;
+        --bg-hard: #dc2626;
+        --text-hard: #ffffff;
         --text-user-input: #475569;
         --bg-same-value: #dbeafe;
     }
@@ -53,12 +53,12 @@
         --text-error: #991b1b;
         --bg-hint: #fef3c7;
         --text-hint: #92400e;
-        --bg-easy: #d1fae5;
-        --text-easy: #065f46;
-        --bg-medium: #fef3c7;
-        --text-medium: #92400e;
-        --bg-hard: #fee2e2;
-        --text-hard: #991b1b;
+        --bg-easy: #059669;
+        --text-easy: #ffffff;
+        --bg-medium: #d97706;
+        --text-medium: #ffffff;
+        --bg-hard: #dc2626;
+        --text-hard: #ffffff;
         --text-user-input: #475569;
         --bg-same-value: #d5d4d4;
     }
@@ -82,12 +82,12 @@
         --text-error: #991b1b;
         --bg-hint: #fef3c7;
         --text-hint: #92400e;
-        --bg-easy: #ecfdf5;
-        --text-easy: #065f46;
-        --bg-medium: #fffbeb;
-        --text-medium: #92400e;
-        --bg-hard: #fef2f2;
-        --text-hard: #991b1b;
+        --bg-easy: #059669;
+        --text-easy: #ffffff;
+        --bg-medium: #d97706;
+        --text-medium: #ffffff;
+        --bg-hard: #dc2626;
+        --text-hard: #ffffff;
         --text-user-input: #8c5f35;
         --bg-same-value: #f8dcb8;
     }
@@ -111,12 +111,12 @@
         --text-error: #fecaca;
         --bg-hint: #78350f;
         --text-hint: #fef3c7;
-        --bg-easy: #064e3b;
-        --text-easy: #a7f3d0;
-        --bg-medium: #78350f;
-        --text-medium: #fef3c7;
-        --bg-hard: #7f1d1d;
-        --text-hard: #fecaca;
+        --bg-easy: #047857;
+        --text-easy: #ffffff;
+        --bg-medium: #b45309;
+        --text-medium: #ffffff;
+        --bg-hard: #b91c1c;
+        --text-hard: #ffffff;
         --text-user-input: #94a3b8;
         --bg-same-value: #9f9e9e;
     }
