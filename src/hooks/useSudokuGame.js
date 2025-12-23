@@ -17,7 +17,12 @@ export function useSudokuGame(initialDifficulty = 'medium') {
     const [cages, setCages] = useState([]);
     const [startingCells, setStartingCells] = useState([]);
     const [hintedCells, setHintedCells] = useState([]);
-    const [hintsRemaining, setHintsRemaining] = useState(3);
+
+    // Derived state for hints
+    const [maxHints, setMaxHints] = useState(3);
+    const [hintsUsed, setHintsUsed] = useState(0);
+    const hintsRemaining = maxHints - hintsUsed;
+
     const [notes, setNotes] = useState(Array(9).fill(0).map(() => Array(9).fill(new Set())));
     const [isNotesMode, setIsNotesMode] = useState(false);
     const [selectedCell, setSelectedCell] = useState(null);
@@ -31,6 +36,7 @@ export function useSudokuGame(initialDifficulty = 'medium') {
     const [showErrors, setShowErrors] = useState(true);
     const [mistakes, setMistakes] = useState(0);
     const [autoRemoveNotes, setAutoRemoveNotes] = useState(true);
+    const [showHighlights, setShowHighlights] = useState(true);
 
     // History for Undo/Redo
     const [history, setHistory] = useState([]);
@@ -89,7 +95,9 @@ export function useSudokuGame(initialDifficulty = 'medium') {
         setIsAutoSolved(false); // Reset auto-solve flag
         setShowErrors(true); // Reset error showing (default ON)
         setHintedCells([]);
-        setHintsRemaining(3);
+        setHintedCells([]);
+        setHintsUsed(0);
+        setSelectedCell(null);
         setSelectedCell(null);
         setTimerSeconds(0);
         setIsTimerRunning(true);
@@ -148,7 +156,17 @@ export function useSudokuGame(initialDifficulty = 'medium') {
         setSolutionBoard(savedState.solutionBoard);
         setStartingCells(savedState.startingCells);
         setHintedCells(savedState.hintedCells);
-        setHintsRemaining(savedState.hintsRemaining);
+        setHintedCells(savedState.hintedCells);
+        // setHintsRemaining(savedState.hintsRemaining); // handled by hintsUsed logic below
+        if (savedState.hintsUsed !== undefined) {
+            setHintsUsed(savedState.hintsUsed);
+        } else if (savedState.hintsRemaining !== undefined) {
+            // Migration for old saves (assuming max 3)
+            setHintsUsed(3 - savedState.hintsRemaining);
+        }
+        if (savedState.maxHints !== undefined) {
+            setMaxHints(savedState.maxHints);
+        }
         setNotes(savedState.notes);
         setNotes(savedState.notes);
         setMistakes(savedState.mistakes);
@@ -161,6 +179,9 @@ export function useSudokuGame(initialDifficulty = 'medium') {
         setIsAutoSolved(savedState.isAutoSolved);
         if (savedState.autoRemoveNotes !== undefined) {
             setAutoRemoveNotes(savedState.autoRemoveNotes);
+        }
+        if (savedState.showHighlights !== undefined) {
+            setShowHighlights(savedState.showHighlights);
         }
 
         // Cages and CellMap must be derived from solution (or constants)
@@ -283,6 +304,9 @@ export function useSudokuGame(initialDifficulty = 'medium') {
             isWon,
             isAutoSolved,
             autoRemoveNotes,
+            showHighlights,
+            maxHints,
+            hintsUsed,
             history // Save history
         };
         saveGameState(stateToSave);
@@ -308,6 +332,9 @@ export function useSudokuGame(initialDifficulty = 'medium') {
                 isWon,
                 isAutoSolved,
                 autoRemoveNotes,
+                showHighlights,
+                maxHints,
+                hintsUsed,
                 history // Save history
             };
             saveGameState(stateToSave);
@@ -515,7 +542,7 @@ export function useSudokuGame(initialDifficulty = 'medium') {
         newBoard[r][c] = correctValue;
         setBoard(newBoard);
         setHintedCells([...hintedCells, [r, c]]);
-        setHintsRemaining(prev => prev - 1);
+        setHintsUsed(prev => prev + 1);
         setStatus({ message: `Hint applied: The correct number is ${correctValue}.`, type: 'success' });
     }, [selectedCell, isFixed, solutionBoard, board, hintedCells, hintsRemaining]);
 
@@ -667,6 +694,10 @@ export function useSudokuGame(initialDifficulty = 'medium') {
         hintsRemaining,
         autoRemoveNotes,
         setAutoRemoveNotes,
+        showHighlights,
+        setShowHighlights,
+        maxHints,
+        setMaxHints,
         undo,
         redo,
         canUndo: history.length > 0,

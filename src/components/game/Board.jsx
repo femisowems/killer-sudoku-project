@@ -8,7 +8,8 @@ import { useGame } from '../../context/GameContext';
 const Board = ({ highlightedCageIndex }) => {
     const {
         board, solutionBoard, showErrors, cages, cellToCageIndex,
-        selectedCell, handleCellSelect, isFixed, isPaused, notes
+        selectedCell, handleCellSelect, isFixed, isPaused, notes,
+        showHighlights
     } = useGame();
 
     // Map context function names to local prop names for consistency if needed, 
@@ -60,9 +61,10 @@ const Board = ({ highlightedCageIndex }) => {
                             const { r: sr, c: sc } = selectedCell;
                             const selectedValue = board[sr][sc];
 
-                            // Highlight peers (row, col, box)
-                            if (sr === r || sc === c) isHighlighted = true;
-                            if (Math.floor(sr / 3) === Math.floor(r / 3) && Math.floor(sc / 3) === Math.floor(c / 3)) isHighlighted = true;
+                            // Highlight peers (row, col) - ONLY if enabled
+                            if (showHighlights) {
+                                if (sr === r || sc === c) isHighlighted = true;
+                            }
 
                             // Highlight same numbers (if not empty)
                             if (selectedValue !== 0 && value === selectedValue) {
