@@ -86,7 +86,7 @@ function App() {
       </header>
 
       {/* Main Layout Container */}
-      <div className="flex flex-col xl:flex-row items-center xl:items-start justify-center gap-6 w-full max-w-[1200px] mt-8">
+      <div className="flex flex-col xl:flex-row items-center xl:items-start justify-center gap-3 w-full max-w-[1200px] mt-4 md:mt-8">
 
         {/* Mobile-only Game Info (Visible on mobile, hidden on desktop) */}
         <div id="mobile-game-info-container" className="w-full max-w-[800px] xl:hidden order-1">
