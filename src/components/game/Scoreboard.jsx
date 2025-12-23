@@ -44,30 +44,24 @@ const Scoreboard = () => {
                 </svg>
             </div>
 
-            <div className="grid grid-cols-2 gap-4">
-                <div className="p-3 rounded-lg border flex flex-col items-center" style={{ backgroundColor: 'var(--bg-app)', borderColor: 'var(--border-thin)' }}>
-                    <span className="text-[10px] uppercase font-bold tracking-wider" style={{ color: 'var(--text-muted)' }}>Best Time</span>
-                    <span className="font-mono font-bold text-lg" style={{ color: 'var(--text-base)' }}>{formatTime(currentStats.best)}</span>
+            <div className="grid grid-cols-3 gap-2">
+                <div className="p-2 rounded-lg border flex flex-col items-center" style={{ backgroundColor: 'var(--bg-app)', borderColor: 'var(--border-thin)' }}>
+                    <span className="text-[9px] uppercase font-bold tracking-wider" style={{ color: 'var(--text-muted)' }}>Played</span>
+                    <span className="font-bold text-base" style={{ color: 'var(--text-base)' }}>{currentStats.played}</span>
                 </div>
-                <div className="p-3 rounded-lg border flex flex-col items-center" style={{ backgroundColor: 'var(--bg-app)', borderColor: 'var(--border-thin)' }}>
-                    <span className="text-[10px] uppercase font-bold tracking-wider" style={{ color: 'var(--text-muted)' }}>Avg Time</span>
-                    <span className="font-mono font-bold text-lg" style={{ color: 'var(--text-base)' }}>{formatTime(currentStats.avg)}</span>
+                <div className="p-2 rounded-lg border flex flex-col items-center" style={{ backgroundColor: 'var(--bg-app)', borderColor: 'var(--border-thin)' }}>
+                    <span className="text-[9px] uppercase font-bold tracking-wider" style={{ color: 'var(--text-muted)' }}>Best</span>
+                    <span className="font-mono font-bold text-base" style={{ color: 'var(--text-base)' }}>{formatTime(currentStats.best)}</span>
+                </div>
+                <div className="p-2 rounded-lg border flex flex-col items-center" style={{ backgroundColor: 'var(--bg-app)', borderColor: 'var(--border-thin)' }}>
+                    <span className="text-[9px] uppercase font-bold tracking-wider" style={{ color: 'var(--text-muted)' }}>Avg</span>
+                    <span className="font-mono font-bold text-base" style={{ color: 'var(--text-base)' }}>{formatTime(currentStats.avg)}</span>
                 </div>
             </div>
 
             {viewDetail && (
-                <div className="grid grid-cols-2 gap-4 mt-4 animate-fade-in-down">
-                    <div className="p-3 rounded-lg border flex flex-col items-center" style={{ backgroundColor: 'var(--bg-app)', borderColor: 'var(--border-thin)' }}>
-                        <span className="text-[10px] uppercase font-bold tracking-wider" style={{ color: 'var(--text-muted)' }}>Played</span>
-                        <span className="font-bold text-lg" style={{ color: 'var(--text-base)' }}>{currentStats.played}</span>
-                    </div>
-                    <div className="p-3 rounded-lg border flex flex-col items-center" style={{ backgroundColor: 'var(--bg-app)', borderColor: 'var(--border-thin)' }}>
-                        <span className="text-[10px] uppercase font-bold tracking-wider" style={{ color: 'var(--text-muted)' }}>Win Rate</span>
-                        <span className="font-bold text-lg" style={{ color: 'var(--text-base)' }}>{currentStats.winRate}%</span>
-                    </div>
-
-                    {/* Mini History Chart - Recharts Area Chart */}
-                    <div className="col-span-2 mt-4 w-full">
+                <div className="mt-4 animate-fade-in-down w-full">
+                    <div className="w-full">
                         <h4 className="text-[10px] font-bold uppercase tracking-wider mb-2" style={{ color: 'var(--text-muted)' }}>
                             Win History {stats[difficulty].wins.length > 20 ? '(Last 20)' : ''}
                         </h4>
