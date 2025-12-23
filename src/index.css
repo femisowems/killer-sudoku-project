@@ -113,8 +113,8 @@
         --text-medium: #fef3c7;
         --bg-hard: #7f1d1d;
         --text-hard: #fecaca;
-        --text-user-input: #60affa;
-        --bg-same-value: #666666;
+        --text-user-input: #e4e4e4;
+        --bg-same-value: #9f9e9e;
     }
 
     html {
