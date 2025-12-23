@@ -47,7 +47,7 @@ const Controls = () => {
 
             {/* Number Input Panel */}
             <div className="p-5 rounded-3xl shadow-lg border" style={{ backgroundColor: 'var(--bg-panel)', borderColor: 'var(--border-thin)' }}>
-                <div className="grid grid-cols-5 gap-3">
+                <div className="grid grid-cols-5 md:grid-cols-10 xl:grid-cols-5 gap-3">
                     {[1, 2, 3, 4, 5, 6, 7, 8, 9].map(num => {
                         const isComplete = numberCounts && numberCounts[num] >= 9;
                         return (

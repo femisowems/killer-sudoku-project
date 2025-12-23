@@ -62,7 +62,7 @@ function App() {
   return (
     <div
       id="app-root"
-      className="min-h-screen flex flex-col items-center py-6 px-2 md:py-10 md:px-4 font-sans transition-colors duration-300"
+      className="min-h-screen flex flex-col items-center py-6 px-2 md:py-6 md:px-4 lg:py-10 font-sans transition-colors duration-300"
       style={{ backgroundColor: 'var(--bg-app)' }}
     >
       {/* Top Right Controls (Fixed) */}
