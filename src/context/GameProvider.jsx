@@ -1,14 +1,15 @@
-
 import React from 'react';
 import { useSudokuGame } from '../hooks/useSudokuGame';
 import { GameContext } from './GameContext';
+
+const PREFS_KEY = 'killer-sudoku-prefs';
 
 export const GameProvider = ({ children }) => {
     // We use the existing hook to manage state
     const gameState = useSudokuGame();
     const { isWon, difficulty, timerSeconds, isAutoSolved } = gameState;
 
-    // Statistics State
+    // --- Statistics State ---
     const [stats, setStats] = React.useState({
         easy: { started: 0, wins: [] },
         medium: { started: 0, wins: [] },
@@ -79,28 +80,66 @@ export const GameProvider = ({ children }) => {
         }
     }, [isWon, difficulty, timerSeconds, isAutoSolved]);
 
-    // Theme State
-    const [theme, setTheme] = React.useState('platinum');
 
-    // Load theme on mount
+    // --- Preferences State (Theme, Timer Visibility, Mistake Visibility) ---
+    const [preferences, setPreferences] = React.useState({
+        theme: 'platinum',
+        showTimer: true,
+        showMistakes: true
+    });
+
+    // Load preferences on mount
     React.useEffect(() => {
-        const savedTheme = localStorage.getItem('killerSudokuTheme');
-        if (savedTheme) {
-            setTheme(savedTheme);
+        try {
+            const savedPrefs = localStorage.getItem(PREFS_KEY);
+            let parsedPrefs = savedPrefs ? JSON.parse(savedPrefs) : {};
+
+            // Migration: Check legacy theme key if not in prefs
+            if (!parsedPrefs.theme) {
+                const legacyTheme = localStorage.getItem('killerSudokuTheme');
+                if (legacyTheme) {
+                    parsedPrefs.theme = legacyTheme;
+                    // Clean up legacy key
+                    localStorage.removeItem('killerSudokuTheme');
+                }
+            }
+
+            // Defaults merged with saved
+            setPreferences(prev => ({
+                ...prev,
+                ...parsedPrefs
+            }));
+        } catch (error) {
+            console.error('Failed to load preferences:', error);
         }
     }, []);
 
-    const updatedSetTheme = (newTheme) => {
-        setTheme(newTheme);
-        localStorage.setItem('killerSudokuTheme', newTheme);
+    // Persist preferences logic
+    const updatePreferences = (updates) => {
+        setPreferences(prev => {
+            const newPrefs = { ...prev, ...updates };
+            localStorage.setItem(PREFS_KEY, JSON.stringify(newPrefs));
+            return newPrefs;
+        });
     };
+
+    // Expose individual setters for easier consumption
+    const setTheme = (theme) => updatePreferences({ theme });
+    const toggleTimerVisibility = () => updatePreferences({ showTimer: !preferences.showTimer });
+    const toggleMistakesVisibility = () => updatePreferences({ showMistakes: !preferences.showMistakes });
+
 
     const value = {
         ...gameState,
         startNewGame: startNewGameWrapper,
         stats,
-        theme,
-        setTheme: updatedSetTheme
+        // Preferences
+        theme: preferences.theme,
+        setTheme,
+        showTimer: preferences.showTimer,
+        toggleTimerVisibility,
+        showMistakes: preferences.showMistakes,
+        toggleMistakesVisibility
     };
 
     return (

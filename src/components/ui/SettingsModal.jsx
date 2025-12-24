@@ -4,7 +4,13 @@ import React from 'react';
 import { useGame } from '../../context/GameContext';
 
 const SettingsModal = ({ isOpen, onClose }) => {
-    const { autoRemoveNotes, setAutoRemoveNotes, showHighlights, setShowHighlights, maxHints, setMaxHints } = useGame();
+    const {
+        autoRemoveNotes, setAutoRemoveNotes,
+        showHighlights, setShowHighlights,
+        maxHints, setMaxHints,
+        showTimer, toggleTimerVisibility,
+        showMistakes, toggleMistakesVisibility
+    } = useGame();
 
     if (!isOpen) return null;
 
@@ -73,6 +79,40 @@ const SettingsModal = ({ isOpen, onClose }) => {
                                 >
                                     {maxHints}
                                 </span>
+                            </button>
+                        </div>
+
+                        {/* Toggle Timer Visibility */}
+                        <div className="flex items-center justify-between p-4 rounded-2xl border shadow-sm transition-all duration-200" style={{ backgroundColor: 'var(--bg-app)', borderColor: 'var(--border-thin)' }}>
+                            <div className="flex flex-col text-left">
+                                <span className="text-sm font-bold" style={{ color: 'var(--text-base)' }}>Game Timer</span>
+                                <span className="text-[11px] leading-tight" style={{ color: 'var(--text-muted)' }}>Show elapsed time</span>
+                            </div>
+                            <button
+                                onClick={toggleTimerVisibility}
+                                className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors duration-200 focus:outline-none ${showTimer ? 'bg-indigo-600' : 'bg-slate-300'}`}
+                                style={{ backgroundColor: showTimer ? 'var(--primary-accent)' : '' }}
+                            >
+                                <span
+                                    className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform duration-200 ${showTimer ? 'translate-x-6' : 'translate-x-1'}`}
+                                />
+                            </button>
+                        </div>
+
+                        {/* Toggle Mistakes Visibility */}
+                        <div className="flex items-center justify-between p-4 rounded-2xl border shadow-sm transition-all duration-200" style={{ backgroundColor: 'var(--bg-app)', borderColor: 'var(--border-thin)' }}>
+                            <div className="flex flex-col text-left">
+                                <span className="text-sm font-bold" style={{ color: 'var(--text-base)' }}>Mistake Counter</span>
+                                <span className="text-[11px] leading-tight" style={{ color: 'var(--text-muted)' }}>Show number of errors</span>
+                            </div>
+                            <button
+                                onClick={toggleMistakesVisibility}
+                                className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors duration-200 focus:outline-none ${showMistakes ? 'bg-indigo-600' : 'bg-slate-300'}`}
+                                style={{ backgroundColor: showMistakes ? 'var(--primary-accent)' : '' }}
+                            >
+                                <span
+                                    className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform duration-200 ${showMistakes ? 'translate-x-6' : 'translate-x-1'}`}
+                                />
                             </button>
                         </div>
 

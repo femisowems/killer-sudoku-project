@@ -10,6 +10,9 @@ import {
 } from '../constants/sudoku-constants';
 import { calculateSmartNoteUpdates } from '../logic/game-logic';
 import { saveGameState, loadGameState, clearGameState } from '../utils/storage';
+import { useTimer } from './useTimer';
+import { useWorker } from './useWorker';
+import { useHistory } from './useHistory';
 
 /**
  * Main game hook managing Sudoku state, validation, and history.
@@ -34,43 +37,38 @@ export function useSudokuGame(initialDifficulty = 'medium') {
     const [status, setStatus] = useState({ message: '', type: 'info' });
     const [isWon, setIsWon] = useState(false);
     const [cellToCageIndex, setCellToCageIndex] = useState(Array(9).fill(0).map(() => Array(9).fill(-1)));
-    const [timerSeconds, setTimerSeconds] = useState(0);
-    const [isTimerRunning, setIsTimerRunning] = useState(false);
-    const [isPaused, setIsPaused] = useState(false);
+
     const [isAutoSolved, setIsAutoSolved] = useState(false);
     const [showErrors, setShowErrors] = useState(true);
     const [mistakes, setMistakes] = useState(0);
     const [autoRemoveNotes, setAutoRemoveNotes] = useState(true);
     const [showHighlights, setShowHighlights] = useState(true);
 
-    // History for Undo/Redo
-    const [history, setHistory] = useState([]);
-    const [future, setFuture] = useState([]);
+    // --- Composed Hooks ---
+    // --- Composed Hooks ---
+    const {
+        timerSeconds,
+        isPaused,
+        setIsPaused,
+        togglePause,
+        resetTimer,
+        stopTimer,
+        startTimer,
+        setTimerSeconds
+    } = useTimer();
 
-    // Worker Ref
-    const workerRef = useRef(null);
+    const { validateBoard } = useWorker();
 
-    // Initialize Worker
-    useEffect(() => {
-        workerRef.current = new Worker(new URL('../workers/puzzle.worker.js', import.meta.url), { type: 'module' });
-
-        workerRef.current.onmessage = (e) => {
-            const { type, payload } = e.data;
-            if (type === 'validationResult') {
-                const { unique, solutionCount } = payload;
-                if (!unique) {
-                    console.warn(`Generated puzzle has ${solutionCount} solutions. It might not be a valid Sudoku.`);
-                    // Optionally set a status message here, but careful not to spam user
-                }
-            }
-        };
-
-        return () => {
-            if (workerRef.current) {
-                workerRef.current.terminate();
-            }
-        };
-    }, []);
+    const {
+        history,
+        future,
+        addToHistory: addToHistoryStack,
+        handleUndo,
+        handleRedo,
+        resetHistory,
+        setHistory,
+        setFuture
+    } = useHistory();
 
     // Helper to calculate cage sums and map cells to cages
     const setupCagesAndMap = (solution) => {
@@ -98,18 +96,15 @@ export function useSudokuGame(initialDifficulty = 'medium') {
         setIsAutoSolved(false); // Reset auto-solve flag
         setShowErrors(true); // Reset error showing (default ON)
         setHintedCells([]);
-        setHintedCells([]);
         setHintsUsed(0);
         setSelectedCell(null);
-        setSelectedCell(null);
-        setTimerSeconds(0);
-        setIsTimerRunning(true);
-        setIsPaused(false);
         setMistakes(0);
         setNotes(Array(9).fill(0).map(() => Array(9).fill(new Set()))); // Reset notes
         setIsNotesMode(false); // Reset notes mode
-        setHistory([]); // Reset history
-        setFuture([]); // Reset future
+
+        // Reset sub-hooks
+        resetTimer();
+        resetHistory();
 
         // 1. Generate solution
         const newSolution = generateValidBoard();
@@ -131,18 +126,13 @@ export function useSudokuGame(initialDifficulty = 'medium') {
         setBoard(newBoard);
 
         // Validate Puzzle in Background
-        if (workerRef.current) {
-            workerRef.current.postMessage({
-                type: 'validate',
-                payload: { board: newBoard }
-            });
-        }
+        validateBoard(newBoard);
 
         // Clear any saved state
         clearGameState();
 
         setStatus({ message: `New ${diff.charAt(0).toUpperCase() + diff.slice(1)} game started. Good luck!`, type: 'info' });
-    }, [difficulty]);
+    }, [difficulty, resetTimer, resetHistory, validateBoard]);
 
     // Restore game from saved state
     const restoreGame = useCallback((savedState) => {
@@ -159,7 +149,6 @@ export function useSudokuGame(initialDifficulty = 'medium') {
         setSolutionBoard(savedState.solutionBoard);
         setStartingCells(savedState.startingCells);
         setHintedCells(savedState.hintedCells);
-        setHintedCells(savedState.hintedCells);
         // setHintsRemaining(savedState.hintsRemaining); // handled by hintsUsed logic below
         if (savedState.hintsUsed !== undefined) {
             setHintsUsed(savedState.hintsUsed);
@@ -171,13 +160,15 @@ export function useSudokuGame(initialDifficulty = 'medium') {
             setMaxHints(savedState.maxHints);
         }
         setNotes(savedState.notes);
-        setNotes(savedState.notes);
         setMistakes(savedState.mistakes);
-        setHistory(savedState.history || []); // Load history if available
+
+        // Restore sub-hooks state
+        setHistory(savedState.history || []);
         setFuture([]); // Reset future on load (simpler)
         setTimerSeconds(savedState.timerSeconds);
-        setIsTimerRunning(true); // Resume timer on load
-        setIsPaused(savedState.isPaused); // Or maybe force pause? Let's keep saved state.
+        startTimer(); // Resume timer on load
+
+        setIsPaused(savedState.isPaused); // Keep saved pause state
         setIsWon(savedState.isWon);
         setIsAutoSolved(savedState.isAutoSolved);
         if (savedState.autoRemoveNotes !== undefined) {
@@ -202,14 +193,9 @@ export function useSudokuGame(initialDifficulty = 'medium') {
         setStatus({ message: 'Game restored', type: 'info' });
 
         // Re-validate if needed
-        if (workerRef.current) {
-            workerRef.current.postMessage({
-                type: 'validate',
-                payload: { board: savedState.board }
-            });
-        }
+        validateBoard(savedState.board);
 
-    }, [startNewGame, initialDifficulty]);
+    }, [startNewGame, initialDifficulty, setHistory, setFuture, setTimerSeconds, startTimer, setIsPaused, validateBoard]);
 
     // Initial load - check storage first
     useEffect(() => {
@@ -221,19 +207,6 @@ export function useSudokuGame(initialDifficulty = 'medium') {
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
-
-    // Timer Interval
-    useEffect(() => {
-        let interval = null;
-        if (isTimerRunning && !isWon && !isPaused) {
-            interval = setInterval(() => {
-                setTimerSeconds(s => s + 1);
-            }, 1000);
-        } else if ((!isTimerRunning || isPaused) && interval) {
-            clearInterval(interval);
-        }
-        return () => clearInterval(interval);
-    }, [isTimerRunning, isWon, isPaused]);
 
     // Automatic Win Detection
     useEffect(() => {
@@ -250,10 +223,10 @@ export function useSudokuGame(initialDifficulty = 'medium') {
 
         if (isCorrect) {
             setIsWon(true);
-            setIsTimerRunning(false);
+            stopTimer();
             setStatus({ message: 'Congratulations! You solved it!', type: 'success' });
         }
-    }, [board, solutionBoard, isWon]);
+    }, [board, solutionBoard, isWon, stopTimer]);
 
     // Idle Timer (5 minutes)
     const idleTimerRef = useRef(null);
@@ -268,7 +241,7 @@ export function useSudokuGame(initialDifficulty = 'medium') {
                 // Optional: alert or status update? Usually modal is sufficient.
             }, 300000); // 5 minutes = 300,000 ms
         }
-    }, [isWon, isPaused]);
+    }, [isWon, isPaused, setIsPaused]);
 
     useEffect(() => {
         // Events to detect activity
@@ -338,48 +311,37 @@ export function useSudokuGame(initialDifficulty = 'medium') {
     }, [getGameState, timerSeconds]);
 
     // History Helpers
-    const addToHistory = useCallback(() => {
+    const performAddToHistory = useCallback(() => {
         // Deep copy board and notes (notes are Set, so need careful copy)
         const currentBoard = board.map(row => [...row]);
         const currentNotes = notes.map(row => row.map(set => new Set(set)));
 
-        setHistory(prev => [...prev, { board: currentBoard, notes: currentNotes }]);
-        setFuture([]); // Clear future on new move
-    }, [board, notes]);
+        addToHistoryStack({ board: currentBoard, notes: currentNotes });
+    }, [board, notes, addToHistoryStack]);
 
     const undo = useCallback(() => {
-        if (!isPaused && !isWon && history.length > 0) {
-            const previousState = history[history.length - 1];
-            const newHistory = history.slice(0, -1);
+        const previousState = handleUndo({
+            board: board.map(row => [...row]),
+            notes: notes.map(row => row.map(set => new Set(set)))
+        }, isPaused, isWon);
 
-            // Save current state to future before undoing
-            const currentBoard = board.map(row => [...row]);
-            const currentNotes = notes.map(row => row.map(set => new Set(set)));
-            setFuture(prev => [{ board: currentBoard, notes: currentNotes }, ...prev]);
-
-            // Apply previous state
+        if (previousState) {
             setBoard(previousState.board);
             setNotes(previousState.notes);
-            setHistory(newHistory);
         }
-    }, [history, board, notes, isPaused, isWon]);
+    }, [handleUndo, board, notes, isPaused, isWon]);
 
     const redo = useCallback(() => {
-        if (!isPaused && !isWon && future.length > 0) {
-            const nextState = future[0];
-            const newFuture = future.slice(1);
+        const nextState = handleRedo({
+            board: board.map(row => [...row]),
+            notes: notes.map(row => row.map(set => new Set(set)))
+        }, isPaused, isWon);
 
-            // Save current state to history before redoing
-            const currentBoard = board.map(row => [...row]);
-            const currentNotes = notes.map(row => row.map(set => new Set(set)));
-            setHistory(prev => [...prev, { board: currentBoard, notes: currentNotes }]);
-
-            // Apply next state
+        if (nextState) {
             setBoard(nextState.board);
             setNotes(nextState.notes);
-            setFuture(newFuture);
         }
-    }, [future, board, notes, isPaused, isWon]);
+    }, [handleRedo, board, notes, isPaused, isWon]);
 
     const handleCellSelect = useCallback((r, c) => {
         if (selectedCell && selectedCell.r === r && selectedCell.c === c) {
@@ -417,7 +379,7 @@ export function useSudokuGame(initialDifficulty = 'medium') {
             if (board[r][c] !== 0) return;
 
             // Save state before changing notes
-            addToHistory();
+            performAddToHistory();
 
             const currentNotes = new Set(notes[r][c]);
             if (currentNotes.has(number)) {
@@ -434,7 +396,7 @@ export function useSudokuGame(initialDifficulty = 'medium') {
 
         // Standard Input Mode
         // Save state before changing board
-        addToHistory();
+        performAddToHistory();
 
         const newBoard = [...board.map(row => [...row])];
         newBoard[r][c] = number;
@@ -458,9 +420,9 @@ export function useSudokuGame(initialDifficulty = 'medium') {
 
         // Check for immediate win (optional here, but good for feedback)
         // We'll leave win check to a separate effect or function call
-    }, [selectedCell, isFixed, board, solutionBoard, isNotesMode, notes, addToHistory, autoRemoveNotes, cages, cellToCageIndex]);
+    }, [selectedCell, isFixed, board, solutionBoard, isNotesMode, notes, performAddToHistory, autoRemoveNotes, cages, cellToCageIndex]);
 
-    const toggleNotesMode = useCallback(() => {
+    const toggleNotesModeArg = useCallback(() => {
         setIsNotesMode(prev => !prev);
     }, []);
 
@@ -510,18 +472,9 @@ export function useSudokuGame(initialDifficulty = 'medium') {
         setBoard(solvedBoard);
         setIsWon(true);
         setIsAutoSolved(true); // Mark as auto-solved
-        setIsTimerRunning(false);
+        stopTimer();
         setStatus({ message: 'Solved! Use "New Game" to play again.', type: 'success' });
-    }, [solutionBoard]);
-
-    const togglePause = useCallback(() => {
-        if (!isWon) {
-            setIsPaused(prev => !prev);
-        }
-    }, [isWon]);
-
-    // Calculate visible mistakes (dynamic conflict count)
-    // const mistakes = useMemo(...)
+    }, [solutionBoard, stopTimer]);
 
     // Keyboard Navigation (Moved here to ensure handlers are defined)
     useEffect(() => {
@@ -540,7 +493,7 @@ export function useSudokuGame(initialDifficulty = 'medium') {
 
             // Note Mode Toggle
             if (e.key.toLowerCase() === 'n') {
-                toggleNotesMode();
+                toggleNotesModeArg();
                 return;
             }
 
@@ -604,7 +557,7 @@ export function useSudokuGame(initialDifficulty = 'medium') {
 
         window.addEventListener('keydown', handleKeyDown);
         return () => window.removeEventListener('keydown', handleKeyDown);
-    }, [selectedCell, isPaused, isWon, handleNumberInput, toggleNotesMode, togglePause, undo, redo]);
+    }, [selectedCell, isPaused, isWon, handleNumberInput, toggleNotesModeArg, togglePause, undo, redo]);
 
     return {
         board,
@@ -633,7 +586,7 @@ export function useSudokuGame(initialDifficulty = 'medium') {
         notes,
         isNotesMode,
 
-        toggleNotesMode,
+        toggleNotesMode: toggleNotesModeArg,
         hintsRemaining,
         autoRemoveNotes,
         setAutoRemoveNotes,
