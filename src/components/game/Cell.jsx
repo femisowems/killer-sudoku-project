@@ -167,6 +167,7 @@ const Cell = ({
                     animate={isWon ? {
                         scale: [1, 1.2, 1],
                         filter: ["brightness(1)", "brightness(1.5)", "brightness(1)"],
+                        opacity: 1,
                         transition: {
                             delay: (r * 9 + c) * 0.03, // Stagger effect
                             duration: 0.5,
