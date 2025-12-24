@@ -58,6 +58,12 @@ function App() {
   // Apply theme to document root for global CSS variables
   React.useEffect(() => {
     document.documentElement.setAttribute('data-theme', theme);
+
+    // Update PWA theme color meta tag
+    const metaThemeColor = document.querySelector('meta[name="theme-color"]');
+    if (metaThemeColor) {
+      metaThemeColor.setAttribute('content', THEME_COLORS[theme]);
+    }
   }, [theme]);
 
   return (
