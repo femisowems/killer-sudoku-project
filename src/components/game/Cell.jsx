@@ -138,15 +138,7 @@ const Cell = ({
         bgColorClass += ' hover:brightness-95'; // Subtle hover across themes
     }
 
-    // Animation Override
-    const animateProps = {};
-    if (isGroupCompleteAnimation) {
-        animateProps.animate = {
-            scale: [1, 1.05, 1], // Subtle breathing
-            transition: { duration: 1.5, ease: "easeInOut" }
-        };
-        zIndexClass = 'z-20'; /* Pop above others during animation */
-    }
+
 
     return (
         <motion.div
@@ -157,7 +149,6 @@ const Cell = ({
                 ...themeStyles,
                 aspectRatio: '0.9'
             }}
-            {...animateProps}
         >
             {/* Completion Highlight Overlay */}
             {isGroupCompleteAnimation && (
