@@ -12,6 +12,7 @@ import GameInfo from './components/game/GameInfo';
 import Scoreboard from './components/game/Scoreboard';
 import ThemePicker from './components/ui/ThemePicker';
 import SettingsModal from './components/ui/SettingsModal';
+import InstallPWA from './components/InstallPWA';
 import { useGame } from './context/GameContext';
 
 const THEME_COLORS = {
@@ -401,6 +402,7 @@ function App() {
           Made by <a href="https://ssowemimo.com" target="_blank" rel="noopener noreferrer" className="hover:text-primary transition-colors" style={{ color: 'var(--text-base)' }}>Femi Sowems</a>
         </p>
       </footer>
+      <InstallPWA />
     </div >
   );
 }
