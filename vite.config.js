@@ -20,6 +20,7 @@ export default defineConfig({
         name: 'Killer Sudoku',
         short_name: 'Killer Sudoku',
         description: 'Daily Killer Sudoku puzzles.',
+        display: 'standalone',
         theme_color: '#ffffff',
         icons: [
           {
