@@ -1,5 +1,4 @@
 import React from 'react';
-
 // eslint-disable-next-line no-unused-vars
 import { motion } from 'framer-motion';
 
@@ -7,7 +6,8 @@ const Cell = ({
     r, c, value, cageIndex,
     isSelected, isHighlighted, isSameValue, isCageHighlighted, fixedState,
     isConflict, isCageConflict, cageSum, isError,
-    onSelect, cellToCageIndex, notes, isWon
+    onSelect, cellToCageIndex, notes, isWon,
+    isGroupCompleteAnimation
 }) => {
     // ... existing logic ...
 
@@ -44,7 +44,6 @@ const Cell = ({
             : '2px dashed var(--text-muted)'; // Thematic muted color
 
         const style = {};
-        // ... rest of getCageBorders remains same ...
         // Helper to safely get neighbor cage index
         const getCage = (row, col) => {
             if (row < 0 || row > 8 || col < 0 || col > 8) return -1;
@@ -139,8 +138,26 @@ const Cell = ({
         bgColorClass += ' hover:brightness-95'; // Subtle hover across themes
     }
 
+    // Animation Override
+    const animateProps = {};
+    if (isGroupCompleteAnimation) {
+        animateProps.animate = {
+            backgroundColor: ["var(--bg-highlight)", themeStyles.backgroundColor],
+            boxShadow: [
+                "0 0 0 rgba(0,0,0,0)",
+                `0 0 10px var(--primary-accent-muted)`, // Glow with theme accent
+                "0 0 0 rgba(0,0,0,0)"
+            ],
+            transition: {
+                duration: 0.6,
+                ease: "easeInOut"
+            }
+        };
+        zIndexClass = 'z-20'; /* Pop above others during animation */
+    }
+
     return (
-        <div
+        <motion.div
             onClick={() => onSelect(r, c)}
             className={`${baseClasses} ${bgColorClass} ${textClass} ${zIndexClass}`}
             style={{
@@ -148,7 +165,10 @@ const Cell = ({
                 ...themeStyles,
                 aspectRatio: '0.9'
             }}
+            {...animateProps}
         >
+            {/* Inner Cage Border Overlay */}
+
             {/* Inner Cage Border Overlay */}
             <div
                 className="absolute inset-[3px] pointer-events-none z-20"
@@ -191,7 +211,7 @@ const Cell = ({
                     ))}
                 </motion.div>
             )}
-        </div>
+        </motion.div>
     );
 };
 

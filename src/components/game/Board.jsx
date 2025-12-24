@@ -9,7 +9,7 @@ const Board = ({ highlightedCageIndex }) => {
     const {
         board, solutionBoard, showErrors, cages, cellToCageIndex,
         selectedCell, handleCellSelect, isFixed, isPaused, notes,
-        showHighlights, isWon
+        showHighlights, isWon, animatingGroups
     } = useGame();
 
     // Map context function names to local prop names for consistency if needed, 
@@ -26,6 +26,19 @@ const Board = ({ highlightedCageIndex }) => {
         });
         return indices;
     }, [board, cages]);
+
+    // Helper to check if cell is in an animating group
+    const isCellAnimating = (r, c) => {
+        if (!animatingGroups || animatingGroups.size === 0) return false;
+
+        const rowId = `row-${r}`;
+        const colId = `col-${c}`;
+        const br = Math.floor(r / 3);
+        const bc = Math.floor(c / 3);
+        const boxId = `box-${br}-${bc}`;
+
+        return animatingGroups.has(rowId) || animatingGroups.has(colId) || animatingGroups.has(boxId);
+    };
 
     return (
         <div id="sudoku-board-container"
@@ -97,6 +110,7 @@ const Board = ({ highlightedCageIndex }) => {
                                 cellToCageIndex={cellToCageIndex}
                                 notes={notes[r][c]}
                                 isWon={isWon}
+                                isGroupCompleteAnimation={isCellAnimating(r, c)}
                             />
                         );
                     })

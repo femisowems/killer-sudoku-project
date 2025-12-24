@@ -44,6 +44,10 @@ export function useSudokuGame(initialDifficulty = 'medium') {
     const [autoRemoveNotes, setAutoRemoveNotes] = useState(true);
     const [showHighlights, setShowHighlights] = useState(true);
 
+    // Animation State
+    const [animatingGroups, setAnimatingGroups] = useState(new Set());
+    const completedGroupsRef = useRef(new Set());
+
     // --- Composed Hooks ---
     // --- Composed Hooks ---
     const {
@@ -89,6 +93,92 @@ export function useSudokuGame(initialDifficulty = 'medium') {
         return { cages: newCages, cellToCageIndex: newCellToCage };
     };
 
+    // Helper: Calculate currently completed groups without triggering animation
+    const getCompletedGroupsSet = (currentBoard) => {
+        const completed = new Set();
+        // Check Rows
+        for (let r = 0; r < 9; r++) {
+            const row = currentBoard[r];
+            if (new Set(row).size === 9 && !row.includes(0)) completed.add(`row-${r}`);
+        }
+        // Check Cols
+        for (let c = 0; c < 9; c++) {
+            const col = currentBoard.map(row => row[c]);
+            if (new Set(col).size === 9 && !col.includes(0)) completed.add(`col-${c}`);
+        }
+        // Check Boxes
+        for (let br = 0; br < 3; br++) {
+            for (let bc = 0; bc < 3; bc++) {
+                const boxValues = [];
+                for (let r = br * 3; r < br * 3 + 3; r++) {
+                    for (let c = bc * 3; c < bc * 3 + 3; c++) {
+                        boxValues.push(currentBoard[r][c]);
+                    }
+                }
+                if (new Set(boxValues).size === 9 && !boxValues.includes(0)) completed.add(`box-${br}-${bc}`);
+            }
+        }
+        return completed;
+    };
+
+    // Logic to check completions and animate
+    const checkAndAnimateCompletions = (newBoard, r, c) => {
+        const foundNewCompletions = [];
+
+        // 1. Check Row
+        const rowId = `row-${r}`;
+        const row = newBoard[r];
+        if (new Set(row).size === 9 && !row.includes(0)) {
+            if (!completedGroupsRef.current.has(rowId)) foundNewCompletions.push(rowId);
+            completedGroupsRef.current.add(rowId);
+        } else {
+            completedGroupsRef.current.delete(rowId);
+        }
+
+        // 2. Check Col
+        const colId = `col-${c}`;
+        const col = newBoard.map(row => row[c]);
+        if (new Set(col).size === 9 && !col.includes(0)) {
+            if (!completedGroupsRef.current.has(colId)) foundNewCompletions.push(colId);
+            completedGroupsRef.current.add(colId);
+        } else {
+            completedGroupsRef.current.delete(colId);
+        }
+
+        // 3. Check Box
+        const br = Math.floor(r / 3);
+        const bc = Math.floor(c / 3);
+        const boxId = `box-${br}-${bc}`;
+        const boxValues = [];
+        for (let i = br * 3; i < br * 3 + 3; i++) {
+            for (let j = bc * 3; j < bc * 3 + 3; j++) {
+                boxValues.push(newBoard[i][j]);
+            }
+        }
+        if (new Set(boxValues).size === 9 && !boxValues.includes(0)) {
+            if (!completedGroupsRef.current.has(boxId)) foundNewCompletions.push(boxId);
+            completedGroupsRef.current.add(boxId);
+        } else {
+            completedGroupsRef.current.delete(boxId);
+        }
+
+        // Trigger Animation for NEWLY completed
+        if (foundNewCompletions.length > 0) {
+            setAnimatingGroups(prev => {
+                const next = new Set(prev);
+                foundNewCompletions.forEach(id => next.add(id));
+                return next;
+            });
+            setTimeout(() => {
+                setAnimatingGroups(prev => {
+                    const next = new Set(prev);
+                    foundNewCompletions.forEach(id => next.delete(id));
+                    return next;
+                });
+            }, 1000);
+        }
+    };
+
     // Initialize game
     const startNewGame = useCallback((diff = difficulty) => {
         setDifficulty(diff);
@@ -101,6 +191,10 @@ export function useSudokuGame(initialDifficulty = 'medium') {
         setMistakes(0);
         setNotes(Array(9).fill(0).map(() => Array(9).fill(new Set()))); // Reset notes
         setIsNotesMode(false); // Reset notes mode
+
+        // Reset Animation State
+        setAnimatingGroups(new Set());
+        completedGroupsRef.current = new Set();
 
         // Reset sub-hooks
         resetTimer();
@@ -124,6 +218,9 @@ export function useSudokuGame(initialDifficulty = 'medium') {
             newBoard[r][c] = newSolution[r][c];
         });
         setBoard(newBoard);
+
+        // Pre-fill completed groups from start
+        completedGroupsRef.current = getCompletedGroupsSet(newBoard);
 
         // Validate Puzzle in Background
         validateBoard(newBoard);
@@ -177,6 +274,9 @@ export function useSudokuGame(initialDifficulty = 'medium') {
         if (savedState.showHighlights !== undefined) {
             setShowHighlights(savedState.showHighlights);
         }
+
+        // Restore completed groups tracking
+        completedGroupsRef.current = getCompletedGroupsSet(savedState.board);
 
         // Cages and CellMap must be derived from solution (or constants)
         try {
@@ -328,6 +428,8 @@ export function useSudokuGame(initialDifficulty = 'medium') {
         if (previousState) {
             setBoard(previousState.board);
             setNotes(previousState.notes);
+            // Silent update of completed groups
+            completedGroupsRef.current = getCompletedGroupsSet(previousState.board);
         }
     }, [handleUndo, board, notes, isPaused, isWon]);
 
@@ -340,6 +442,8 @@ export function useSudokuGame(initialDifficulty = 'medium') {
         if (nextState) {
             setBoard(nextState.board);
             setNotes(nextState.notes);
+            // Silent update of completed groups
+            completedGroupsRef.current = getCompletedGroupsSet(nextState.board);
         }
     }, [handleRedo, board, notes, isPaused, isWon]);
 
@@ -418,6 +522,9 @@ export function useSudokuGame(initialDifficulty = 'medium') {
             setNotes(newNotes);
         }
 
+        // Check animations
+        checkAndAnimateCompletions(newBoard, r, c);
+
         // Check for immediate win (optional here, but good for feedback)
         // We'll leave win check to a separate effect or function call
     }, [selectedCell, isFixed, board, solutionBoard, isNotesMode, notes, performAddToHistory, autoRemoveNotes, cages, cellToCageIndex]);
@@ -449,6 +556,8 @@ export function useSudokuGame(initialDifficulty = 'medium') {
         setHintedCells([...hintedCells, [r, c]]);
         setHintsUsed(prev => prev + 1);
         setStatus({ message: `Hint applied: The correct number is ${correctValue}.`, type: 'success' });
+
+        checkAndAnimateCompletions(newBoard, r, c);
     }, [selectedCell, isFixed, solutionBoard, board, hintedCells, hintsRemaining]);
 
     const checkErrors = useCallback(() => {
@@ -597,6 +706,7 @@ export function useSudokuGame(initialDifficulty = 'medium') {
         undo,
         redo,
         canUndo: history.length > 0,
-        canRedo: future.length > 0
+        canRedo: future.length > 0,
+        animatingGroups
     };
 }
