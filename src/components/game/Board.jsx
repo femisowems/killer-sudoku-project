@@ -96,6 +96,7 @@ const Board = ({ highlightedCageIndex }) => {
                                 onSelect={onSelect}
                                 cellToCageIndex={cellToCageIndex}
                                 notes={notes[r][c]}
+                                isWon={useGame().isWon}
                             />
                         );
                     })

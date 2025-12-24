@@ -1,5 +1,6 @@
 
 import React from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 
 import { useGame } from '../../context/GameContext';
 
@@ -12,127 +13,150 @@ const SettingsModal = ({ isOpen, onClose }) => {
         showMistakes, toggleMistakesVisibility
     } = useGame();
 
-    if (!isOpen) return null;
-
     return (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
-            {/* Backdrop */}
-            <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm transition-opacity" onClick={onClose}></div>
-
-            {/* Modal Card */}
-            <div
-                className="relative rounded-3xl shadow-2xl p-8 max-w-sm w-full animate-pop-in border-4 overflow-hidden"
-                style={{ backgroundColor: 'var(--bg-panel)', borderColor: 'var(--border-thin)' }}
-            >
-                <div className="relative z-10 text-center">
-                    <h2 className="text-2xl font-extrabold mb-6 tracking-tight" style={{ color: 'var(--text-base)' }}>Settings</h2>
-
-                    <div className="space-y-6">
-                        {/* Smart Note Auto-Removal Toggle */}
-                        <div className="flex items-center justify-between p-4 rounded-2xl border shadow-sm transition-all duration-200" style={{ backgroundColor: 'var(--bg-app)', borderColor: 'var(--border-thin)' }}>
-                            <div className="flex flex-col text-left">
-                                <span className="text-sm font-bold" style={{ color: 'var(--text-base)' }}>Smart Notes</span>
-                                <span className="text-[11px] leading-tight" style={{ color: 'var(--text-muted)' }}>Auto-remove from row, column & cage</span>
-                            </div>
-                            <button
-                                onClick={() => setAutoRemoveNotes(!autoRemoveNotes)}
-                                className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors duration-200 focus:outline-none ${autoRemoveNotes ? 'bg-indigo-600' : 'bg-slate-300'}`}
-                                style={{ backgroundColor: autoRemoveNotes ? 'var(--primary-accent)' : '' }}
-                            >
-                                <span
-                                    className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform duration-200 ${autoRemoveNotes ? 'translate-x-6' : 'translate-x-1'}`}
-                                />
-                            </button>
-                        </div>
-
-                        {/* Highlight Areas Toggle */}
-                        <div className="flex items-center justify-between p-4 rounded-2xl border shadow-sm transition-all duration-200" style={{ backgroundColor: 'var(--bg-app)', borderColor: 'var(--border-thin)' }}>
-                            <div className="flex flex-col text-left">
-                                <span className="text-sm font-bold" style={{ color: 'var(--text-base)' }}>Highlight Areas</span>
-                                <span className="text-[11px] leading-tight" style={{ color: 'var(--text-muted)' }}>Highlight row & column</span>
-                            </div>
-                            <button
-                                onClick={() => setShowHighlights(!showHighlights)}
-                                className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors duration-200 focus:outline-none ${showHighlights ? 'bg-indigo-600' : 'bg-slate-300'}`}
-                                style={{ backgroundColor: showHighlights ? 'var(--primary-accent)' : '' }}
-                            >
-                                <span
-                                    className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform duration-200 ${showHighlights ? 'translate-x-6' : 'translate-x-1'}`}
-                                />
-                            </button>
-                        </div>
-
-                        {/* Max Hints Toggle */}
-                        <div className="flex items-center justify-between p-4 rounded-2xl border shadow-sm transition-all duration-200" style={{ backgroundColor: 'var(--bg-app)', borderColor: 'var(--border-thin)' }}>
-                            <div className="flex flex-col text-left">
-                                <span className="text-sm font-bold" style={{ color: 'var(--text-base)' }}>Max Hints</span>
-                                <span className="text-[11px] leading-tight" style={{ color: 'var(--text-muted)' }}>Allowed hints per game</span>
-                            </div>
-                            <button
-                                onClick={() => setMaxHints(maxHints === 3 ? 5 : 3)}
-                                className={`relative inline-flex h-8 w-14 items-center rounded-full transition-colors duration-200 focus:outline-none`}
-                                style={{ backgroundColor: maxHints === 5 ? 'var(--primary-accent)' : 'var(--text-muted)' }}
-                            >
-                                <span
-                                    className={`flex items-center justify-center h-6 w-6 transform rounded-full bg-white shadow-sm text-xs font-bold transition-transform duration-200 ${maxHints === 5 ? 'translate-x-7' : 'translate-x-1'}`}
-                                    style={{ color: maxHints === 5 ? 'var(--primary-accent)' : 'var(--text-muted)' }}
-                                >
-                                    {maxHints}
-                                </span>
-                            </button>
-                        </div>
-
-                        {/* Toggle Timer Visibility */}
-                        <div className="flex items-center justify-between p-4 rounded-2xl border shadow-sm transition-all duration-200" style={{ backgroundColor: 'var(--bg-app)', borderColor: 'var(--border-thin)' }}>
-                            <div className="flex flex-col text-left">
-                                <span className="text-sm font-bold" style={{ color: 'var(--text-base)' }}>Game Timer</span>
-                                <span className="text-[11px] leading-tight" style={{ color: 'var(--text-muted)' }}>Show elapsed time</span>
-                            </div>
-                            <button
-                                onClick={toggleTimerVisibility}
-                                className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors duration-200 focus:outline-none ${showTimer ? 'bg-indigo-600' : 'bg-slate-300'}`}
-                                style={{ backgroundColor: showTimer ? 'var(--primary-accent)' : '' }}
-                            >
-                                <span
-                                    className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform duration-200 ${showTimer ? 'translate-x-6' : 'translate-x-1'}`}
-                                />
-                            </button>
-                        </div>
-
-                        {/* Toggle Mistakes Visibility */}
-                        <div className="flex items-center justify-between p-4 rounded-2xl border shadow-sm transition-all duration-200" style={{ backgroundColor: 'var(--bg-app)', borderColor: 'var(--border-thin)' }}>
-                            <div className="flex flex-col text-left">
-                                <span className="text-sm font-bold" style={{ color: 'var(--text-base)' }}>Mistake Counter</span>
-                                <span className="text-[11px] leading-tight" style={{ color: 'var(--text-muted)' }}>Show number of errors</span>
-                            </div>
-                            <button
-                                onClick={toggleMistakesVisibility}
-                                className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors duration-200 focus:outline-none ${showMistakes ? 'bg-indigo-600' : 'bg-slate-300'}`}
-                                style={{ backgroundColor: showMistakes ? 'var(--primary-accent)' : '' }}
-                            >
-                                <span
-                                    className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform duration-200 ${showMistakes ? 'translate-x-6' : 'translate-x-1'}`}
-                                />
-                            </button>
-                        </div>
-
-                        {/* Future settings can go here */}
-                    </div>
-
-                    <button
+        <AnimatePresence>
+            {isOpen && (
+                <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+                    {/* Backdrop */}
+                    <motion.div
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm"
                         onClick={onClose}
-                        className="mt-8 w-full py-4 text-white font-bold rounded-2xl transition-all hover:scale-[1.02] active:scale-[0.98] shadow-lg"
-                        style={{ backgroundColor: 'var(--primary-accent)' }}
-                    >
-                        Close
-                    </button>
-                </div>
+                    />
 
-                {/* Decorative Blobs */}
-                <div className="absolute -top-10 -right-10 w-32 h-32 rounded-full opacity-10 blur-3xl pointer-events-none" style={{ backgroundColor: 'var(--primary-accent)' }}></div>
-                <div className="absolute -bottom-10 -left-10 w-32 h-32 rounded-full opacity-10 blur-3xl pointer-events-none" style={{ backgroundColor: 'var(--primary-accent)' }}></div>
-            </div>
-        </div >
+                    {/* Modal Card */}
+                    <motion.div
+                        initial={{ scale: 0.9, opacity: 0, y: 20 }}
+                        animate={{ scale: 1, opacity: 1, y: 0 }}
+                        exit={{ scale: 0.9, opacity: 0, y: 20 }}
+                        transition={{ type: "spring", stiffness: 300, damping: 25 }}
+                        className="relative rounded-3xl shadow-2xl p-8 max-w-sm w-full border-4 overflow-hidden"
+                        style={{ backgroundColor: 'var(--bg-panel)', borderColor: 'var(--border-thin)' }}
+                        role="dialog"
+                        aria-modal="true"
+                        aria-labelledby="settings-title"
+                    >
+                        <div className="relative z-10 text-center">
+                            <h2 id="settings-title" className="text-2xl font-extrabold mb-6 tracking-tight" style={{ color: 'var(--text-base)' }}>Settings</h2>
+
+                            <div className="space-y-6">
+                                {/* Smart Note Auto-Removal Toggle */}
+                                <div className="flex items-center justify-between p-4 rounded-2xl border shadow-sm transition-all duration-200" style={{ backgroundColor: 'var(--bg-app)', borderColor: 'var(--border-thin)' }}>
+                                    <div className="flex flex-col text-left">
+                                        <span className="text-sm font-bold" style={{ color: 'var(--text-base)' }}>Smart Notes</span>
+                                        <span className="text-[11px] leading-tight" style={{ color: 'var(--text-muted)' }}>Auto-remove from row, column & cage</span>
+                                    </div>
+                                    <button
+                                        onClick={() => setAutoRemoveNotes(!autoRemoveNotes)}
+                                        className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors duration-200 focus:outline-none ${autoRemoveNotes ? 'bg-indigo-600' : 'bg-slate-300'}`}
+                                        style={{ backgroundColor: autoRemoveNotes ? 'var(--primary-accent)' : '' }}
+                                        aria-label={autoRemoveNotes ? "Disable Smart Notes" : "Enable Smart Notes"}
+                                        aria-pressed={autoRemoveNotes}
+                                    >
+                                        <span
+                                            className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform duration-200 ${autoRemoveNotes ? 'translate-x-6' : 'translate-x-1'}`}
+                                        />
+                                    </button>
+                                </div>
+
+                                {/* Highlight Areas Toggle */}
+                                <div className="flex items-center justify-between p-4 rounded-2xl border shadow-sm transition-all duration-200" style={{ backgroundColor: 'var(--bg-app)', borderColor: 'var(--border-thin)' }}>
+                                    <div className="flex flex-col text-left">
+                                        <span className="text-sm font-bold" style={{ color: 'var(--text-base)' }}>Highlight Areas</span>
+                                        <span className="text-[11px] leading-tight" style={{ color: 'var(--text-muted)' }}>Highlight row & column</span>
+                                    </div>
+                                    <button
+                                        onClick={() => setShowHighlights(!showHighlights)}
+                                        className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors duration-200 focus:outline-none ${showHighlights ? 'bg-indigo-600' : 'bg-slate-300'}`}
+                                        style={{ backgroundColor: showHighlights ? 'var(--primary-accent)' : '' }}
+                                        aria-label={showHighlights ? "Disable Area Highlights" : "Enable Area Highlights"}
+                                        aria-pressed={showHighlights}
+                                    >
+                                        <span
+                                            className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform duration-200 ${showHighlights ? 'translate-x-6' : 'translate-x-1'}`}
+                                        />
+                                    </button>
+                                </div>
+
+                                {/* Max Hints Toggle */}
+                                <div className="flex items-center justify-between p-4 rounded-2xl border shadow-sm transition-all duration-200" style={{ backgroundColor: 'var(--bg-app)', borderColor: 'var(--border-thin)' }}>
+                                    <div className="flex flex-col text-left">
+                                        <span className="text-sm font-bold" style={{ color: 'var(--text-base)' }}>Max Hints</span>
+                                        <span className="text-[11px] leading-tight" style={{ color: 'var(--text-muted)' }}>Allowed hints per game</span>
+                                    </div>
+                                    <button
+                                        onClick={() => setMaxHints(maxHints === 3 ? 5 : 3)}
+                                        className={`relative inline-flex h-8 w-14 items-center rounded-full transition-colors duration-200 focus:outline-none`}
+                                        style={{ backgroundColor: maxHints === 5 ? 'var(--primary-accent)' : 'var(--text-muted)' }}
+                                        aria-label={`Set Max Hints to ${maxHints === 3 ? 5 : 3}`}
+                                    >
+                                        <span
+                                            className={`flex items-center justify-center h-6 w-6 transform rounded-full bg-white shadow-sm text-xs font-bold transition-transform duration-200 ${maxHints === 5 ? 'translate-x-7' : 'translate-x-1'}`}
+                                            style={{ color: maxHints === 5 ? 'var(--primary-accent)' : 'var(--text-muted)' }}
+                                        >
+                                            {maxHints}
+                                        </span>
+                                    </button>
+                                </div>
+
+                                {/* Toggle Timer Visibility */}
+                                <div className="flex items-center justify-between p-4 rounded-2xl border shadow-sm transition-all duration-200" style={{ backgroundColor: 'var(--bg-app)', borderColor: 'var(--border-thin)' }}>
+                                    <div className="flex flex-col text-left">
+                                        <span className="text-sm font-bold" style={{ color: 'var(--text-base)' }}>Game Timer</span>
+                                        <span className="text-[11px] leading-tight" style={{ color: 'var(--text-muted)' }}>Show elapsed time</span>
+                                    </div>
+                                    <button
+                                        onClick={toggleTimerVisibility}
+                                        className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors duration-200 focus:outline-none ${showTimer ? 'bg-indigo-600' : 'bg-slate-300'}`}
+                                        style={{ backgroundColor: showTimer ? 'var(--primary-accent)' : '' }}
+                                        aria-label={showTimer ? "Hide Timer" : "Show Timer"}
+                                        aria-pressed={showTimer}
+                                    >
+                                        <span
+                                            className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform duration-200 ${showTimer ? 'translate-x-6' : 'translate-x-1'}`}
+                                        />
+                                    </button>
+                                </div>
+
+                                {/* Toggle Mistakes Visibility */}
+                                <div className="flex items-center justify-between p-4 rounded-2xl border shadow-sm transition-all duration-200" style={{ backgroundColor: 'var(--bg-app)', borderColor: 'var(--border-thin)' }}>
+                                    <div className="flex flex-col text-left">
+                                        <span className="text-sm font-bold" style={{ color: 'var(--text-base)' }}>Mistake Counter</span>
+                                        <span className="text-[11px] leading-tight" style={{ color: 'var(--text-muted)' }}>Show number of errors</span>
+                                    </div>
+                                    <button
+                                        onClick={toggleMistakesVisibility}
+                                        className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors duration-200 focus:outline-none ${showMistakes ? 'bg-indigo-600' : 'bg-slate-300'}`}
+                                        style={{ backgroundColor: showMistakes ? 'var(--primary-accent)' : '' }}
+                                        aria-label={showMistakes ? "Hide Mistake Counter" : "Show Mistake Counter"}
+                                        aria-pressed={showMistakes}
+                                    >
+                                        <span
+                                            className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform duration-200 ${showMistakes ? 'translate-x-6' : 'translate-x-1'}`}
+                                        />
+                                    </button>
+                                </div>
+
+                            </div>
+
+                            <button
+                                onClick={onClose}
+                                className="mt-8 w-full py-4 text-white font-bold rounded-2xl transition-all hover:scale-[1.02] active:scale-[0.98] shadow-lg"
+                                style={{ backgroundColor: 'var(--primary-accent)' }}
+                            >
+                                Close
+                            </button>
+                        </div>
+
+                        {/* Decorative Blobs */}
+                        <div className="absolute -top-10 -right-10 w-32 h-32 rounded-full opacity-10 blur-3xl pointer-events-none" style={{ backgroundColor: 'var(--primary-accent)' }}></div>
+                        <div className="absolute -bottom-10 -left-10 w-32 h-32 rounded-full opacity-10 blur-3xl pointer-events-none" style={{ backgroundColor: 'var(--primary-accent)' }}></div>
+                    </motion.div>
+                </div>
+            )}
+        </AnimatePresence>
     );
 };
 

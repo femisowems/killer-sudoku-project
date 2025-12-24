@@ -7,7 +7,7 @@ const Cell = ({
     r, c, value, cageIndex,
     isSelected, isHighlighted, isSameValue, isCageHighlighted, fixedState,
     isConflict, isCageConflict, cageSum, isError,
-    onSelect, cellToCageIndex, notes
+    onSelect, cellToCageIndex, notes, isWon
 }) => {
     // ... existing logic ...
 
@@ -164,20 +164,31 @@ const Cell = ({
             {value !== 0 ? (
                 <motion.span
                     initial={{ scale: 0.5, opacity: 0 }}
-                    animate={{ scale: 1, opacity: 1 }}
+                    animate={isWon ? {
+                        scale: [1, 1.2, 1],
+                        filter: ["brightness(1)", "brightness(1.5)", "brightness(1)"],
+                        transition: {
+                            delay: (r * 9 + c) * 0.03, // Stagger effect
+                            duration: 0.5,
+                            repeat: 0
+                        }
+                    } : { scale: 1, opacity: 1 }}
                     key={value}
                     transition={{ type: "spring", stiffness: 300, damping: 20 }}
                 >
                     {value}
                 </motion.span>
             ) : (
-                <div className={`grid grid-cols-3 grid-rows-3 w-full h-full p-0.5 sm:p-1 pt-4 sm:pt-5 md:pt-6 pb-0.5`}>
+                <motion.div
+                    animate={isWon ? { opacity: 0 } : { opacity: 1 }}
+                    className={`grid grid-cols-3 grid-rows-3 w-full h-full p-0.5 sm:p-1 pt-4 sm:pt-5 md:pt-6 pb-0.5`}
+                >
                     {[1, 2, 3, 4, 5, 6, 7, 8, 9].map(num => (
                         <div key={num} className={`flex items-center justify-center text-[7px] sm:text-[8px] md:text-[9px] leading-none font-medium ${isSelected || isConflict ? 'text-white/90' : ''}`} style={{ color: !(isSelected || isConflict) ? 'var(--text-muted)' : undefined }}>
                             {notes && notes.has(num) ? num : ''}
                         </div>
                     ))}
-                </div>
+                </motion.div>
             )}
         </div>
     );
