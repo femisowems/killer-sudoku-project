@@ -29,14 +29,10 @@ export function usePWAInstall() {
         deferredPrompt.prompt();
 
         // Wait for the user to respond to the prompt
-        const { outcome } = await deferredPrompt.userChoice;
+        await deferredPrompt.userChoice;
 
         // We've used the prompt, and can't use it again, discard it
-        if (outcome === 'accepted') {
-            console.log('User accepted the install prompt');
-        } else {
-            console.log('User dismissed the install prompt');
-        }
+        // Outcome: 'accepted' or 'dismissed'
 
         setDeferredPrompt(null);
         setCanInstall(false);

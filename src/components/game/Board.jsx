@@ -9,7 +9,7 @@ const Board = ({ highlightedCageIndex }) => {
     const {
         board, solutionBoard, showErrors, cages, cellToCageIndex,
         selectedCell, handleCellSelect, isFixed, isPaused, notes,
-        showHighlights
+        showHighlights, isWon
     } = useGame();
 
     // Map context function names to local prop names for consistency if needed, 
@@ -96,7 +96,7 @@ const Board = ({ highlightedCageIndex }) => {
                                 onSelect={onSelect}
                                 cellToCageIndex={cellToCageIndex}
                                 notes={notes[r][c]}
-                                isWon={useGame().isWon}
+                                isWon={isWon}
                             />
                         );
                     })
