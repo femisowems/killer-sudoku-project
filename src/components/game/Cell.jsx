@@ -142,16 +142,8 @@ const Cell = ({
     const animateProps = {};
     if (isGroupCompleteAnimation) {
         animateProps.animate = {
-            backgroundColor: ["var(--bg-highlight)", themeStyles.backgroundColor],
-            boxShadow: [
-                "0 0 0 rgba(0,0,0,0)",
-                `0 0 10px var(--primary-accent-muted)`, // Glow with theme accent
-                "0 0 0 rgba(0,0,0,0)"
-            ],
-            transition: {
-                duration: 0.6,
-                ease: "easeInOut"
-            }
+            scale: [1, 1.05, 1], // Subtle breathing
+            transition: { duration: 1.5, ease: "easeInOut" }
         };
         zIndexClass = 'z-20'; /* Pop above others during animation */
     }
@@ -167,7 +159,16 @@ const Cell = ({
             }}
             {...animateProps}
         >
-            {/* Inner Cage Border Overlay */}
+            {/* Completion Highlight Overlay */}
+            {isGroupCompleteAnimation && (
+                <motion.div
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: [0, 0.3, 0] }} // Gentle pulse in and out
+                    transition={{ duration: 1.5, ease: "easeInOut" }}
+                    className="absolute inset-0 z-10 pointer-events-none"
+                    style={{ backgroundColor: 'var(--primary-accent)' }}
+                />
+            )}
 
             {/* Inner Cage Border Overlay */}
             <div
