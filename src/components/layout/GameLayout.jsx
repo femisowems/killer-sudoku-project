@@ -18,7 +18,7 @@ const GameLayout = ({
     return (
         <div
             id="app-root"
-            className="min-h-screen flex flex-col items-center py-6 px-2 md:py-6 md:px-0 xl:px-4 lg:py-10 font-sans transition-colors duration-300"
+            className="min-h-screen flex flex-col items-center py-6 px-2 md:py-6 md:px-20 xl:px-4 lg:py-10 font-sans transition-colors duration-300"
             style={{ backgroundColor: 'var(--bg-app)' }}
         >
             {/* Top Right Controls (Fixed) */}
@@ -45,7 +45,7 @@ const GameLayout = ({
             <div className="flex flex-col xl:flex-row items-center xl:items-start justify-center gap-3 w-full max-w-[1200px] mt-4 md:mt-8">
 
                 {/* Mobile-only Game Info */}
-                <div id="mobile-game-info-container" className="w-full max-w-[800px] xl:hidden order-1">
+                <div id="mobile-game-info-container" className="w-full max-w-[800px] xl:hidden order-1 ">
                     {gameInfo}
                 </div>
 
