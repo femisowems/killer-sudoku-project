@@ -18,7 +18,7 @@ const GameLayout = ({
     return (
         <div
             id="app-root"
-            className="min-h-screen flex flex-col items-center py-6 px-2 md:py-6 md:px-4 lg:py-10 font-sans transition-colors duration-300"
+            className="min-h-screen flex flex-col items-center py-6 px-2 md:py-6 md:px-0 xl:px-4 lg:py-10 font-sans transition-colors duration-300"
             style={{ backgroundColor: 'var(--bg-app)' }}
         >
             {/* Top Right Controls (Fixed) */}
@@ -67,7 +67,7 @@ const GameLayout = ({
                 </section>
 
                 {/* Center Column: Game Board */}
-                <main id="game-board-area" className="flex flex-col items-center w-full flex-grow order-2 xl:order-2">
+                <main id="game-board-area" className="flex flex-col items-center w-full md:max-w-[65vh] xl:max-w-none flex-grow order-2 xl:order-2">
                     {board}
                     <div className="mt-4 w-full flex justify-center">
                         {statusMessage}
