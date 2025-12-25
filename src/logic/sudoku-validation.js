@@ -87,3 +87,54 @@ export function getCageCombinations(targetSum, count) {
     findCombinations(1, 0, []);
     return results;
 }
+
+/**
+ * Checks if a specific row is complete (contains 1-9 exactly once and no zeros).
+ * @param {number[][]} board
+ * @param {number} rowIndex
+ * @returns {boolean}
+ */
+export function isRowComplete(board, rowIndex) {
+    const row = board[rowIndex];
+    // Fail immediately if there's a zero
+    if (row.includes(0)) return false;
+
+    const values = new Set(row);
+    // Check if we have exactly 9 unique numbers
+    return values.size === 9;
+}
+
+/**
+ * Checks if a specific column is complete (contains 1-9 exactly once and no zeros).
+ * @param {number[][]} board
+ * @param {number} colIndex
+ * @returns {boolean}
+ */
+export function isColumnComplete(board, colIndex) {
+    const values = new Set();
+    for (let r = 0; r < 9; r++) {
+        const val = board[r][colIndex];
+        if (val === 0) return false;
+        values.add(val);
+    }
+    return values.size === 9;
+}
+
+/**
+ * Checks if a specific 3x3 box is complete (contains 1-9 exactly once and no zeros).
+ * @param {number[][]} board
+ * @param {number} startRow - Top-left row index of the box (0, 3, 6)
+ * @param {number} startCol - Top-left column index of the box (0, 3, 6)
+ * @returns {boolean}
+ */
+export function isBoxComplete(board, startRow, startCol) {
+    const values = new Set();
+    for (let r = 0; r < 3; r++) {
+        for (let c = 0; c < 3; c++) {
+            const val = board[startRow + r][startCol + c];
+            if (val === 0) return false;
+            values.add(val);
+        }
+    }
+    return values.size === 9;
+}

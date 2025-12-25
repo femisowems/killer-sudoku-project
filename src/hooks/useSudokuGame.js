@@ -4,6 +4,11 @@ import {
     generateValidBoard,
     generatePuzzle
 } from '../logic/sudoku-generator';
+import {
+    isRowComplete,
+    isColumnComplete,
+    isBoxComplete
+} from '../logic/sudoku-validation';
 
 import {
     CAGE_SHAPES
@@ -98,24 +103,16 @@ export function useSudokuGame(initialDifficulty = 'medium') {
         const completed = new Set();
         // Check Rows
         for (let r = 0; r < 9; r++) {
-            const row = currentBoard[r];
-            if (new Set(row).size === 9 && !row.includes(0)) completed.add(`row-${r}`);
+            if (isRowComplete(currentBoard, r)) completed.add(`row-${r}`);
         }
         // Check Cols
         for (let c = 0; c < 9; c++) {
-            const col = currentBoard.map(row => row[c]);
-            if (new Set(col).size === 9 && !col.includes(0)) completed.add(`col-${c}`);
+            if (isColumnComplete(currentBoard, c)) completed.add(`col-${c}`);
         }
         // Check Boxes
         for (let br = 0; br < 3; br++) {
             for (let bc = 0; bc < 3; bc++) {
-                const boxValues = [];
-                for (let r = br * 3; r < br * 3 + 3; r++) {
-                    for (let c = bc * 3; c < bc * 3 + 3; c++) {
-                        boxValues.push(currentBoard[r][c]);
-                    }
-                }
-                if (new Set(boxValues).size === 9 && !boxValues.includes(0)) completed.add(`box-${br}-${bc}`);
+                if (isBoxComplete(currentBoard, br * 3, bc * 3)) completed.add(`box-${br}-${bc}`);
             }
         }
         return completed;
@@ -127,8 +124,7 @@ export function useSudokuGame(initialDifficulty = 'medium') {
 
         // 1. Check Row
         const rowId = `row-${r}`;
-        const row = newBoard[r];
-        if (new Set(row).size === 9 && !row.includes(0)) {
+        if (isRowComplete(newBoard, r)) {
             if (!completedGroupsRef.current.has(rowId)) foundNewCompletions.push(rowId);
             completedGroupsRef.current.add(rowId);
         } else {
@@ -137,8 +133,7 @@ export function useSudokuGame(initialDifficulty = 'medium') {
 
         // 2. Check Col
         const colId = `col-${c}`;
-        const col = newBoard.map(row => row[c]);
-        if (new Set(col).size === 9 && !col.includes(0)) {
+        if (isColumnComplete(newBoard, c)) {
             if (!completedGroupsRef.current.has(colId)) foundNewCompletions.push(colId);
             completedGroupsRef.current.add(colId);
         } else {
@@ -149,13 +144,7 @@ export function useSudokuGame(initialDifficulty = 'medium') {
         const br = Math.floor(r / 3);
         const bc = Math.floor(c / 3);
         const boxId = `box-${br}-${bc}`;
-        const boxValues = [];
-        for (let i = br * 3; i < br * 3 + 3; i++) {
-            for (let j = bc * 3; j < bc * 3 + 3; j++) {
-                boxValues.push(newBoard[i][j]);
-            }
-        }
-        if (new Set(boxValues).size === 9 && !boxValues.includes(0)) {
+        if (isBoxComplete(newBoard, br * 3, bc * 3)) {
             if (!completedGroupsRef.current.has(boxId)) foundNewCompletions.push(boxId);
             completedGroupsRef.current.add(boxId);
         } else {
@@ -467,6 +456,12 @@ export function useSudokuGame(initialDifficulty = 'medium') {
     }, [startingCells, hintedCells]);
 
     const handleNumberInput = useCallback((number) => {
+        // Prevent modification if game is already won
+        if (isWon) {
+            setStatus({ message: 'Game is already won!', type: 'success' });
+            return;
+        }
+
         if (!selectedCell) {
             setStatus({ message: 'Please select a cell first.', type: 'info' });
             return;
