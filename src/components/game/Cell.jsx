@@ -158,7 +158,6 @@ const Cell = ({
                     transition={{
                         duration: 1.5,
                         ease: "easeInOut",
-                        delay: (r + c) * 0.05 // Subtle diagonal ripple
                     }}
                     className="absolute inset-0 z-10 pointer-events-none"
                     style={{ backgroundColor: 'var(--primary-accent)' }}
