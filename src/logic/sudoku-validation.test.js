@@ -1,6 +1,12 @@
 
 import { describe, it, expect } from 'vitest';
-import { isRowComplete, isColumnComplete, isBoxComplete } from './sudoku-validation';
+import {
+    isRowComplete,
+    isColumnComplete,
+    isBoxComplete,
+    getAffectedGroupIds,
+    checkRelatedGroups
+} from './sudoku-validation';
 
 describe('Sudoku Validation Logic', () => {
     // Helper to create an empty 9x9 board
@@ -114,6 +120,29 @@ describe('Sudoku Validation Logic', () => {
 
             expect(isBoxComplete(board, 0, 0)).toBe(true);
             expect(isBoxComplete(board, 3, 3)).toBe(false);
+        });
+    });
+
+    describe('Reference Helpers', () => {
+        it('getAffectedGroupIds should return correct row, col, and box IDs', () => {
+            const ids = getAffectedGroupIds(4, 4); // Center of board (box 1-1)
+            expect(ids).toEqual(['row-4', 'col-4', 'box-1-1']);
+
+            const ids2 = getAffectedGroupIds(0, 8); // Top-right (box 0-2)
+            expect(ids2).toEqual(['row-0', 'col-8', 'box-0-2']);
+        });
+
+        it('checkRelatedGroups should return only completed groups', () => {
+            const board = createEmptyBoard();
+            // Fill row 0 completely
+            board[0] = [1, 2, 3, 4, 5, 6, 7, 8, 9];
+
+            // Check cell 0,0 - Row is done, Col is not, Box is not
+            const results = checkRelatedGroups(board, 0, 0);
+            expect(results).toContain('row-0');
+            expect(results).not.toContain('col-0');
+            expect(results).not.toContain('box-0-0');
+            expect(results.length).toBe(1);
         });
     });
 });

@@ -138,3 +138,38 @@ export function isBoxComplete(board, startRow, startCol) {
     }
     return values.size === 9;
 }
+
+// --- Helpers for Refactoring ---
+
+export const getRowId = (r) => `row-${r}`;
+export const getColId = (c) => `col-${c}`;
+export const getBoxId = (r, c) => `box-${Math.floor(r / 3)}-${Math.floor(c / 3)}`;
+
+export function getAffectedGroupIds(r, c) {
+    return [
+        getRowId(r),
+        getColId(c),
+        getBoxId(r, c)
+    ];
+}
+
+/**
+ * Checks the relevant row, column, and box for a specific cell position.
+ * Returns an array of IDs of groups that are COMPLETE.
+ */
+export function checkRelatedGroups(board, r, c) {
+    const results = [];
+
+    // Row
+    if (isRowComplete(board, r)) results.push(getRowId(r));
+
+    // Col
+    if (isColumnComplete(board, c)) results.push(getColId(c));
+
+    // Box
+    const startRow = Math.floor(r / 3) * 3;
+    const startCol = Math.floor(c / 3) * 3;
+    if (isBoxComplete(board, startRow, startCol)) results.push(getBoxId(r, c));
+
+    return results;
+}

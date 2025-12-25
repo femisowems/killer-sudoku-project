@@ -7,7 +7,9 @@ import {
 import {
     isRowComplete,
     isColumnComplete,
-    isBoxComplete
+    isBoxComplete,
+    checkRelatedGroups,
+    getAffectedGroupIds
 } from '../logic/sudoku-validation';
 
 import {
@@ -122,34 +124,22 @@ export function useSudokuGame(initialDifficulty = 'medium') {
     const checkAndAnimateCompletions = (newBoard, r, c) => {
         const foundNewCompletions = [];
 
-        // 1. Check Row
-        const rowId = `row-${r}`;
-        if (isRowComplete(newBoard, r)) {
-            if (!completedGroupsRef.current.has(rowId)) foundNewCompletions.push(rowId);
-            completedGroupsRef.current.add(rowId);
-        } else {
-            completedGroupsRef.current.delete(rowId);
-        }
+        // Use helper to check only relevant groups
+        const currentlyCompleteIds = new Set(checkRelatedGroups(newBoard, r, c));
+        const potentiallyAffectedIds = getAffectedGroupIds(r, c);
 
-        // 2. Check Col
-        const colId = `col-${c}`;
-        if (isColumnComplete(newBoard, c)) {
-            if (!completedGroupsRef.current.has(colId)) foundNewCompletions.push(colId);
-            completedGroupsRef.current.add(colId);
-        } else {
-            completedGroupsRef.current.delete(colId);
-        }
-
-        // 3. Check Box
-        const br = Math.floor(r / 3);
-        const bc = Math.floor(c / 3);
-        const boxId = `box-${br}-${bc}`;
-        if (isBoxComplete(newBoard, br * 3, bc * 3)) {
-            if (!completedGroupsRef.current.has(boxId)) foundNewCompletions.push(boxId);
-            completedGroupsRef.current.add(boxId);
-        } else {
-            completedGroupsRef.current.delete(boxId);
-        }
+        potentiallyAffectedIds.forEach(id => {
+            if (currentlyCompleteIds.has(id)) {
+                // It is complete now. Was it complete before?
+                if (!completedGroupsRef.current.has(id)) {
+                    foundNewCompletions.push(id);
+                }
+                completedGroupsRef.current.add(id);
+            } else {
+                // It is NOT complete now.
+                completedGroupsRef.current.delete(id);
+            }
+        });
 
         // Trigger Animation for NEWLY completed
         if (foundNewCompletions.length > 0) {
