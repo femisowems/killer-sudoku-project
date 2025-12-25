@@ -63,7 +63,7 @@ const Cell = ({
     };
 
     // Standardized Font Size
-    const baseClasses = "relative flex justify-center items-center text-lg sm:text-2xl md:text-2xl xl:text-3xl cursor-pointer select-none transition-all duration-200 focus:outline-none";
+    const baseClasses = "relative flex justify-center items-center text-lg sm:text-2xl md:text-xl xl:text-3xl cursor-pointer select-none transition-all duration-200 focus:outline-none";
 
     // Background Color Logic
     let bgColorClass = ''; // Will use inline style for theme-aware bg
