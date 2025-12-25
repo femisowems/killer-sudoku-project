@@ -155,7 +155,11 @@ const Cell = ({
                 <motion.div
                     initial={{ opacity: 0 }}
                     animate={{ opacity: [0, 0.3, 0] }} // Gentle pulse in and out
-                    transition={{ duration: 1.5, ease: "easeInOut" }}
+                    transition={{
+                        duration: 1.5,
+                        ease: "easeInOut",
+                        delay: (r + c) * 0.05 // Subtle diagonal ripple
+                    }}
                     className="absolute inset-0 z-10 pointer-events-none"
                     style={{ backgroundColor: 'var(--primary-accent)' }}
                 />

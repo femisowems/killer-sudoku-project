@@ -164,6 +164,11 @@ export function useSudokuGame(initialDifficulty = 'medium') {
 
         // Trigger Animation for NEWLY completed
         if (foundNewCompletions.length > 0) {
+            // Haptics for mobile
+            if (navigator.vibrate) {
+                navigator.vibrate(50);
+            }
+
             setAnimatingGroups(prev => {
                 const next = new Set(prev);
                 foundNewCompletions.forEach(id => next.add(id));
