@@ -11,24 +11,24 @@ A modern, responsive implementation of Killer Sudoku built with React and Tailwi
   <img src="./public/assets/demo.webp" width="100%" alt="Killer Sudoku Gameplay Demo">
 </p>
 
-## Features
-
 - **Classic Killer Sudoku Rules**: Fill the grid so that every row, column, and 3x3 box contains digits 1-9. Dashed "cages" must sum to the specified target number without repeating digits.
-- **Dynamic Puzzle Generation**: Instantly generate new puzzles with selectable difficulty levels:
-    - **Easy**: Great for beginners.
-    - **Medium**: A balanced challenge.
-    - **Hard**: For Sudoku veterans.
-- **Smart Highlighting**: 
-    - Real-time error detection for row/column/box and cage sum conflicts.
-    - Visual cues for selected cells and related cages.
-- **Helpful Tools**:
-    - **Mistakes Counter**: Keep track of your errors (optional validation).
-    - **Notes Mode**: Annotate cells with potential numbers (coming soon). 
+- **True Procedural Generation**:
+    - **Dynamic Cages**: Every game generates a unique cage layout. You'll never play the same grid twice.
+    - **Difficulty Scaling**:
+        - **Easy**: Smaller cages (pairs/triples) for a quick game.
+        - **Medium**: Balanced mix of cage sizes.
+        - **Hard**: Complex, winding cages that challenge your logic.
+- **Rich Gameplay Features**:
+    - **Smart Notes**: Toggle notes mode to track candidates. Includes optional "Smart Auto-Remove" to clear notes when you place a number.
+    - **Themes**: Choose from curated color themes like Platinum, Seashell, or Onyx.
+    - **Statistics**: Track your games played, win rate, and best times.
     - **Cage Combinations**: View valid number combinations for any selected cage to help deduce the solution.
-    - **Pause/Resume**: Take a break without losing your progress (blurs board to prevent peeking).
-- **Responsive Design**: Fully optimized for desktop and mobile devices. Features a flexible layout that adapts to screen size.
-- **Keyboard Support**: Full navigation using arrow keys and number input.
-- **Win Celebration**: Confetti animation upon successfully completing the puzzle.
+    - **Pause/Resume**: Take a break without losing your progress.
+- **Modern UI/UX**:
+    - **Real-time Validation**: Highlights conflicts in rows, columns, boxes, or cages.
+    - **Responsive Design**: Optimized for desktop, tablet, and mobile.
+    - **PWA Support**: Installable as a native-like app on your device.
+    - **Win Celebration**: Confetti animation upon victory.
 
 ## Tech Stack
 

@@ -12,9 +12,7 @@ import {
     getAffectedGroupIds
 } from '../logic/sudoku-validation';
 
-import {
-    CAGE_SHAPES
-} from '../constants/sudoku-constants';
+import { generateCages } from '../logic/cage-generator';
 import { calculateSmartNoteUpdates } from '../logic/game-logic';
 import { saveGameState, loadGameState, clearGameState } from '../utils/storage';
 import { useTimer } from './useTimer';
@@ -80,25 +78,6 @@ export function useSudokuGame(initialDifficulty = 'medium') {
         setHistory,
         setFuture
     } = useHistory();
-
-    // Helper to calculate cage sums and map cells to cages
-    const setupCagesAndMap = (solution) => {
-        // Calculate cage sums
-        const newCages = CAGE_SHAPES.map(cage => {
-            const sum = cage.cells.reduce((acc, [r, c]) => acc + solution[r][c], 0);
-            return { ...cage, sum };
-        });
-
-        // Map cells to cages
-        const newCellToCage = Array(9).fill(0).map(() => Array(9).fill(-1));
-        newCages.forEach((cage, index) => {
-            cage.cells.forEach(([r, c]) => {
-                newCellToCage[r][c] = index;
-            });
-        });
-
-        return { cages: newCages, cellToCageIndex: newCellToCage };
-    };
 
     // Helper: Calculate currently completed groups without triggering animation
     const getCompletedGroupsSet = (currentBoard) => {
@@ -188,13 +167,29 @@ export function useSudokuGame(initialDifficulty = 'medium') {
         const newSolution = generateValidBoard();
         setSolutionBoard(newSolution);
 
-        // Calculate and set derived cage data
-        const { cages: newCages, cellToCageIndex: newCellToCage } = setupCagesAndMap(newSolution);
+        // 2. Generate Dynamic Cages
+        // This is the core difficulty logic improvement
+        const newCagesBase = generateCages(diff, newSolution);
+
+        // Calculate cage sums based on solution
+        const newCages = newCagesBase.map((cage, index) => {
+            const sum = cage.cells.reduce((acc, [r, c]) => acc + newSolution[r][c], 0);
+            return { ...cage, sum };
+        });
+
+        // 3. Map cells to cages
+        const newCellToCage = Array(9).fill(0).map(() => Array(9).fill(-1));
+        newCages.forEach((cage, index) => {
+            cage.cells.forEach(([r, c]) => {
+                newCellToCage[r][c] = index;
+            });
+        });
+
         setCages(newCages);
         setCellToCageIndex(newCellToCage);
 
-        // 4. Setup starting board
-        const startingCoords = generatePuzzle(diff);
+        // 4. Setup starting board using dynamic cages for constraint
+        const startingCoords = generatePuzzle(diff, newCages);
         setStartingCells(startingCoords);
 
         const newBoard = Array(9).fill(0).map(() => Array(9).fill(0));
@@ -225,16 +220,25 @@ export function useSudokuGame(initialDifficulty = 'medium') {
             return;
         }
 
+        // New Logic: Check for dynamic cages in save
+        // If missing (legacy save), we can't faithfully restore the exact visual state without CAGE_SHAPES constant.
+        // For now, we will restart if cages are missing to avoid broken UI.
+        if (!savedState.cages) {
+            console.warn('Legacy save file detected (no cages). Starting new game to ensure compatibility.');
+            clearGameState();
+            startNewGame(initialDifficulty);
+            return;
+        }
+
         setDifficulty(savedState.difficulty);
         setBoard(savedState.board);
         setSolutionBoard(savedState.solutionBoard);
         setStartingCells(savedState.startingCells);
         setHintedCells(savedState.hintedCells);
-        // setHintsRemaining(savedState.hintsRemaining); // handled by hintsUsed logic below
+
         if (savedState.hintsUsed !== undefined) {
             setHintsUsed(savedState.hintsUsed);
         } else if (savedState.hintsRemaining !== undefined) {
-            // Migration for old saves (assuming max 3)
             setHintsUsed(3 - savedState.hintsRemaining);
         }
         if (savedState.maxHints !== undefined) {
@@ -243,13 +247,13 @@ export function useSudokuGame(initialDifficulty = 'medium') {
         setNotes(savedState.notes);
         setMistakes(savedState.mistakes);
 
-        // Restore sub-hooks state
+        // Restore sub-hooks
         setHistory(savedState.history || []);
-        setFuture([]); // Reset future on load (simpler)
+        setFuture([]);
         setTimerSeconds(savedState.timerSeconds);
-        startTimer(); // Resume timer on load
+        startTimer();
 
-        setIsPaused(savedState.isPaused); // Keep saved pause state
+        setIsPaused(savedState.isPaused);
         setIsWon(savedState.isWon);
         setIsAutoSolved(savedState.isAutoSolved);
         if (savedState.autoRemoveNotes !== undefined) {
@@ -259,20 +263,20 @@ export function useSudokuGame(initialDifficulty = 'medium') {
             setShowHighlights(savedState.showHighlights);
         }
 
-        // Restore completed groups tracking
         completedGroupsRef.current = getCompletedGroupsSet(savedState.board);
 
-        // Cages and CellMap must be derived from solution (or constants)
-        try {
-            const { cages: restoredCages, cellToCageIndex: restoredMap } = setupCagesAndMap(savedState.solutionBoard);
-            setCages(restoredCages);
-            setCellToCageIndex(restoredMap);
-        } catch (e) {
-            console.error('Failed to reconstruct cages from saved solution:', e);
-            clearGameState();
-            startNewGame(initialDifficulty);
-            return;
-        }
+        // Restore Cages directly
+        setCages(savedState.cages);
+
+        // Rebuild Cell Map from restored cages
+        // This is safer than saving the map which is large redundancy
+        const restoredMap = Array(9).fill(0).map(() => Array(9).fill(-1));
+        savedState.cages.forEach((cage, index) => {
+            cage.cells.forEach(([r, c]) => {
+                restoredMap[r][c] = index;
+            });
+        });
+        setCellToCageIndex(restoredMap);
 
         setStatus({ message: 'Game restored', type: 'info' });
 
@@ -345,11 +349,14 @@ export function useSudokuGame(initialDifficulty = 'medium') {
 
     // Auto-Save Effect
     // Helper to get current game state for saving
+    // Auto-Save Effect
+    // Helper to get current game state for saving
     const getGameState = useCallback(() => {
         return {
             difficulty,
             board,
             solutionBoard,
+            cages, // Save dynamic cages
             startingCells,
             hintedCells,
             hintsRemaining,
@@ -365,7 +372,7 @@ export function useSudokuGame(initialDifficulty = 'medium') {
             hintsUsed,
             history
         };
-    }, [difficulty, board, solutionBoard, startingCells, hintedCells, hintsRemaining, notes, mistakes, timerSeconds, isPaused, isWon, isAutoSolved, autoRemoveNotes, showHighlights, maxHints, hintsUsed, history]);
+    }, [difficulty, board, solutionBoard, cages, startingCells, hintedCells, hintsRemaining, notes, mistakes, timerSeconds, isPaused, isWon, isAutoSolved, autoRemoveNotes, showHighlights, maxHints, hintsUsed, history]);
 
     // Auto-Save Effect
     useEffect(() => {

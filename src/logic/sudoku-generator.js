@@ -8,22 +8,25 @@ CAGE_SHAPES.forEach((cage, index) => {
     });
 });
 
-export function generatePuzzle(difficulty) {
+export function generatePuzzle(difficulty, cages) {
     const count = DIFFICULTY_COUNTS[difficulty] || 30;
 
-    // 1. Map cells to their cage index for quick lookup (Shadowing global for clarity in this scope if needed, but we can reuse global)
-    // Actually, let's reuse the global CELL_TO_CAGE for efficiency, or just use the logic below.
-    // The original logic used a local map. I'll stick to the original logic for safety in this function to avoid regression.
+    // 1. Map cells to their cage index for quick lookup
     const cellToCage = new Array(9).fill(0).map(() => new Array(9).fill(-1));
-    CAGE_SHAPES.forEach((cage, index) => {
-        cage.cells.forEach(([r, c]) => {
-            cellToCage[r][c] = index;
-        });
-    });
 
-    // 2. Prepare cage tracking
-    const cageTotalCells = CAGE_SHAPES.map(c => c.cells.length);
-    const cageRevealedCount = new Array(CAGE_SHAPES.length).fill(0);
+    // Safety check: if no cages provided (tests or legacy), can't strictly enforce cage rules perfectly here
+    // but usually cages will be passed.
+    if (cages) {
+        cages.forEach((cage, index) => {
+            cage.cells.forEach(([r, c]) => {
+                cellToCage[r][c] = index;
+            });
+        });
+    }
+
+    // 2. Prepare cage tracking (if cages exist)
+    const cageTotalCells = cages ? cages.map(c => c.cells.length) : [];
+    const cageRevealedCount = cages ? new Array(cages.length).fill(0) : [];
 
     const allCells = [];
     for (let r = 0; r < 9; r++) {
@@ -48,7 +51,8 @@ export function generatePuzzle(difficulty) {
 
         // Check if revealing this cell would fully reveal the cage
         // We allow it ONLY if it's NOT the last hidden cell
-        if (cageIdx !== -1) {
+        // (Only apply this logic if we have cage data)
+        if (cageIdx !== -1 && cages) {
             if (cageRevealedCount[cageIdx] + 1 < cageTotalCells[cageIdx]) {
                 // Safe to reveal
                 selectedCells.push([r, c]);
@@ -57,6 +61,7 @@ export function generatePuzzle(difficulty) {
                 // Skip this cell to keep at least one hidden in the cage
             }
         } else {
+            // No cage data or not in cage, just add
             selectedCells.push([r, c]);
         }
     }
