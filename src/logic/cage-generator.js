@@ -142,7 +142,6 @@ export function generateCages(difficulty = 'medium', solutionBoard) {
 
                         neighborCage.cells.push([r, c]);
                         cages.splice(i, 1); // Remove the single-cell cage
-                        merged = true;
                         break;
                     }
                 }

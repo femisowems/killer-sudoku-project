@@ -172,7 +172,7 @@ export function useSudokuGame(initialDifficulty = 'medium') {
         const newCagesBase = generateCages(diff, newSolution);
 
         // Calculate cage sums based on solution
-        const newCages = newCagesBase.map((cage, index) => {
+        const newCages = newCagesBase.map((cage) => {
             const sum = cage.cells.reduce((acc, [r, c]) => acc + newSolution[r][c], 0);
             return { ...cage, sum };
         });
@@ -524,7 +524,7 @@ export function useSudokuGame(initialDifficulty = 'medium') {
 
         // Check for immediate win (optional here, but good for feedback)
         // We'll leave win check to a separate effect or function call
-    }, [selectedCell, isFixed, board, solutionBoard, isNotesMode, notes, performAddToHistory, autoRemoveNotes, cages, cellToCageIndex]);
+    }, [selectedCell, isFixed, board, solutionBoard, isNotesMode, notes, performAddToHistory, autoRemoveNotes, cages, cellToCageIndex, isWon]);
 
     const toggleNotesModeArg = useCallback(() => {
         setIsNotesMode(prev => !prev);
