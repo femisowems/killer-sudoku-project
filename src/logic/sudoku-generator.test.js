@@ -65,7 +65,7 @@ describe('Sudoku Generator Logic', () => {
 
     describe('generatePuzzle', () => {
         it('should return an array of starting coordinates', () => {
-            const puzzle = generatePuzzle('easy');
+            const puzzle = generatePuzzle('easy', CAGE_SHAPES);
             expect(Array.isArray(puzzle)).toBe(true);
             puzzle.forEach(coord => {
                 expect(coord.length).toBe(2);
@@ -78,7 +78,7 @@ describe('Sudoku Generator Logic', () => {
 
         it('should match the requested difficulty count (approximate)', () => {
             const easeCount = DIFFICULTY_COUNTS['easy']; // e.g. 40
-            const puzzle = generatePuzzle('easy');
+            const puzzle = generatePuzzle('easy', CAGE_SHAPES);
             // Logic caps at count, but might stop earlier to preserve hidden cage cells
             // So puzzle size should be <= count
             expect(puzzle.length).toBeLessThanOrEqual(easeCount);
@@ -88,7 +88,7 @@ describe('Sudoku Generator Logic', () => {
 
         it('should never fully reveal a cage (leave at least one cell hidden)', () => {
             // Test with a higher count to force potential full reveals
-            const puzzle = generatePuzzle('hard');
+            const puzzle = generatePuzzle('hard', CAGE_SHAPES);
 
             // Map revealing state
             const revealedSet = new Set(puzzle.map(([r, c]) => `${r},${c}`));
