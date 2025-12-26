@@ -95,6 +95,13 @@ const DifficultyModal = ({ isOpen, onClose }) => {
                                 >
                                     Hard
                                 </button>
+                                <button
+                                    onClick={() => onSelectDifficulty('expert')}
+                                    className="w-full py-4 font-bold rounded-xl transition-all hover:scale-[1.02] active:scale-[0.98] hover:brightness-95"
+                                    style={{ backgroundColor: '#7c3aed', color: '#ffffff' }} // Violet-600
+                                >
+                                    Expert
+                                </button>
                             </div>
 
                             {!hasActiveGame && (

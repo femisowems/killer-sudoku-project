@@ -14,15 +14,23 @@ export function generateCages(difficulty = 'medium', solutionBoard) {
     let maxCageSize = 5;
     let preferredSize = 3;
     let complexityChance = 0.3; // Chance to make non-linear shapes
+    let maxCageSum = 25; // Limit arithmetic difficulty for Medium
 
     if (difficulty === 'easy') {
         maxCageSize = 3;
         preferredSize = 2;
         complexityChance = 0.1;
+        maxCageSum = 15; // Simple math for Easy
     } else if (difficulty === 'hard') {
         maxCageSize = 6; // Occasional large cages
         preferredSize = 4;
         complexityChance = 0.6;
+        maxCageSum = 20; // Full range
+    } else if (difficulty === 'expert') {
+        maxCageSize = 8; // Very large cages
+        preferredSize = 5;
+        complexityChance = 0.9; // Almost always complex shapes
+        maxCageSum = 25; // Full range
     }
 
     const grid = Array(9).fill(0).map(() => Array(9).fill(false)); // true if assigned
@@ -47,8 +55,11 @@ export function generateCages(difficulty = 'medium', solutionBoard) {
             const cageCells = [[r, c]];
             // Track values to prevent duplicates (if solutionBoard provided)
             const cageValues = new Set();
+            let currentSum = 0;
             if (solutionBoard) {
-                cageValues.add(solutionBoard[r][c]);
+                const val = solutionBoard[r][c];
+                cageValues.add(val);
+                currentSum += val;
             }
 
             grid[r][c] = true;
@@ -68,9 +79,14 @@ export function generateCages(difficulty = 'medium', solutionBoard) {
             while (cageCells.length < targetSize) {
                 let neighbors = getNeighbors(currentCell[0], currentCell[1]);
 
-                // Filter neighbors that would cause value duplication
+                // Filter neighbors that would cause value duplication or exceed max sum
                 if (solutionBoard) {
-                    neighbors = neighbors.filter(([nr, nc]) => !cageValues.has(solutionBoard[nr][nc]));
+                    neighbors = neighbors.filter(([nr, nc]) => {
+                        const val = solutionBoard[nr][nc];
+                        if (cageValues.has(val)) return false;
+                        if (currentSum + val > maxCageSum) return false;
+                        return true;
+                    });
                 }
 
                 // If no neighbors, try to branch from any existing cell in the cage (complexity)
@@ -82,7 +98,12 @@ export function generateCages(difficulty = 'medium', solutionBoard) {
                     for (const randomCell of shuffledCells) {
                         let potentialNeighbors = getNeighbors(randomCell[0], randomCell[1]);
                         if (solutionBoard) {
-                            potentialNeighbors = potentialNeighbors.filter(([nr, nc]) => !cageValues.has(solutionBoard[nr][nc]));
+                            potentialNeighbors = potentialNeighbors.filter(([nr, nc]) => {
+                                const val = solutionBoard[nr][nc];
+                                if (cageValues.has(val)) return false;
+                                if (currentSum + val > maxCageSum) return false;
+                                return true;
+                            });
                         }
 
                         if (potentialNeighbors.length > 0) {
@@ -101,7 +122,9 @@ export function generateCages(difficulty = 'medium', solutionBoard) {
                 grid[nextCell[0]][nextCell[1]] = true;
 
                 if (solutionBoard) {
-                    cageValues.add(solutionBoard[nextCell[0]][nextCell[1]]);
+                    const val = solutionBoard[nextCell[0]][nextCell[1]];
+                    cageValues.add(val);
+                    currentSum += val;
                 }
 
                 currentCell = nextCell;
@@ -136,6 +159,12 @@ export function generateCages(difficulty = 'medium', solutionBoard) {
                             const neighborValues = new Set(neighborCage.cells.map(([cr, cc]) => solutionBoard[cr][cc]));
                             if (neighborValues.has(val)) {
                                 continue; // Skip this neighbor, duplicate would occur
+                            }
+
+                            // SUM CHECK: Ensure merging doesn't exceed maxCageSum
+                            const neighborSum = neighborCage.cells.reduce((acc, [cr, cc]) => acc + solutionBoard[cr][cc], 0);
+                            if (neighborSum + val > maxCageSum) {
+                                continue; // Skip, would exceed sum limit
                             }
                         }
 

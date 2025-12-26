@@ -53,6 +53,42 @@ describe('Cage Generator', () => {
         expect(foundLarge).toBe(true);
     });
 
+    it('should generate very large cages for expert difficulty', () => {
+        let foundMassive = false;
+        for (let i = 0; i < 10; i++) {
+            const cages = generateCages('expert');
+            // Expert allows up to 8 cells
+            if (cages.some(c => c.cells.length >= 7)) {
+                foundMassive = true;
+                break;
+            }
+        }
+        expect(foundMassive).toBe(true);
+    });
+
+    it('should limit cage sums for easy difficulty', () => {
+        // We need a solution board to test sums
+        const solution = [
+            [1, 2, 3, 4, 5, 6, 7, 8, 9],
+            [4, 5, 6, 7, 8, 9, 1, 2, 3],
+            [7, 8, 9, 1, 2, 3, 4, 5, 6],
+            [2, 3, 1, 5, 6, 4, 8, 9, 7],
+            [5, 6, 4, 8, 9, 7, 2, 3, 1],
+            [8, 9, 7, 2, 3, 1, 5, 6, 4],
+            [3, 1, 2, 6, 4, 5, 9, 7, 8],
+            [6, 4, 5, 9, 7, 8, 3, 1, 2],
+            [9, 7, 8, 3, 1, 2, 6, 4, 5]
+        ];
+
+        for (let i = 0; i < 5; i++) {
+            const cages = generateCages('easy', solution);
+            for (const cage of cages) {
+                const sum = cage.cells.reduce((acc, [r, c]) => acc + solution[r][c], 0);
+                expect(sum).toBeLessThanOrEqual(15);
+            }
+        }
+    });
+
     it('should produce valid contiguous cages', () => {
         const cages = generateCages('medium');
 
