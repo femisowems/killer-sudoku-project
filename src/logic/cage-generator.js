@@ -121,7 +121,6 @@ export function generateCages(difficulty = 'medium', solutionBoard) {
 
             // Find a neighbor cage to merge into
             const deltas = [[0, 1], [0, -1], [1, 0], [-1, 0]];
-            let merged = false;
 
             for (const [dr, dc] of deltas) {
                 const nr = r + dr;
