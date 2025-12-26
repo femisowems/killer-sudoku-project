@@ -25,12 +25,12 @@ export function generateCages(difficulty = 'medium', solutionBoard) {
         maxCageSize = 6; // Occasional large cages
         preferredSize = 4;
         complexityChance = 0.6;
-        maxCageSum = 20; // Full range
+        maxCageSum = 18; // Full range
     } else if (difficulty === 'expert') {
         maxCageSize = 8; // Very large cages
         preferredSize = 5;
         complexityChance = 0.9; // Almost always complex shapes
-        maxCageSum = 25; // Full range
+        maxCageSum = 20; // Full range
     }
 
     const grid = Array(9).fill(0).map(() => Array(9).fill(false)); // true if assigned
