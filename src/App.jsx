@@ -71,12 +71,13 @@ function App() {
       />
 
       {/* Instructions / Tips */}
-      <div className="p-4 rounded-xl border text-xs" style={{ backgroundColor: 'var(--bg-panel)', borderColor: 'var(--border-thin)', color: 'var(--text-muted)' }}>
-        <p className="mb-2 font-semibold" style={{ color: 'var(--text-base)' }}>How to play:</p>
-        <ul className="list-disc pl-4 space-y-1">
-          <li>Normal Sudoku rules apply.</li>
-          <li>Numbers in cages must sum to the target.</li>
-          <li>Numbers in a cage cannot repeat.</li>
+      <div className="p-4 rounded-xl border text-xs leading-relaxed" style={{ backgroundColor: 'var(--bg-panel)', borderColor: 'var(--border-thin)', color: 'var(--text-muted)' }}>
+        <p className="mb-2 font-bold text-sm" style={{ color: 'var(--text-base)' }}>How to play:</p>
+        <ul className="list-disc pl-4 space-y-2">
+          <li><span className="font-semibold" style={{ color: 'var(--text-base)' }}>Fill the grid</span> with numbers 1 to 9.</li>
+          <li><span className="font-semibold" style={{ color: 'var(--text-base)' }}>Sudoku Rules:</span> Each row, column, and 3x3 box must contain each number exactly once.</li>
+          <li><span className="font-semibold" style={{ color: 'var(--text-base)' }}>Killer Rules:</span> The sum of numbers in a cage (dotted lines) must match the small number in the corner.</li>
+          <li><span className="font-semibold" style={{ color: 'var(--text-base)' }}>No Repeats:</span> Numbers cannot repeat within a single cage.</li>
         </ul>
       </div>
     </>
