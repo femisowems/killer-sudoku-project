@@ -12,6 +12,7 @@ import GameInfo from './components/game/GameInfo';
 import Scoreboard from './components/game/Scoreboard';
 import SettingsModal from './components/ui/SettingsModal';
 import InstallPWA from './components/InstallPWA';
+import UserProfileModal from './components/ui/UserProfileModal';
 import GameLayout from './components/layout/GameLayout';
 import { useGame } from './context/GameContext';
 
@@ -31,6 +32,7 @@ function App() {
   const [showWinModal, setShowWinModal] = React.useState(false);
   const [showNewGameModal, setShowNewGameModal] = React.useState(true);
   const [showSettingsModal, setShowSettingsModal] = React.useState(false);
+  const [showUserProfileModal, setShowUserProfileModal] = React.useState(false);
 
   const [highlightedCageIndex, setHighlightedCageIndex] = React.useState(null);
 
@@ -104,6 +106,11 @@ function App() {
         isOpen={showSettingsModal}
         onClose={() => setShowSettingsModal(false)}
       />
+
+      <UserProfileModal
+        isOpen={showUserProfileModal}
+        onClose={() => setShowUserProfileModal(false)}
+      />
     </>
   );
 
@@ -127,6 +134,7 @@ function App() {
       footer={footerContent}
       installPWA={<InstallPWA />}
       onSettingsClick={() => setShowSettingsModal(true)}
+      onUserProfileClick={() => setShowUserProfileModal(true)}
       onNewGameClick={() => setShowNewGameModal(true)}
     />
   );

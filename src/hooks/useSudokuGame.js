@@ -587,6 +587,7 @@ export function useSudokuGame(initialDifficulty = 'medium') {
         const handleKeyDown = (e) => {
             // Ignore keyboard events if modifiers are pressed (Cmd, Ctrl, etc.)
             if (e.ctrlKey || e.metaKey || e.altKey) return;
+            if (!e.key) return;
 
             // Global Hotkeys
             if (e.key.toLowerCase() === 'p') {

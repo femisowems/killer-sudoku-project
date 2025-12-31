@@ -1,6 +1,8 @@
 import React from 'react';
 import { useSudokuGame } from '../hooks/useSudokuGame';
 import { GameContext } from './GameContext';
+import { useAuth } from './AuthContext';
+import { supabase } from '../lib/supabaseClient';
 
 const PREFS_KEY = 'killer-sudoku-prefs';
 
@@ -13,7 +15,8 @@ export const GameProvider = ({ children }) => {
     const [stats, setStats] = React.useState({
         easy: { started: 0, wins: [] },
         medium: { started: 0, wins: [] },
-        hard: { started: 0, wins: [] }
+        hard: { started: 0, wins: [] },
+        expert: { started: 0, wins: [] }
     });
 
     // Load stats on mount
@@ -36,6 +39,18 @@ export const GameProvider = ({ children }) => {
             }
         }
     }, []);
+
+    // Reset Stats
+    const resetStats = () => {
+        const emptyStats = {
+            easy: { started: 0, wins: [] },
+            medium: { started: 0, wins: [] },
+            hard: { started: 0, wins: [] },
+            expert: { started: 0, wins: [] }
+        };
+        setStats(emptyStats);
+        localStorage.setItem('killerSudokuStats', JSON.stringify(emptyStats));
+    };
 
     // Wrap startNewGame to track stats (Games Started)
     const startNewGameWrapper = (diff) => {
@@ -84,6 +99,9 @@ export const GameProvider = ({ children }) => {
     // --- Preferences State (Theme, Timer Visibility, Mistake Visibility) ---
     const [preferences, setPreferences] = React.useState({
         theme: 'platinum',
+        username: 'Guest Player',
+        joinDate: null,
+        lastActive: null,
         showTimer: true,
         showMistakes: true
     });
@@ -104,15 +122,102 @@ export const GameProvider = ({ children }) => {
                 }
             }
 
+            // Join Date & Last Active Logic
+            const now = new Date().toISOString();
+            if (!parsedPrefs.joinDate) {
+                parsedPrefs.joinDate = now;
+            }
+            parsedPrefs.lastActive = now;
+
             // Defaults merged with saved
-            setPreferences(prev => ({
-                ...prev,
-                ...parsedPrefs
-            }));
+            setPreferences(prev => {
+                const newPrefs = {
+                    ...prev,
+                    ...parsedPrefs
+                };
+                // Persist immediately to save 'lastActive' update
+                localStorage.setItem(PREFS_KEY, JSON.stringify(newPrefs));
+                return newPrefs;
+            });
+
         } catch (error) {
             console.error('Failed to load preferences:', error);
         }
     }, []);
+    // --- Supabase Sync Logic ---
+    const { user } = useAuth();
+    // eslint-disable-next-line no-unused-vars
+    const [isSyncing, setIsSyncing] = React.useState(false);
+
+    // Initial Load (Local Storage) - Already handled above, but we need to reconcile with Cloud if logged in
+    React.useEffect(() => {
+        if (!user) return;
+
+        const fetchProfile = async () => {
+            setIsSyncing(true);
+            try {
+                let { data, error } = await supabase
+                    .from('profiles')
+                    .select('stats, preferences')
+                    .eq('id', user.id)
+                    .maybeSingle();
+
+                if (error) {
+                    console.error('Error fetching profile:', error);
+                }
+
+                if (data) {
+                    // Found Cloud Data - Merge or Overwrite?
+                    // For simplicity: Cloud wins if it exists, otherwise we assume this is a new device or fresh start.
+                    if (data.stats) setStats(data.stats);
+                    if (data.preferences) setPreferences(prev => ({ ...prev, ...data.preferences }));
+                } else {
+                    // No profile exists yet, create one with current local data
+                    await supabase.from('profiles').insert({
+                        id: user.id,
+                        stats: stats,
+                        preferences: preferences,
+                        updated_at: new Date()
+                    });
+                }
+            } catch (err) {
+                console.error("Supabase Sync Error:", err);
+            } finally {
+                setIsSyncing(false);
+            }
+        };
+
+        fetchProfile();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [user]); // Runs when user logs in
+
+    // Auto-Save to Supabase when stats or preferences change
+    // Using a Ref to safely debounce saving to avoid too many writes
+    const saveTimeoutRef = React.useRef(null);
+
+    React.useEffect(() => {
+        if (!user) return;
+
+        if (saveTimeoutRef.current) clearTimeout(saveTimeoutRef.current);
+
+        saveTimeoutRef.current = setTimeout(async () => {
+            try {
+                const { error } = await supabase
+                    .from('profiles')
+                    .upsert({
+                        id: user.id,
+                        stats: stats,
+                        preferences: preferences,
+                        updated_at: new Date()
+                    });
+                if (error) console.error('Error auto-saving:', error);
+            } catch (err) {
+                console.error('Save error:', err);
+            }
+        }, 2000); // 2 second debounce
+
+        return () => clearTimeout(saveTimeoutRef.current);
+    }, [stats, preferences, user]);
 
     // Persist preferences logic
     const updatePreferences = (updates) => {
@@ -124,6 +229,7 @@ export const GameProvider = ({ children }) => {
     };
 
     // Expose individual setters for easier consumption
+    const setUsername = (username) => updatePreferences({ username });
     const setTheme = (theme) => updatePreferences({ theme });
     const toggleTimerVisibility = () => updatePreferences({ showTimer: !preferences.showTimer });
     const toggleMistakesVisibility = () => updatePreferences({ showMistakes: !preferences.showMistakes });
@@ -133,7 +239,12 @@ export const GameProvider = ({ children }) => {
         ...gameState,
         startNewGame: startNewGameWrapper,
         stats,
+        resetStats,
         // Preferences
+        username: preferences.username,
+        joinDate: preferences.joinDate,
+        lastActive: preferences.lastActive,
+        setUsername,
         theme: preferences.theme,
         setTheme,
         showTimer: preferences.showTimer,
@@ -148,5 +259,3 @@ export const GameProvider = ({ children }) => {
         </GameContext.Provider>
     );
 };
-
-

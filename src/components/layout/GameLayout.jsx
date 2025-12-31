@@ -13,6 +13,7 @@ const GameLayout = ({
     footer,
     installPWA,
     onSettingsClick,
+    onUserProfileClick,
     onNewGameClick // Passed down for the buttons
 }) => {
     return (
@@ -24,6 +25,16 @@ const GameLayout = ({
             {/* Top Right Controls (Fixed) */}
             <div className="absolute top-2 right-2 sm:top-4 sm:right-4 z-50 flex flex-col gap-2">
                 <ThemePicker />
+                <button
+                    onClick={onUserProfileClick}
+                    className="p-2 rounded-full transition-all shadow-sm border hover:brightness-95 active:scale-95"
+                    style={{ backgroundColor: 'var(--bg-panel)', borderColor: 'var(--border-thin)', color: 'var(--text-base)' }}
+                    title="User Profile"
+                >
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                        <path fillRule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clipRule="evenodd" />
+                    </svg>
+                </button>
                 <button
                     onClick={onSettingsClick}
                     className="p-2 rounded-full transition-all shadow-sm border hover:brightness-95 active:scale-95"
