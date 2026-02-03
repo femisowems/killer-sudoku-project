@@ -152,7 +152,7 @@ export function generateCages(difficulty = 'medium', solutionBoard) {
                     // Find the cage containing this neighbor
                     const neighborCage = cages.find(g => g !== cages[i] && g.cells.some(([cr, cc]) => cr === nr && cc === nc));
 
-                    if (neighborCage && neighborCage.cells.length < 8) {
+                    if (neighborCage && neighborCage.cells.length <= maxCageSize) {
                         // UNIQUNESS CHECK
                         if (solutionBoard) {
                             // Check if neighbor cage already has 'val'
